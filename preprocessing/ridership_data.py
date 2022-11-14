@@ -16,12 +16,4 @@ class RidershipData(DataBase):
     def read_data(self):
         raw_df = self.raw_data.read_data()
         
-        return raw_df
-    
-    
-
-if __name__ == '__main__':
-    print(os.getcwd())
-    RRD = RawRidershipData('data/ridership_data/SFMTA.xlsx', 'SF')
-    RD = RidershipData(RRD)
-    print(RD.read_data())
+        return raw_data
