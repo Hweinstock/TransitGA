@@ -11,7 +11,7 @@ class RidershipData(DataBase):
 
     def __init__(self, raw_data : RawRidershipData):
         self.raw_data = raw_data
-        DataBase.__init__(raw_data.filepath, raw_data.city_name)
+        DataBase.__init__(self, raw_data.filepath, raw_data.city_name)
 
     def read_data(self):
         raw_df = self.raw_data.read_data()
@@ -21,6 +21,7 @@ class RidershipData(DataBase):
     
 
 if __name__ == '__main__':
-    RRD = RawRidershipData('data/ridership_data/SFMTA.xlsx')
+    print(os.getcwd())
+    RRD = RawRidershipData('data/ridership_data/SFMTA.xlsx', 'SF')
     RD = RidershipData(RRD)
     print(RD.read_data())
