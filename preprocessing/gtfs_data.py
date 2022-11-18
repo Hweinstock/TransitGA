@@ -4,6 +4,8 @@ from pathlib import Path
 
 from root_logger import RootLogger
 from preprocessing.data import DataBase
+from gtfs_objects.trips import Trip
+from gtfs_objects.routes import Route
 
 
 class GTFSData(DataBase):
@@ -15,21 +17,17 @@ class GTFSData(DataBase):
 
     def read_data(self):
         return self.feed
-    
-    def get_trips_for_route(self, routes: List[str], fixed_direction=0):
-        trips = self.read_data().trips 
-        trip_ids = {}
+
+    def set_trips_for_all_routes(self, routes: List[Route]):
+        """
+        Modifies routes in place to add trips associated with them to their corresponding objects. 
+
+        Args:
+            routes (List[Route]): List of Routes to update. 
+        """
+        trips_df = self.read_data().trips 
         for route in routes:
-            # Look at all trips on specified route. 
-            # Extract out trip_id
-            trip_id_for_route= trips.loc[(trips['route_id'] == route) & (trips['direction_id'] == fixed_direction)]['trip_id'].tolist()
-            unique_trip_ids = list(set(trip_id_for_route))
-            if unique_trip_ids == []:
-                RootLogger.log_warning(f'No trips found for id {route}')
-            else:
-                RootLogger.log_info(f'Successfully matched {len(unique_trip_ids)} trips to {route}')
-            trip_ids[route] = unique_trip_ids
-        return trip_ids
+            route.get_trips_for_route(trips_df)
     
     def get_stops_for_trip_id(self, trip_id: str):
         stop_times_df = self.read_data().stop_times

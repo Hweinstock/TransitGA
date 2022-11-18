@@ -57,7 +57,7 @@ class RidershipData(DataBase):
         gtfs_routes_df = gtfs.read_data().routes
         print(ridership_df.columns)
         matched_routes = []
-        
+
         for index, row in ridership_df.iterrows():
             route_id = row['route_id']
             result = gtfs_routes_df.loc[(gtfs_routes_df['route_id'] == route_id)]
@@ -66,12 +66,17 @@ class RidershipData(DataBase):
             else:
                 if len(result.index) > 1:
                     RootLogger.log_warning(f'Matched multiple routes with {route_id}, taking first found.')
-                else:
-                    RootLogger.log_info(f'Successfuly found route with id {route_id}')
 
                 route = result.iloc[0]
+                route_type = route['route_type']
+
+                if route_type != 3:
+                    RootLogger.log_debug(f'Found non-bus route, dropping route with id {route_id}')
+                    continue
+                
+                RootLogger.log_info(f'Successfuly found route with id {route_id}')
                 route_long_name = route['route_long_name']
-                new_route = Route(id=route_id, name=route_long_name)
+                new_route = Route(id=route_id, name=route_long_name, city_name=self.city_name)
                 matched_routes.append(new_route)
         
         return matched_routes

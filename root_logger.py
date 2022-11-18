@@ -15,7 +15,10 @@ class RootLogger:
     LEVEL = logging.INFO
 
     def log_info(msg):
-        logging.info(f'{bcolors.OKGREEN}{msg}{bcolors.ENDC}')
+        logging.info(f'{bcolors.OKBLUE}{msg}{bcolors.ENDC}')
     
     def log_warning(msg):
         logging.warning(f'{bcolors.WARNING}{msg}{bcolors.ENDC}')
+    
+    def log_debug(msg):
+        logging.debug(f'{bcolors.OKGREEN}{msg}{bcolors.ENDC}')
