@@ -1,10 +1,9 @@
 from typing import List
-from root_logger import RootLogger
-import math 
-
-from preprocessing.data import DataBase
 import gtfs_kit as gk
 from pathlib import Path
+
+from root_logger import RootLogger
+from preprocessing.data import DataBase
 
 
 class GTFSData(DataBase):
