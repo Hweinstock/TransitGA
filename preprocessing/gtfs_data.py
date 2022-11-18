@@ -1,5 +1,6 @@
 from typing import List
 from root_logger import RootLogger
+import math 
 
 from preprocessing.data import DataBase
 import gtfs_kit as gk
@@ -31,7 +32,17 @@ class GTFSData(DataBase):
                 RootLogger.log_info(f'Successfully matched {len(unique_trip_ids)} trips to {route}')
             trip_ids[route] = unique_trip_ids
         return trip_ids
-        
+    
+    def get_stops_for_trip_id(self, trip_id: str):
+        stop_times_df = self.read_data().stop_times
+        resulting_stops = stop_times_df.loc[(stop_times_df['trip_id'] == trip_id)]
+        stations=[]
+        for index, row in resulting_stops.iterrows():
+            station_id = row['stop_id']
+            trip_sequence = row['stop_sequence']
+            stations.append((station_id, trip_sequence))
+
+        return stations
 
             
     
