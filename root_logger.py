@@ -13,3 +13,9 @@ class bcolors:
 
 class RootLogger:
     LEVEL = logging.INFO
+
+    def log_info(msg):
+        logging.info(f'{bcolors.OKGREEN}{msg}{bcolors.ENDC}')
+    
+    def log_warning(msg):
+        logging.warning(f'{bcolors.WARNING}{msg}{bcolors.ENDC}')
