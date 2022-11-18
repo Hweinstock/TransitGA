@@ -1,5 +1,11 @@
 import pandas as pd  
+import logging 
+
+from root_logger import bcolors, RootLogger
 from preprocessing.data import DataBase
+from preprocessing.gtfs_data import GTFSData
+
+logging.basicConfig(level=RootLogger.LEVEL)
 
 class RawRidershipData(DataBase):
 
@@ -33,5 +39,19 @@ class RidershipData(DataBase):
             total_ridership_data.append((route_id, route_name, total_ridership))
         new_data = pd.DataFrame(total_ridership_data, 
                     columns=['route_id', 'route_name', 'total_ridership'])
-                    
+
         return new_data
+    
+    def match_id_with_gtfs(self, gtfs: GTFSData):
+        ridership_df = self.read_data() 
+        gtfs_routes_df = gtfs.read_data().routes
+
+        for index, row in ridership_df.iterrows():
+            route_id = row['route_id']
+            result = gtfs_routes_df.loc[(gtfs_routes_df['route_id'] == route_id)]
+            if result.empty:
+                logging.warning(f'{bcolors.WARNING}Failed to find route with id {route_id}{bcolors.ENDC}')
+            else:
+                logging.info(f'{bcolors.OKGREEN}Succesfully found route with id {route_id}{bcolors.ENDC}')
+
+            
