@@ -17,9 +17,8 @@ class GTFSData(DataBase):
     def read_data(self):
         return self.feed
     
-    def get_trips_for_route(self, routes: List[str]):
+    def get_trips_for_route(self, routes: List[str], fixed_direction=0):
         trips = self.read_data().trips 
-        fixed_direction = 0
         trip_ids = {}
         for route in routes:
             # Look at all trips on specified route. 
