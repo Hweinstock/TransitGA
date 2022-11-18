@@ -1,5 +1,6 @@
 import pandas as pd  
 import logging 
+from typing import List
 
 from root_logger import bcolors, RootLogger
 from preprocessing.data import DataBase
@@ -41,16 +42,20 @@ class RidershipData(DataBase):
 
         return new_data
     
-    def match_id_with_gtfs(self, gtfs: GTFSData):
+    def get_matched_ids_from_gtfs(self, gtfs: GTFSData) -> List[str]:
         ridership_df = self.read_data() 
         gtfs_routes_df = gtfs.read_data().routes
 
+        matched_routes = []
         for index, row in ridership_df.iterrows():
             route_id = row['route_id']
             result = gtfs_routes_df.loc[(gtfs_routes_df['route_id'] == route_id)]
             if result.empty:
-                RootLogger.log_warning(f'Failed to find route with id {route_id}')
+                RootLogger.log_warning(f'Failed to match route with id {route_id}')
             else:
                 RootLogger.log_info(f'Successfuly found route with id {route_id}')
+                matched_routes.append(route_id)
+        
+        return matched_routes
 
             

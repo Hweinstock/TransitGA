@@ -9,4 +9,5 @@ RD = RidershipData(RRD)
 RD.export_data()
 
 SF_GTFS = GTFSData('data/gtfs_data/SFMTA.zip', 'SF')
-RD.match_id_with_gtfs(SF_GTFS)
+matched_routes = RD.get_matched_ids_from_gtfs(SF_GTFS)
+trips_from_routes = SF_GTFS.get_trips_for_route(matched_routes)
