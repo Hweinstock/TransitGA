@@ -70,7 +70,7 @@ class RidershipData(DataBase):
                 route_type = route['route_type']
 
                 if route_type != 3:
-                    RootLogger.log_debug(f'Found non-bus route, dropping route with id {route_id}')
+                    RootLogger.log_info(f'Found non-bus route, dropping route with id {route_id}')
                     continue
                 
                 RootLogger.log_info(f'Successfuly found route with id {route_id}')

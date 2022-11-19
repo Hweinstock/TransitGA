@@ -20,7 +20,8 @@ class GTFSData(DataBase):
 
     def set_trips_for_all_routes(self, routes: List[Route]):
         """
-        Modifies routes in place to add trips associated with them to their corresponding objects. 
+        Modifies route objects in place to add trips associated with them. 
+        Only adds trips with unique shape_ids. 
 
         Args:
             routes (List[Route]): List of Routes to update. 
