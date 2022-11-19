@@ -55,14 +55,13 @@ class RidershipData(DataBase):
         """
         ridership_df = self.read_data() 
         gtfs_routes_df = gtfs.read_data().routes
-        print(ridership_df.columns)
         matched_routes = []
 
         for index, row in ridership_df.iterrows():
             route_id = row['route_id']
             result = gtfs_routes_df.loc[(gtfs_routes_df['route_id'] == route_id)]
             if result.empty:
-                RootLogger.log_warning(f'Failed to match route with id {route_id}')
+                RootLogger.log_warning(f'Failed to match route with id {route_id}, dropping it.')
             else:
                 if len(result.index) > 1:
                     RootLogger.log_warning(f'Matched multiple routes with {route_id}, taking first found.')
@@ -76,7 +75,11 @@ class RidershipData(DataBase):
                 
                 RootLogger.log_info(f'Successfuly found route with id {route_id}')
                 route_long_name = route['route_long_name']
-                new_route = Route(id=route_id, name=route_long_name, city_name=self.city_name)
+                ridership = row['total_ridership']
+                new_route = Route(id=route_id, 
+                                  name=route_long_name, 
+                                  city_name=self.city_name, 
+                                  ridership=ridership)
                 matched_routes.append(new_route)
         
         return matched_routes
