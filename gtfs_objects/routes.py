@@ -9,6 +9,7 @@ class Route:
         self.city_name = city_name
         self.trips = []
         self.ridership = ridership
+        self.shapes_covered = {}
     
     def add_trips(self, trips):
         self.trips += trips
@@ -29,17 +30,22 @@ class Route:
             trip_headwaysign = row['trip_headsign']
             shape_id = row['shape_id']
             direction_id = row['direction_id']
-            new_trip = Trip(trip_id=trip_id, 
-                            route_id=route_id, 
-                            message=trip_headwaysign, 
-                            shape_id=shape_id, 
-                            direction= direction_id)
-            trip_objects.append(new_trip)
+
+            if shape_id not in self.shapes_covered:
+                new_trip = Trip(trip_id=trip_id, 
+                                route_id=route_id, 
+                                message=trip_headwaysign, 
+                                shape_id=shape_id, 
+                                direction= direction_id)
+                trip_objects.append(new_trip)
+                self.shapes_covered[shape_id] = True 
+                RootLogger.log_debug(f'Matched shape_id {shape_id} to route {route_id}')
+
 
         if trip_objects == []:
             RootLogger.log_warning(f'No trips found for id {self.id}')
         else:
-            RootLogger.log_info(f'Successfully matched {len(trip_objects)} trips to route {self.id}')
+            RootLogger.log_info(f'Successfully matched {len(trip_objects)} unique trips to route {self.id}')
 
         self.add_trips(trip_objects)
     
