@@ -11,6 +11,9 @@ RD.export_data()
 SF_GTFS = GTFSData('data/gtfs_data/SFMTA.zip', 'SF')
 matched_routes = RD.get_matched_ids_from_gtfs(SF_GTFS)
 SF_GTFS.set_trips_for_all_routes(matched_routes)
+
+for route in matched_routes:
+    print(route.display_trips())
 # Next step is to trim the shapes associated with each route. 
 
 # first_trip = trips_from_routes['1'][0]
