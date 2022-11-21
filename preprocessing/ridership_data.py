@@ -5,7 +5,7 @@ from typing import List
 from root_logger import bcolors, RootLogger
 from preprocessing.data import DataBase
 from preprocessing.gtfs_data import GTFSData
-from gtfs_objects.routes import Route
+from gtfs_objects.routes import GTFSRoute
 
 logging.basicConfig(level=RootLogger.LEVEL)
 
@@ -76,7 +76,7 @@ class RidershipData(DataBase):
                 RootLogger.log_info(f'Successfuly found route with id {route_id}')
                 route_long_name = route['route_long_name']
                 ridership = row['total_ridership']
-                new_route = Route(id=route_id, 
+                new_route = GTFSRoute(id=route_id, 
                                   name=route_long_name, 
                                   city_name=self.city_name, 
                                   ridership=ridership)

@@ -4,21 +4,26 @@ import pandas as pd
 from gtfs_objects.trips import Trip
 from root_logger import RootLogger
 
-class Route:
-    
-    def __init__(self, id, name, city_name, ridership):
+class BaseRoute:
+
+    def __init__(self, id: str, name: str, city_name: str, ridership: int):
         self.id = id 
         self.name = name
         self.city_name = city_name
-        self.trips = []
         self.ridership = ridership
+    
+    def __str__(self):
+        return f'(route_id: {self.id}, route_name: {self.name}, ridership: {self.ridership})'
+
+class GTFSRoute(BaseRoute):
+    
+    def __init__(self, id: str, name: str, city_name: str, ridership: int):
+        BaseRoute.__init__(id, name, city_name, ridership)
+        self.trips = []
         self.shapes_covered = {}
     
     def add_trips(self, trips):
         self.trips += trips
-
-    def __str__(self):
-        return f'(route_id: {self.id}, route_name: {self.name}, ridership: {self.ridership})'
     
     def display_trips(self):
         return ''.join([f'{t}\n' for t in self.trips])
@@ -87,5 +92,10 @@ class Route:
 
         return max_trips
 
-            
-    
+class SimpleRoute(BaseRoute):
+
+    def __init__(self, id: str, name: str, city_name: str, ridership: int):
+        BaseRoute.__init__(id, name, city_name, ridership)
+
+def simplify_route(route: GTFSRoute) -> SimpleRoute:
+    pass

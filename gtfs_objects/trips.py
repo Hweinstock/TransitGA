@@ -1,5 +1,8 @@
 #from preprocessing.gtfs_data import GTFSData
+
+from typing import List
 import pandas as pd 
+
 from gtfs_objects.stops import Stop, stop_from_stop_row_data
 from root_logger import RootLogger
 
@@ -14,7 +17,7 @@ class Trip:
         self.stops = []
 
 
-    def get_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame):
+    def get_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
         Return a list of stop ids associated with trip. 
 
