@@ -13,6 +13,10 @@ class BaseRoute:
         self.name = name
         self.city_name = city_name
         self.ridership = ridership
+        self.trips = []
+    
+    def add_trips(self, trips):
+        self.trips += trips
     
     def __str__(self):
         return f'(route_id: {self.id}, route_name: {self.name}, ridership: {self.ridership})'
@@ -21,11 +25,7 @@ class GTFSRoute(BaseRoute):
     
     def __init__(self, id: str, name: str, city_name: str, ridership: int):
         BaseRoute.__init__(self, id=id, name=name, city_name=city_name, ridership=ridership)
-        self.trips = []
         self.shapes_covered = {}
-    
-    def add_trips(self, trips):
-        self.trips += trips
     
     def display_trips(self):
         return ''.join([f'{t}\n' for t in self.trips])
@@ -105,4 +105,9 @@ class GTFSRoute(BaseRoute):
 class SimpleRoute(BaseRoute):
 
     def __init__(self, id: str, name: str, city_name: str, ridership: int):
-        BaseRoute.__init__(id, name, city_name, ridership)
+        BaseRoute.__init__(self, id, name, city_name, ridership)
+
+def simplify_route(OriginalRoute: GTFSRoute) -> SimpleRoute:
+    Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name, OriginalRoute.city_name, OriginalRoute.ridership)
+    Simple.add_trips(OriginalRoute.trips)
+    return Simple

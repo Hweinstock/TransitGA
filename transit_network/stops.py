@@ -27,7 +27,7 @@ class Stop:
 
     def is_transfer(self):
         if len(self.routes) == 0:
-            RootLogger.log_warning(f'Stop {self.id} has no stops!')
+            RootLogger.log_warning(f'Stop {self.id} with parent {self.parent_id} has no routes!')
         return len(self.routes) > 1
     
     def get_id(self):
