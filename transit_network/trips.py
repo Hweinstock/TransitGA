@@ -16,6 +16,9 @@ class Trip:
         self.direction = direction
         self.stops = [] # In Tuple format: (Stop, seq in trip)
 
+    @property
+    def ridership(self):
+        return sum([s.ridership for s in self.stops])
 
     def update_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
@@ -64,4 +67,5 @@ class Trip:
         route_id: {self.route_id}, \
         message: {self.message}, \
         shape_id: {self.shape_id}, \
-        direction: {self.direction}'
+        direction: {self.direction}, \
+        ridership: {self.ridership}'

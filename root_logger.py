@@ -12,7 +12,7 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 class RootLogger:
-    LEVEL = logging.DEBUG
+    LEVEL = logging.ERROR
 
     def log_info(msg):
         logging.info(f'{bcolors.OKBLUE}{msg}{bcolors.ENDC}')

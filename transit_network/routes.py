@@ -8,27 +8,27 @@ from root_logger import RootLogger
 
 class BaseRoute:
 
-    def __init__(self, id: str, name: str, city_name: str, ridership: int):
+    def __init__(self, id: str, name: str, city_name: str):
         self.id = id 
         self.name = name
         self.city_name = city_name
-        self.ridership = ridership
         self.trips = []
     
     def add_trips(self, trips):
         self.trips += trips
     
+    def display_trips(self):
+        return ''.join([f'{t}\n' for t in self.trips])
+    
     def __str__(self):
-        return f'(route_id: {self.id}, route_name: {self.name}, ridership: {self.ridership})'
+        return f'(route_id: {self.id}, route_name: {self.name}, trips: {self.display_trips()})'
 
 class GTFSRoute(BaseRoute):
     
     def __init__(self, id: str, name: str, city_name: str, ridership: int):
-        BaseRoute.__init__(self, id=id, name=name, city_name=city_name, ridership=ridership)
+        BaseRoute.__init__(self, id=id, name=name, city_name=city_name)
+        self.ridership = ridership
         self.shapes_covered = {}
-    
-    def display_trips(self):
-        return ''.join([f'{t}\n' for t in self.trips])
 
     def get_trips_for_route(self, trips_df: pd.DataFrame, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame):
 
@@ -101,13 +101,23 @@ class GTFSRoute(BaseRoute):
             RootLogger.log_warning(f'Asymetric trips found of length {max_len[0]} and {max_len[1]} for route {cur_trip.route_id}')
 
         return max_trips
+    
+    def __str__(self):
+        BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 class SimpleRoute(BaseRoute):
 
-    def __init__(self, id: str, name: str, city_name: str, ridership: int):
-        BaseRoute.__init__(self, id, name, city_name, ridership)
+    def __init__(self, id: str, name: str, city_name: str):
+        BaseRoute.__init__(self, id, name, city_name)
+    
+    @property
+    def ridership(self):
+        return sum([t.ridership for t in self.trips])
+    
+    def __str__(self):
+        BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 def simplify_route(OriginalRoute: GTFSRoute) -> SimpleRoute:
-    Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name, OriginalRoute.city_name, OriginalRoute.ridership)
+    Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name, OriginalRoute.city_name)
     Simple.add_trips(OriginalRoute.trips)
     return Simple

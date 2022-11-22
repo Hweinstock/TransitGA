@@ -21,6 +21,7 @@ class Stop:
         self.parent_id = parent_id
         self.matches_trips = []
         self.routes = []
+        self.ridership = 0
     
     def add_transfer_route(self, new_route: str):
         self.routes += [new_route]
@@ -38,5 +39,5 @@ class Stop:
 
 
     def __str__(self) -> str:
-        return f'(stop_id: {self.stop_id}, stop_name: {self.stop_name}, parent_stop: {self.parent_id}'
+        return f'(stop_id: {self.id}, stop_name: {self.name}, parent_stop: {self.parent_id}, routes: {self.routes})'
     
