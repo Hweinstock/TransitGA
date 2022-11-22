@@ -4,7 +4,7 @@ from pathlib import Path
 
 from root_logger import RootLogger
 from preprocessing.data import DataBase
-from gtfs_objects.routes import Route
+from transit_network.routes import GTFSRoute
 
 
 class GTFSData(DataBase):
@@ -17,7 +17,7 @@ class GTFSData(DataBase):
     def read_data(self):
         return self.feed
 
-    def set_trips_for_all_routes(self, routes: List[Route]):
+    def set_trips_for_all_routes(self, routes: List[GTFSRoute]):
         """
         Modifies route objects in place to add trips associated with them. 
         Only adds trips with unique shape_ids. 
@@ -30,7 +30,6 @@ class GTFSData(DataBase):
         stops_df = self.read_data().stops
         for route in routes:
             route.get_trips_for_route(trips_df, stop_times_df, stops_df)
-
-            
+    
     
     

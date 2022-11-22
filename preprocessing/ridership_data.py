@@ -5,7 +5,7 @@ from typing import List
 from root_logger import bcolors, RootLogger
 from preprocessing.data import DataBase
 from preprocessing.gtfs_data import GTFSData
-from gtfs_objects.routes import GTFSRoute
+from transit_network.routes import GTFSRoute
 
 logging.basicConfig(level=RootLogger.LEVEL)
 
@@ -43,7 +43,7 @@ class RidershipData(DataBase):
 
         return new_data
     
-    def get_matched_ids_from_gtfs(self, gtfs: GTFSData) -> List[Route]:
+    def get_matched_ids_from_gtfs(self, gtfs: GTFSData) -> List[GTFSRoute]:
         """
         Parse through GTFS data to determine which ridership routes are in GTFS data. 
 

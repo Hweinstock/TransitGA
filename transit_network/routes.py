@@ -1,7 +1,9 @@
 from typing import List
 import pandas as pd 
 
-from gtfs_objects.trips import Trip
+from transit_network.trips import Trip
+from transit_network.stops import Stop 
+
 from root_logger import RootLogger
 
 class BaseRoute:
@@ -18,7 +20,7 @@ class BaseRoute:
 class GTFSRoute(BaseRoute):
     
     def __init__(self, id: str, name: str, city_name: str, ridership: int):
-        BaseRoute.__init__(id, name, city_name, ridership)
+        BaseRoute.__init__(self, id=id, name=name, city_name=city_name, ridership=ridership)
         self.trips = []
         self.shapes_covered = {}
     
@@ -58,6 +60,14 @@ class GTFSRoute(BaseRoute):
         longest_trips = self.get_longest_trips(trip_objects, stop_times_df, stops_df)
         self.add_trips(longest_trips)
     
+    def get_all_stops(self) -> List[Stop]:
+        all_stops = []
+        for trip in self.trips:
+            all_stops += [s[0] for s in trip.stops]
+        
+        return all_stops
+
+
     def get_longest_trips(self, trip_objects: List[Trip], stop_times_df: pd.DataFrame, stops_df:pd.DataFrame):
         """
         Take the longest trips in each direction and assign them to the route. 
@@ -77,7 +87,7 @@ class GTFSRoute(BaseRoute):
         max_trips = [None, None]
 
         for cur_trip in trip_objects:
-            stops = cur_trip.get_stops(stop_times_df, stops_df)
+            stops = cur_trip.update_stops(stop_times_df, stops_df)
             trip_len = len(stops)
             trip_dir = cur_trip.direction
 
@@ -96,6 +106,3 @@ class SimpleRoute(BaseRoute):
 
     def __init__(self, id: str, name: str, city_name: str, ridership: int):
         BaseRoute.__init__(id, name, city_name, ridership)
-
-def simplify_route(route: GTFSRoute) -> SimpleRoute:
-    pass

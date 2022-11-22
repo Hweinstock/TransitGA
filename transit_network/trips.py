@@ -3,7 +3,7 @@
 from typing import List
 import pandas as pd 
 
-from gtfs_objects.stops import Stop, stop_from_stop_row_data
+from transit_network.stops import Stop, stop_from_stop_row_data
 from root_logger import RootLogger
 
 class Trip:
@@ -14,10 +14,10 @@ class Trip:
         self.message = message
         self.shape_id = shape_id 
         self.direction = direction
-        self.stops = []
+        self.stops = [] # In Tuple format: (Stop, seq in trip)
 
 
-    def get_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
+    def update_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
         Return a list of stop ids associated with trip. 
 
