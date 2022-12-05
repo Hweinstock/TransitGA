@@ -1,13 +1,10 @@
 import pandas as pd  
-import logging 
 from typing import List
 
-from root_logger import bcolors, RootLogger
+from root_logger import RootLogger
 from preprocessing.data import DataBase
 from preprocessing.gtfs_data import GTFSData
 from transit_network.routes import GTFSRoute
-
-logging.basicConfig(level=RootLogger.LEVEL)
 
 class RawRidershipData(DataBase):
 

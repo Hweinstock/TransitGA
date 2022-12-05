@@ -1,30 +1,46 @@
 from typing import List 
 
 from root_logger import RootLogger
+from transit_network.shapes import ShapePoint
 
 def stop_from_stop_row_data(row):
     id = row['stop_id']
+    stop_lat = row['stop_lat']
+    stop_lon = row['stop_lon']
     stop_name = row['stop_name']
     if 'parent_station' in row:
         parent_station = row['parent_station']
     else:
         parent_station = None 
     
-    return Stop(id= id, name=stop_name, parent_id=parent_station)
+    return Stop(id= id, name=stop_name, location=(stop_lat, stop_lon), parent_id=parent_station)
 
 
 class Stop:
 
-    def __init__(self, id, name, parent_id=None):
+    def __init__(self, id, name, location, parent_id=None):
         self.id = id 
         self.name = name
         self.parent_id = parent_id
         self.matches_trips = []
         self.routes = []
         self.ridership = 0
+        self.location = location
     
     def add_transfer_route(self, new_route: str):
         self.routes += [new_route]
+
+    @property
+    def location_lat(self):
+        return self.location[0]
+
+    @property
+    def location_lon(self):
+        return self.location[1]
+
+    def distance_to_point(self, point: ShapePoint):
+        # Standard distance formula for two points in two dimensions
+        return abs((point.lat-self.location_lat)**2 + (point.lon-self.location_lon)**2)**(0.5)
 
     def is_transfer(self):
         if len(self.routes) == 0:

@@ -15,3 +15,5 @@ class RootLogger:
     
     def log_error(msg):
         logging.error(f'{Fore.RED}{msg}{Style.RESET_ALL}')
+
+logging.basicConfig(level=RootLogger.LEVEL)

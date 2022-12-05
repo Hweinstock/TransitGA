@@ -1,7 +1,7 @@
 from typing import List
 import pandas as pd 
 
-from transit_network.trips import Trip
+from transit_network.trips import GTFSTrip, SimpleTrip, BaseTrip
 from transit_network.stops import Stop 
 
 from root_logger import RootLogger
@@ -14,7 +14,7 @@ class BaseRoute:
         self.city_name = city_name
         self.trips = []
     
-    def add_trips(self, trips):
+    def add_trips(self, trips: BaseTrip):
         self.trips += trips
     
     def display_trips(self):
@@ -41,7 +41,7 @@ class GTFSRoute(BaseRoute):
             direction_id = row['direction_id']
 
             if shape_id not in self.shapes_covered:
-                new_trip = Trip(trip_id=row['trip_id'], 
+                new_trip = GTFSTrip(trip_id=row['trip_id'], 
                                 route_id=row['route_id'], 
                                 message=row['trip_headsign'], 
                                 shape_id=shape_id, 
@@ -68,7 +68,7 @@ class GTFSRoute(BaseRoute):
         return all_stops
 
 
-    def get_longest_trips(self, trip_objects: List[Trip], stop_times_df: pd.DataFrame, stops_df:pd.DataFrame):
+    def get_longest_trips(self, trip_objects: List[GTFSTrip], stop_times_df: pd.DataFrame, stops_df:pd.DataFrame):
         """
         Take the longest trips in each direction and assign them to the route. 
         This ensures we have a 2-1 mapping of trips to routes. 
@@ -117,7 +117,7 @@ class SimpleRoute(BaseRoute):
     def __str__(self):
         BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
-def simplify_route(OriginalRoute: GTFSRoute) -> SimpleRoute:
+def simplify_route(OriginalRoute: GTFSRoute, simple_trips: List[SimpleTrip]) -> SimpleRoute:
     Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name, OriginalRoute.city_name)
-    Simple.add_trips(OriginalRoute.trips)
+    Simple.add_trips(simple_trips)
     return Simple

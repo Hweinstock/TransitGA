@@ -4,22 +4,51 @@ from typing import List
 import pandas as pd 
 
 from transit_network.stops import Stop, stop_from_stop_row_data
+from transit_network.shapes import ShapePoint
 from root_logger import RootLogger
 
-class Trip:
-
-    def __init__(self, trip_id, route_id, message, shape_id, direction):
+class BaseTrip:
+    
+    def __init__(self, trip_id, route_id, message, direction):
         self.id = trip_id
         self.route_id = route_id
         self.message = message
-        self.shape_id = shape_id 
         self.direction = direction
-        self.stops = [] # In Tuple format: (Stop, seq in trip)
-
+    
     @property
     def ridership(self):
         return sum([s.ridership for s in self.stops])
+    
+    def display_stops(self):
+        result_str= '['
+        for stop_id, order in self.stops[:-1]:
+            result_str += f'{stop_id} -> '
+        
+        result_str += str(self.stops[-1][0])
+        return result_str + ']'
 
+
+class SimpleTrip(BaseTrip):
+
+    def __init__(self, trip_id, route_id, message, direction, shape_points, stops, ridership):
+        BaseTrip.__init__(self, trip_id, route_id, message, direction)
+        self.stops = stops
+        self.shape_points = shape_points
+        
+
+
+class GTFSTrip(BaseTrip):
+
+    def __init__(self, trip_id, route_id, message, shape_id, direction):
+        BaseTrip.__init__(self, trip_id, route_id, message, direction)
+        self.shape_id = shape_id 
+        self.stops = [] # In Tuple format: (Stop, seq in trip)
+
+    def set_stops(self, stops: List[Stop], shapes_df: pd.DataFrame):
+        self.stops = stops
+
+    
+    
     def update_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
         Return a list of stop ids associated with trip. 
@@ -53,14 +82,6 @@ class Trip:
 
         self.stops = stations
         return stations
-    
-    def display_stops(self):
-        result_str= '['
-        for stop_id, order in self.stops[:-1]:
-            result_str += f'{stop_id} -> '
-        
-        result_str += str(self.stops[-1][0])
-        return result_str + ']'
 
     def __str__(self):
         return f'(trip_id: {self.id}, \
@@ -69,3 +90,73 @@ class Trip:
         shape_id: {self.shape_id}, \
         direction: {self.direction}, \
         ridership: {self.ridership}'
+
+
+def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) -> List[List[ShapePoint]]:
+    partition = []
+    cur_stop_points = []
+
+    num_stops = len(stops)
+    num_points = len(shape_points)
+
+    cur_closest_stop_index = 0
+    prev_dist_to_stop = 0
+
+
+    for point in shape_points:
+        # Current stop that is closest
+        closest_stop = stops[cur_closest_stop_index]
+
+        # Distance from stop to ShapePoint 
+        cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
+
+        if cur_dist_to_cur_stop == 0:
+            RootLogger.log_debug(f'Found shape point on top of stop!')
+
+        # If this distance is increasing i.e. we are moving away from stop, move to next stop. 
+        if cur_dist_to_cur_stop > prev_dist_to_stop:
+            partition.append(cur_stop_points)
+
+            cur_stop_points = []
+            cur_closest_stop_index += 1
+            if cur_closest_stop_index == num_stops:
+                cur_closest_stop_index -= 1
+                RootLogger.log_warning(f'Hit final stop, but at point {point.sequence_num} out of {num_points}. \
+                    decrementing cur_closest_stop_index')
+
+            closest_stop = stops[cur_closest_stop_index]
+            cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
+
+        prev_dist_to_stop = cur_dist_to_cur_stop
+        cur_stop_points.append(point)
+    
+    # Add final stop
+    partition.append(cur_stop_points)
+    cur_closest_stop_index += 1
+
+    if cur_closest_stop_index < num_stops:
+        RootLogger.log_error(f'Invalid partition generated for stops. Made it to stop {cur_closest_stop_index} out of {num_stops}')
+    return partition
+
+def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridership: int, shape_points: List[ShapePoint]) -> SimpleTrip:
+
+    seperated_shape_points = partition_shape_points(shape_points, new_stops)
+    trip_ridership = route_ridership / 2.0
+    assign_ridership_to_stops(new_stops, trip_ridership)
+    NewTrip = SimpleTrip(trip_id=original_trip.id, 
+                              route_id=original_trip.route_id,
+                              message=original_trip.message, 
+                              direction=original_trip.direction, 
+                              shape_points=seperated_shape_points,
+                              stops=new_stops, 
+                              ridership= trip_ridership)
+    return NewTrip
+
+
+def assign_ridership_to_stops(StopList: List[Stop], trip_ridership: int):
+    num_of_stops = len(StopList)
+
+    # We incremement since transfer stops will naturally occur multiple times. 
+    # This rewards transfer stops by counting them on each route they transfer for. 
+    for stop in StopList:
+        stop.ridership += trip_ridership / num_of_stops
