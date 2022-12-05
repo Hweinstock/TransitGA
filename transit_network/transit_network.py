@@ -46,6 +46,8 @@ class TransitNetwork:
 
         return f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
 
+    def to_gtfs(self):
+        pass
 
 
 def determine_transfers(routes: List[GTFSRoute]):
