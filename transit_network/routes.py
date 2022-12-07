@@ -22,6 +22,12 @@ class BaseRoute:
     
     def __str__(self):
         return f'(route_id: {self.id}, route_name: {self.name}, trips: {self.display_trips()})'
+    
+    def to_gtfs_row(self):
+        # 3 marks the route type (bus), which is the only type parsed. 
+        return [self.id, self.name, self.name, 3]
+
+
 
 class GTFSRoute(BaseRoute):
     

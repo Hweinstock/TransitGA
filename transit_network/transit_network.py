@@ -1,5 +1,6 @@
 from typing import List 
 import pandas as pd 
+import os
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop 
@@ -10,6 +11,11 @@ from root_logger import RootLogger
 
 
 class TransitNetwork:
+    
+    route_file_headers = ['route_id' ,'route_short_name', 'route_long_name', 'route_type']
+    trips_file_headers = ['route_id', 'service_id', 'trip_id', 'direction_id', 'shape_id', 'trip_headsign']
+    stop_times_file_headers = ['trip_id', 'arrival_time', 'depature_time', 'stop_id', 'stop_sequence']
+    shapes_file_headers = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_sequence']
 
     def __init__(self, routes: List[SimpleRoute]):
         self.routes = routes
@@ -46,8 +52,42 @@ class TransitNetwork:
 
         return f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
 
-    def to_gtfs(self):
-        pass
+
+    def to_gtfs(self, folder='output_gtfs'):
+
+        def rows_to_file(rows, headers, filename):
+            df = pd.DataFrame(rows, columns=headers)
+            raw_csv_text = df.to_csv(index=False)
+            text_file = os.path.join(folder, filename+'.txt')
+
+            RootLogger.log_debug(f'Outputting gtfs file to {text_file} in directory {folder}.')
+
+            with open(text_file, 'w') as output:
+                output.write(raw_csv_text)
+
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+
+        route_rows = [r.to_gtfs_row() for r in self.routes]
+        rows_to_file(route_rows, self.route_file_headers, 'routes')
+
+        trip_rows = [t.to_gtfs_row() for t in self.trips]
+        rows_to_file(trip_rows, self.trips_file_headers, 'trips')
+
+        shapes_rows = []
+        for trip in self.trips:
+            shapes_rows += trip.get_shapes_rows()
+        rows_to_file(shapes_rows, self.shapes_file_headers, 'shapes')
+
+        stop_rows = []
+        for s in self.stops:
+            stop_rows += s.to_gtfs_rows()
+        rows_to_file(stop_rows, self.stop_times_file_headers, 'stops')
+        
+
+
+
+        
 
 
 def determine_transfers(routes: List[GTFSRoute]):

@@ -34,6 +34,24 @@ class SimpleTrip(BaseTrip):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
+
+    @property
+    def flattened_shape_points(self):
+        return [Point for partition in self.shape_points for Point in partition]
+
+    def to_gtfs_row(self):
+        # Give all trips service id 0, since we don't care about what time they run, only geometry. 
+        # We make shape_id to the same as trip_id with 00 on the end. 
+        return [self.route_id, 0, self.id, self.direction, self.id+'00', self.message]
+    
+    def get_shapes_rows(self):
+        rows = []
+        for index, shape in enumerate(self.flattened_shape_points):
+            shape.sequence_num = index + 1
+            new_row = shape.to_gtfs_row()
+            rows.append(new_row)
+    
+        return rows
         
 
 
@@ -46,8 +64,6 @@ class GTFSTrip(BaseTrip):
 
     def set_stops(self, stops: List[Stop], shapes_df: pd.DataFrame):
         self.stops = stops
-
-    
     
     def update_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
@@ -139,6 +155,11 @@ def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) ->
     return partition
 
 def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridership: int, shape_points: List[ShapePoint]) -> SimpleTrip:
+    
+    # We set the trip sequence values for stop, this is used in exporting to gtfs. 
+    for index, stop in enumerate(new_stops):
+        # want start sequence to start at 1 -> n
+        stop.trip_sequences[original_trip.id] = index + 1 
 
     seperated_shape_points = partition_shape_points(shape_points, new_stops)
     trip_ridership = route_ridership / 2.0

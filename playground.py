@@ -14,7 +14,7 @@ matched_routes = RD.get_matched_ids_from_gtfs(SF_GTFS)
 SF_GTFS.set_trips_for_all_routes(matched_routes)
 
 Network = create_network_from_GTFSRoutes(matched_routes, SF_GTFS.read_data().shapes)
-print(str(Network))
+Network.to_gtfs()
 # Next step is to trim the shapes associated with each route. 
 
 # first_trip = trips_from_routes['1'][0]

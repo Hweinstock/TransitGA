@@ -24,6 +24,7 @@ class Stop:
         self.parent_id = parent_id
         self.matches_trips = []
         self.routes = []
+        self.trip_sequences = {} # This is set when we simplify the trip. 
         self.ridership = 0
         self.location = location
     
@@ -52,6 +53,17 @@ class Stop:
             return self.parent_id 
         else:
             return self.id 
+    
+    def to_gtfs_rows(self):
+        rows = []
+        for trip_id in list(self.trip_sequences.keys()):
+            # set 0, 0 arrival depature since we don't care about time. 
+            cur_row = [trip_id, 0, 0, self.id, self.trip_sequences[trip_id]]
+            rows.append(cur_row)
+        
+        return rows
+
+
 
 
     def __str__(self) -> str:
