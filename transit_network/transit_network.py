@@ -1,6 +1,7 @@
 from typing import List 
 import pandas as pd 
 import os
+import shutil
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop 
@@ -14,7 +15,8 @@ class TransitNetwork:
     
     route_file_headers = ['route_id' ,'route_short_name', 'route_long_name', 'route_type']
     trips_file_headers = ['route_id', 'service_id', 'trip_id', 'direction_id', 'shape_id', 'trip_headsign']
-    stop_times_file_headers = ['trip_id', 'arrival_time', 'depature_time', 'stop_id', 'stop_sequence']
+    stop_times_file_headers = ['trip_id', 'arrival_time', 'departure_time', 'stop_id', 'stop_sequence']
+    stop_file_headers = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'parent_station']
     shapes_file_headers = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_sequence']
 
     def __init__(self, routes: List[SimpleRoute]):
@@ -79,16 +81,16 @@ class TransitNetwork:
             shapes_rows += trip.get_shapes_rows()
         rows_to_file(shapes_rows, self.shapes_file_headers, 'shapes')
 
-        stop_rows = []
+        stop_times_rows = []
         for s in self.stops:
-            stop_rows += s.to_gtfs_rows()
-        rows_to_file(stop_rows, self.stop_times_file_headers, 'stops')
-        
+            stop_times_rows += s.to_stop_time_gtfs_rows()
+        rows_to_file(stop_times_rows, self.stop_times_file_headers, 'stop_times')
+
+        stop_rows = [s.to_gtfs_row() for s in self.stops]
+        rows_to_file(stop_rows, self.stop_file_headers, 'stops')
 
 
-
-        
-
+        shutil.make_archive('output_gtfs', 'zip', folder)
 
 def determine_transfers(routes: List[GTFSRoute]):
     # Determine Transfers for each route

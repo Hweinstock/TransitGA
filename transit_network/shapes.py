@@ -9,8 +9,8 @@ class ShapePoint:
         self.lon = lon 
         self.sequence_num = sequence_num 
     
-    def to_gtfs_row(self):
-        return [self.shape_id, self.lat, self.lon, self.sequence_num]
+    def to_gtfs_row(self, new_shape_id: str):
+        return [new_shape_id , self.lat, self.lon, self.sequence_num]
 
 
 def get_shapes_from_df(df: pd.DataFrame) -> List[ShapePoint]: 

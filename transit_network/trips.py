@@ -42,18 +42,20 @@ class SimpleTrip(BaseTrip):
     def to_gtfs_row(self):
         # Give all trips service id 0, since we don't care about what time they run, only geometry. 
         # We make shape_id to the same as trip_id with 00 on the end. 
-        return [self.route_id, 0, self.id, self.direction, self.id+'00', self.message]
+        return [self.route_id, 0, self.id, self.direction, self.custom_shape_id, self.message]
     
     def get_shapes_rows(self):
         rows = []
         for index, shape in enumerate(self.flattened_shape_points):
             shape.sequence_num = index + 1
-            new_row = shape.to_gtfs_row()
+            new_row = shape.to_gtfs_row(self.custom_shape_id)
             rows.append(new_row)
     
         return rows
         
-
+    @property
+    def custom_shape_id(self):
+        return self.id+'00'
 
 class GTFSTrip(BaseTrip):
 

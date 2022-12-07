@@ -54,7 +54,7 @@ class Stop:
         else:
             return self.id 
     
-    def to_gtfs_rows(self):
+    def to_stop_time_gtfs_rows(self):
         rows = []
         for trip_id in list(self.trip_sequences.keys()):
             # set 0, 0 arrival depature since we don't care about time. 
@@ -62,6 +62,9 @@ class Stop:
             rows.append(cur_row)
         
         return rows
+    
+    def to_gtfs_row(self):
+        return [self.id, self.name, self.location_lat, self.location_lon, self.parent_id]
 
 
 
