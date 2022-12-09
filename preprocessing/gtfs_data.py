@@ -30,6 +30,14 @@ class GTFSData(DataBase):
         stops_df = self.read_data().stops
         for route in routes:
             route.get_trips_for_route(trips_df, stop_times_df, stops_df)
+    @property
+    def num_stops(self):
+        return len(self.read_data().stops.index)
     
+    @property
+    def num_trips(self):
+        return len(self.read_data().trips.index)
     
-    
+    @property
+    def num_routes(self):
+        return len(self.read_data().routes.index)

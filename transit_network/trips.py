@@ -120,15 +120,15 @@ def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) ->
     cur_closest_stop_index = 0
     prev_dist_to_stop = 0
 
-
+    local_min = float('inf')
     for point in shape_points:
         # Current stop that is closest
         closest_stop = stops[cur_closest_stop_index]
 
         # Distance from stop to ShapePoint 
         cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
-
-        if cur_dist_to_cur_stop == 0:
+        local_min = min(local_min, cur_dist_to_cur_stop)
+        if cur_dist_to_cur_stop == 0.0:
             RootLogger.log_debug(f'Found shape point on top of stop!')
 
         # If this distance is increasing i.e. we are moving away from stop, move to next stop. 
@@ -151,7 +151,7 @@ def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) ->
     # Add final stop
     partition.append(cur_stop_points)
     cur_closest_stop_index += 1
-
+    RootLogger.log_debug(f'Found minimum distance: {local_min}')
     if cur_closest_stop_index < num_stops:
         RootLogger.log_error(f'Invalid partition generated for stops. Made it to stop {cur_closest_stop_index} out of {num_stops}')
     return partition

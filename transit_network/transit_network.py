@@ -23,6 +23,18 @@ class TransitNetwork:
         self.routes = routes
 
     @property
+    def num_stops(self):
+        return len(self.stops)
+    
+    @property
+    def num_trips(self):
+        return len(self.trips)
+    
+    @property
+    def num_routes(self):
+        return len(self.routes)
+
+    @property
     def trips(self) -> List[GTFSTrip]:
         all_trips = []
         for route in self.routes:
@@ -116,7 +128,7 @@ def determine_transfers(routes: List[GTFSRoute]):
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 
     all_stop_transfers = determine_transfers(routes)
-
+    
     # Update stop objects so that they all have transfer points set. 
     simple_routes = []
     for route in routes:
@@ -156,12 +168,6 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
 
             new_trip = simplify_trip(trip, new_stops, route.ridership, shape_points)
             new_trips.append(new_trip)
-            
-
-            # move ridership data to the stop level. 
-            # assign_ridership_to_stops(new_stops, route.ridership)
-            # trip.set_stops(new_stops, shapes_df)
-            # trip.stops = new_stops 
 
         simple_route = simplify_route(route, new_trips)
         simple_routes.append(simple_route)
