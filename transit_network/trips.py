@@ -95,7 +95,7 @@ class GTFSTrip(BaseTrip):
             else:
                 RootLogger.log_info(f'Successfully matched stop with id {stop_id} to trip {self.id}')
             stop_row = stop_data.iloc[0]
-            stop_obj = stop_from_stop_row_data(stop_row)
+            stop_obj = stop_from_stop_row_data(stop_row, self.route_id)
             stations.append((stop_obj, trip_sequence))
 
         self.stops = stations

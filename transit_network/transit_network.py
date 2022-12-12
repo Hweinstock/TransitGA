@@ -7,7 +7,7 @@ from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop 
 from transit_network.trips import GTFSTrip, simplify_trip
 from transit_network.shapes import ShapePoint, get_shapes_from_df
-from preprocessing.determine_transfers import determine_transfers
+from preprocessing.determine_transfers import new_determine_transfers
 
 from root_logger import RootLogger
 
@@ -107,7 +107,7 @@ class TransitNetwork:
         
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 
-    all_stop_transfers = determine_transfers(routes)
+    all_stop_transfers = new_determine_transfers(routes)
     
     # Update stop objects so that they all have transfer points set. 
     simple_routes = []
@@ -115,8 +115,9 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
         RootLogger.log_info(f'Simplifying trips for route {route.id}')
         new_trips = []
         for trip in route.trips:
-            new_stops = [all_stop_transfers[stop[0].get_id()] for stop in trip.stops if all_stop_transfers[stop[0].get_id()].is_transfer()]
-            new_stop_ids = [s.get_id() for s in new_stops]
+            [stop[0] for stop in trip.stops if stop[0]]
+            #new_stops = [all_stop_transfers[stop[0].get_id()] for stop in trip.stops if all_stop_transfers[stop[0].get_id()].is_transfer()]
+            #new_stop_ids = [s.get_id() for s in new_stops]
 
             # We want to add endpoint to the trips
             first_stop = trip.stops[0][0]
