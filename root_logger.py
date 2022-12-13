@@ -2,7 +2,7 @@ import logging
 from colorama import Fore, Back, Style
 
 class RootLogger:
-    LEVEL = logging.DEBUG
+    LEVEL = logging.INFO
 
     def log_info(msg):
         logging.info(f'{Fore.BLUE}{msg}{Style.RESET_ALL}')

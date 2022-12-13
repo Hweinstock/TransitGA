@@ -4,7 +4,7 @@ from transit_network.routes import GTFSRoute
 from transit_network.stops import Stop
 from root_logger import RootLogger
 
-TRANSFER_THRESHOLD = 0.000001
+TRANSFER_THRESHOLD = 0.0001
 
 def flatten(lst: List[List[any]]) -> List[any]:
     return [item for sublist in lst for item in sublist]
@@ -52,27 +52,27 @@ def new_determine_transfers(routes: List[GTFSRoute]):
 
     return new_stops 
 
-def determine_transfers(routes: List[GTFSRoute]):
-    # temp_all_stops = flatten([r.get_all_stops() for r in routes])
+# def determine_transfers(routes: List[GTFSRoute]):
+#     # temp_all_stops = flatten([r.get_all_stops() for r in routes])
     
-    # temp_new_stops = merge_stops(temp_all_stops)
-    # print(temp_new_stops)
-    # Determine Transfers for each route
-    all_stop_transfers = {}
-    for route in routes:
-        route_stops = route.get_all_stops()
-        for stop in route_stops:
-            stop_id = stop.get_id()
-            # Already seen this stop
-            if stop_id in all_stop_transfers:
-                stop_obj = all_stop_transfers[stop_id]
-                # noticed that stop_id were duplicated. 
-                # Wnder if this is because routes in two directions repeat stops on way back?
-                if stop_id not in stop_obj.routes:
-                    RootLogger.log_info(f'Found transfer at stop {stop_id} on route {route.id}.')
-                    stop_obj.add_transfer_route(route.id)
-            else:
-                all_stop_transfers[stop.id] = stop
-                stop.add_transfer_route(route.id)
+#     # temp_new_stops = merge_stops(temp_all_stops)
+#     # print(temp_new_stops)
+#     # Determine Transfers for each route
+#     all_stop_transfers = {}
+#     for route in routes:
+#         route_stops = route.get_all_stops()
+#         for stop in route_stops:
+#             stop_id = stop.get_id()
+#             # Already seen this stop
+#             if stop_id in all_stop_transfers:
+#                 stop_obj = all_stop_transfers[stop_id]
+#                 # noticed that stop_id were duplicated. 
+#                 # Wnder if this is because routes in two directions repeat stops on way back?
+#                 if stop_id not in stop_obj.routes:
+#                     RootLogger.log_info(f'Found transfer at stop {stop_id} on route {route.id}.')
+#                     stop_obj.add_transfer_route(route.id)
+#             else:
+#                 all_stop_transfers[stop.id] = stop
+#                 stop.add_transfer_route(route.id)
 
-    return all_stop_transfers
+#     return all_stop_transfers

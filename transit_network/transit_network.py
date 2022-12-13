@@ -4,7 +4,7 @@ import os
 import shutil
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
-from transit_network.stops import Stop 
+from transit_network.stops import Stop, map_ids_to_obj
 from transit_network.trips import GTFSTrip, simplify_trip
 from transit_network.shapes import ShapePoint, get_shapes_from_df
 from preprocessing.determine_transfers import new_determine_transfers
@@ -102,23 +102,33 @@ class TransitNetwork:
         stop_rows = [s.to_gtfs_row() for s in self.stops]
         rows_to_file(stop_rows, self.stop_file_headers, 'stops')
 
-
         shutil.make_archive('output_gtfs', 'zip', folder)
         
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 
-    all_stop_transfers = new_determine_transfers(routes)
-    
+    transfer_stops_obj = new_determine_transfers(routes)
+    print('# of transfer stops', len(transfer_stops_obj))
+    id_to_obj_map = map_ids_to_obj(transfer_stops_obj)
     # Update stop objects so that they all have transfer points set. 
     simple_routes = []
     for route in routes:
         RootLogger.log_info(f'Simplifying trips for route {route.id}')
         new_trips = []
         for trip in route.trips:
-            [stop[0] for stop in trip.stops if stop[0]]
+            new_stops = [] 
+
+            for stop in trip.stops:
+                stop_id = stop[0].get_id()
+                cur_stop = id_to_obj_map[stop_id]
+                if cur_stop.is_transfer(): 
+                    new_stops.append(cur_stop)
+            
+
+
+            # new_stops = [stop[0] for stop in trip.stops if stop[0].get_id() in id_to_obj_map]
             #new_stops = [all_stop_transfers[stop[0].get_id()] for stop in trip.stops if all_stop_transfers[stop[0].get_id()].is_transfer()]
             #new_stop_ids = [s.get_id() for s in new_stops]
-
+            
             # We want to add endpoint to the trips
             first_stop = trip.stops[0][0]
             first_stop_id = first_stop.get_id()
@@ -126,10 +136,10 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
             last_stop_id = last_stop.get_id()
 
             # We check if the id is in the stops because id accounts for parent stops
-            if first_stop_id not in new_stop_ids:
+            if first_stop_id not in id_to_obj_map:
                 new_stops = [first_stop] + new_stops
             
-            if last_stop_id not in new_stop_ids:
+            if last_stop_id not in id_to_obj_map:
                 new_stops += [last_stop]
 
             # Debugging Information
@@ -139,7 +149,7 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
             if num_new_stops > num_stops:
                 RootLogger.log_warning(f'Simplifying trip {trip.id} increased # of stops from {num_stops} to {num_new_stops}')
             else:
-                RootLogger.log_debug(f'Trip {trip.id} reduced number of stops from {num_stops} to {num_new_stops}')
+                RootLogger.log_info(f'Trip {trip.id} reduced number of stops from {num_stops} to {num_new_stops}')
 
             # Shape Information for each trip. 
             shape_id = trip.shape_id

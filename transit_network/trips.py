@@ -93,7 +93,7 @@ class GTFSTrip(BaseTrip):
             if len(stop_data.index) > 1:
                 RootLogger.log_warning(f'Matched multiple stop with id {stop_id} on trip {self.id} from route {self.route_id}, dropping rest of them.')
             else:
-                RootLogger.log_info(f'Successfully matched stop with id {stop_id} to trip {self.id}')
+                RootLogger.log_debug(f'Successfully matched stop with id {stop_id} to trip {self.id}')
             stop_row = stop_data.iloc[0]
             stop_obj = stop_from_stop_row_data(stop_row, self.route_id)
             stations.append((stop_obj, trip_sequence))
