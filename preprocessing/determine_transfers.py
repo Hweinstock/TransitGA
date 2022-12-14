@@ -4,7 +4,7 @@ from transit_network.routes import GTFSRoute
 from transit_network.stops import Stop
 from root_logger import RootLogger
 
-TRANSFER_THRESHOLD = 0.0001
+TRANSFER_THRESHOLD = 0.001
 
 def flatten(lst: List[List[any]]) -> List[any]:
     return [item for sublist in lst for item in sublist]
@@ -47,8 +47,22 @@ def merge_stops(stops: List[Stop]) -> List[Stop]:
 
 def new_determine_transfers(routes: List[GTFSRoute]):
     all_stops = flatten([r.get_all_stops() for r in routes])
+
+    RootLogger.log_info(f'Looking for duplicate stops across routes, starting with {len(all_stops)}')
+    unique_stops_map = {}
+    for stop in all_stops:
+        if stop.id not in unique_stops_map:
+            unique_stops_map[stop.id] = stop
+        else:
+            unique_stops_map[stop.id].add_transfer_routes(stop.routes)
     
-    new_stops = merge_stops(all_stops)
+    unique_stops = list(unique_stops_map.values())
+    RootLogger.log_info(f'Finished looking for duplicate stops across routes, ended with {len(unique_stops)}')
+
+
+    RootLogger.log_info(f'Merging stops, starting with {len(unique_stops)}')
+    new_stops = merge_stops(unique_stops)
+    RootLogger.log_info(f'Finished merging stops, down to {len(new_stops)}')
 
     return new_stops 
 

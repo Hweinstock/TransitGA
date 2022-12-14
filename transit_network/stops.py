@@ -30,7 +30,7 @@ class Stop:
         self.location = location
     
     def add_transfer_routes(self, new_routes: List[str]):
-        self.routes += [new_routes]
+        self.routes += new_routes
 
     @property
     def location_lat(self):
@@ -60,6 +60,7 @@ class Stop:
 
     def merge_with(self, second_stop):
         if self.id == second_stop.id:
+            RootLogger.log_warning(f'Found duplicate stops with id {self.id}, should this happen??')
             # Found duplicate stops
             self.add_transfer_routes(second_stop.routes)
             return self
@@ -86,7 +87,11 @@ class Stop:
     def is_transfer(self):
         if len(self.routes) == 0:
             RootLogger.log_warning(f'Stop {self.id} with parent {self.parent_id} has no routes!')
-        return len(self.routes) > 1
+        try:
+            num_unique_routes = len(set(self.routes))
+        except TypeError:
+            print(self.routes)
+        return num_unique_routes > 1
     
     def get_id(self):
         if self.parent_id is not None:
