@@ -109,12 +109,20 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
     transfer_stops_obj = new_determine_transfers(routes)
     print('# of transfer stops', len(transfer_stops_obj))
     id_to_obj_map = map_ids_to_obj(transfer_stops_obj)
+    unique_shapes = {}
     # Update stop objects so that they all have transfer points set. 
     simple_routes = []
     for route in routes:
         RootLogger.log_info(f'Simplifying trips for route {route.id}')
         new_trips = []
         for trip in route.trips:
+            # Currently not using. 
+            # if trip.shape_id in unique_shapes:
+            #     RootLogger.log_warning(f'Found duplicate shaped trip {trip.id} on route {route.id}. Dropping this trip.')
+            #     continue 
+            # else:
+            #     unique_shapes[trip.shape_id] = True
+
             new_stops = [] 
 
             for stop in trip.stops:
@@ -122,12 +130,6 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
                 cur_stop = id_to_obj_map[stop_id]
                 if cur_stop.is_transfer(): 
                     new_stops.append(cur_stop)
-            
-
-
-            # new_stops = [stop[0] for stop in trip.stops if stop[0].get_id() in id_to_obj_map]
-            #new_stops = [all_stop_transfers[stop[0].get_id()] for stop in trip.stops if all_stop_transfers[stop[0].get_id()].is_transfer()]
-            #new_stop_ids = [s.get_id() for s in new_stops]
             
             # We want to add endpoint to the trips
             first_stop = trip.stops[0][0]

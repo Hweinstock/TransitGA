@@ -9,3 +9,5 @@
 - General: We replace each stop with its parent station in the simplification step? Is this okay for reversing it?
 
 - General: Going with uniform approximation of stop distribution. This should be something slightly more advanced. 
+
+- General: How should we handle duplcate shape_id routes? Right now we take all. Best option would be to take the trip with most stops of certain shape?

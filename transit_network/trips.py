@@ -6,6 +6,7 @@ import pandas as pd
 from transit_network.stops import Stop, stop_from_stop_row_data
 from transit_network.shapes import ShapePoint
 from root_logger import RootLogger
+from preprocessing.partition_shape_points import partition_shape_points
 
 class BaseTrip:
     
@@ -108,53 +109,6 @@ class GTFSTrip(BaseTrip):
         shape_id: {self.shape_id}, \
         direction: {self.direction}, \
         ridership: {self.ridership}'
-
-
-def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) -> List[List[ShapePoint]]:
-    partition = []
-    cur_stop_points = []
-
-    num_stops = len(stops)
-    num_points = len(shape_points)
-
-    cur_closest_stop_index = 0
-    prev_dist_to_stop = 0
-
-    local_min = float('inf')
-    for point in shape_points:
-        # Current stop that is closest
-        closest_stop = stops[cur_closest_stop_index]
-
-        # Distance from stop to ShapePoint 
-        cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
-        local_min = min(local_min, cur_dist_to_cur_stop)
-        if cur_dist_to_cur_stop == 0.0:
-            RootLogger.log_debug(f'Found shape point on top of stop!')
-
-        # If this distance is increasing i.e. we are moving away from stop, move to next stop. 
-        if cur_dist_to_cur_stop > prev_dist_to_stop:
-            partition.append(cur_stop_points)
-
-            cur_stop_points = []
-            cur_closest_stop_index += 1
-            if cur_closest_stop_index == num_stops:
-                cur_closest_stop_index -= 1
-                RootLogger.log_warning(f'Hit final stop, but at point {point.sequence_num} out of {num_points}. \
-                    decrementing cur_closest_stop_index')
-
-            closest_stop = stops[cur_closest_stop_index]
-            cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
-
-        prev_dist_to_stop = cur_dist_to_cur_stop
-        cur_stop_points.append(point)
-    
-    # Add final stop
-    partition.append(cur_stop_points)
-    cur_closest_stop_index += 1
-    RootLogger.log_debug(f'Found minimum distance: {local_min}')
-    if cur_closest_stop_index < num_stops:
-        RootLogger.log_error(f'Invalid partition generated for stops. Made it to stop {cur_closest_stop_index} out of {num_stops}')
-    return partition
 
 def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridership: int, shape_points: List[ShapePoint]) -> SimpleTrip:
     
