@@ -11,14 +11,13 @@ from preprocessing.determine_transfers import new_determine_transfers
 
 from root_logger import RootLogger
 
+ROUTE_FILE_HEADERS = ['route_id' ,'route_short_name', 'route_long_name', 'route_type']
+TRIPS_FILE_HEADERS = ['route_id', 'service_id', 'trip_id', 'direction_id', 'shape_id', 'trip_headsign']
+STOP_TIMES_FILE_HEADERS = ['trip_id', 'arrival_time', 'departure_time', 'stop_id', 'stop_sequence']
+STOP_FILE_HEADERS = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'parent_station']
+SHAPES_FILE_HEADERS = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_sequence']
 
 class TransitNetwork:
-    
-    route_file_headers = ['route_id' ,'route_short_name', 'route_long_name', 'route_type']
-    trips_file_headers = ['route_id', 'service_id', 'trip_id', 'direction_id', 'shape_id', 'trip_headsign']
-    stop_times_file_headers = ['trip_id', 'arrival_time', 'departure_time', 'stop_id', 'stop_sequence']
-    stop_file_headers = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'parent_station']
-    shapes_file_headers = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_sequence']
 
     def __init__(self, routes: List[SimpleRoute]):
         self.routes = routes
@@ -84,23 +83,23 @@ class TransitNetwork:
             os.makedirs(folder)
 
         route_rows = [r.to_gtfs_row() for r in self.routes]
-        rows_to_file(route_rows, self.route_file_headers, 'routes')
+        rows_to_file(route_rows, ROUTE_FILE_HEADERS, 'routes')
 
         trip_rows = [t.to_gtfs_row() for t in self.trips]
-        rows_to_file(trip_rows, self.trips_file_headers, 'trips')
+        rows_to_file(trip_rows, TRIPS_FILE_HEADERS, 'trips')
 
         shapes_rows = []
         for trip in self.trips:
             shapes_rows += trip.get_shapes_rows()
-        rows_to_file(shapes_rows, self.shapes_file_headers, 'shapes')
+        rows_to_file(shapes_rows, SHAPES_FILE_HEADERS, 'shapes')
 
         stop_times_rows = []
         for s in self.stops:
             stop_times_rows += s.to_stop_time_gtfs_rows()
-        rows_to_file(stop_times_rows, self.stop_times_file_headers, 'stop_times')
+        rows_to_file(stop_times_rows, STOP_TIMES_FILE_HEADERS, 'stop_times')
 
         stop_rows = [s.to_gtfs_row() for s in self.stops]
-        rows_to_file(stop_rows, self.stop_file_headers, 'stops')
+        rows_to_file(stop_rows, STOP_FILE_HEADERS, 'stops')
 
         shutil.make_archive('output_gtfs', 'zip', folder)
         
