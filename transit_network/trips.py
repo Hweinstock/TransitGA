@@ -35,10 +35,23 @@ class SimpleTrip(BaseTrip):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
+        self.ridership = ridership
 
     @property
     def flattened_shape_points(self):
         return [Point for partition in self.shape_points for Point in partition]
+    
+    @property
+    def unique_stop_ids(self):
+        return [stop.id for stop in self.stops]
+    
+    def does_share_stop_with(self, other_trip) -> bool:
+        # TODO: More efficient way to do this I believe. 
+        for id_1 in self.unique_stop_ids:
+            for id_2 in other_trip.unique_stop_ids:
+                if id_1 == id_2:
+                    return id_1
+        return None 
 
     def to_gtfs_row(self):
         # Give all trips service id 0, since we don't care about what time they run, only geometry. 
@@ -137,3 +150,20 @@ def assign_ridership_to_stops(StopList: List[Stop], trip_ridership: int):
     # This rewards transfer stops by counting them on each route they transfer for. 
     for stop in StopList:
         stop.ridership += trip_ridership / num_of_stops
+
+def common_transfer_point(trip_A: SimpleTrip, trip_B: SimpleTrip) -> bool: 
+    # Trips must be the same direction
+    if trip_A.direction != trip_B.direction:
+        return None 
+
+    # Trip ids must be distinct (not breeding trip with itself)
+    if trip_A.id == trip_B.id:
+        return None 
+    
+    shared_stop = trip_A.does_share_stop_with(trip_B)
+    
+    # No common transfer stops
+    if shared_stop is None:
+        return shared_stop 
+    
+    return shared_stop
