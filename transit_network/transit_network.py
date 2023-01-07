@@ -2,10 +2,11 @@ from typing import List
 import pandas as pd 
 import os
 import shutil
+import copy
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
-from transit_network.trips import GTFSTrip, simplify_trip
+from transit_network.trips import GTFSTrip, simplify_trip, SimpleTrip
 from transit_network.shapes import ShapePoint, get_shapes_from_df
 from preprocessing.determine_transfers import new_determine_transfers
 
@@ -19,8 +20,13 @@ SHAPES_FILE_HEADERS = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_seq
 
 class TransitNetwork:
 
-    def __init__(self, routes: List[SimpleRoute]):
+    def __init__(self, routes: List[SimpleRoute], id : str = '0'):
+        self.id = id
         self.routes = routes
+
+    def get_copy(self):
+        # Make this a deepcopy. 
+        return copy(self)
 
     @property
     def num_stops(self):
@@ -102,7 +108,7 @@ class TransitNetwork:
         rows_to_file(stop_rows, STOP_FILE_HEADERS, 'stops')
 
         shutil.make_archive('output_gtfs', 'zip', folder)
-        
+
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 
     transfer_stops_obj = new_determine_transfers(routes)
@@ -164,5 +170,23 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
         simple_route = simplify_route(route, new_trips)
         simple_routes.append(simple_route)
 
-    return TransitNetwork(simple_routes) 
+    return TransitNetwork(simple_routes, id='0') 
+
+def create_network_from_trips(trips: List[SimpleTrip], id: str):
+    routes_dict = {}
+    for trip in trips:
+        route_id = trip.route_id
+        if route_id in routes_dict:
+            routes_dict[route_id].append(trip)
+        else:
+            routes_dict[route_id] = [trip]
+    
+    new_routes = []
+    for route_id in routes_dict:
+        new_route = SimpleRoute(route_id)
+        new_route.add_trips(routes_dict[route_id])
+        new_routes.append(new_route)
+    
+    return new_routes
+    
 

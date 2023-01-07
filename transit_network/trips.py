@@ -27,11 +27,24 @@ class BaseTrip:
         
         result_str += str(self.stops[-1][0])
         return result_str + ']'
+    
+    def get_index_of_stop_id(self, target_id: str):
+        for index, cur_stop in enumerate(self.stops):
+            if cur_stop.id == target_id: 
+                return index 
+
+        RootLogger.log_error(f'Unable to locate shared stop {target_id} in trip {self.id}')
+        return None 
+    
+    def __eq__(self, other_obj: object) -> bool:
+        return other_obj.id == self.id
 
 
 class SimpleTrip(BaseTrip):
 
-    def __init__(self, trip_id, route_id, message, direction, shape_points, stops, ridership):
+    def __init__(self, trip_id: str, route_id: str, message: str, 
+                       direction: int, shape_points: List[List[ShapePoint]],
+                       stops: List[str], ridership: int):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
@@ -44,7 +57,7 @@ class SimpleTrip(BaseTrip):
     @property
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
-    
+
     def does_share_stop_with(self, other_trip) -> bool:
         # TODO: More efficient way to do this I believe. 
         for id_1 in self.unique_stop_ids:
