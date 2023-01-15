@@ -186,7 +186,7 @@ def create_network_from_trips(trips: List[SimpleTrip], id: str):
         new_route = SimpleRoute(route_id)
         new_route.add_trips(routes_dict[route_id])
         new_routes.append(new_route)
-    
-    return new_routes
+        
+    return TransitNetwork(new_routes, id)
     
 
