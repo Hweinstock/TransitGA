@@ -28,4 +28,5 @@ def create_simplified_gtfs_SFMTA():
 
     Network = create_network_from_GTFSRoutes(matched_routes, SF_GTFS.read_data().shapes)
     print(generate_compression_metrics(SF_GTFS, Network))
-    Network.to_gtfs()
+    Network.write_to_pickle('test')
+    Network.write_to_gtfs()

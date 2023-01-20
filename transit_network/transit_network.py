@@ -2,7 +2,8 @@ from typing import List
 import pandas as pd 
 import os
 import shutil
-import copy
+from copy import deepcopy
+import pickle
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
@@ -26,7 +27,7 @@ class TransitNetwork:
 
     def get_copy(self):
         # Make this a deepcopy. 
-        return copy(self)
+        return deepcopy(self)
 
     @property
     def num_stops(self):
@@ -72,8 +73,11 @@ class TransitNetwork:
 
         return f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
 
+    def write_to_pickle(self, filename=id):
+        with open(filename, 'wb') as output:
+            pickle.dump(self, output)
 
-    def to_gtfs(self, folder='output_gtfs'):
+    def write_to_gtfs(self, folder='output_gtfs'):
 
         def rows_to_file(rows, headers, filename):
             df = pd.DataFrame(rows, columns=headers)
@@ -188,5 +192,11 @@ def create_network_from_trips(trips: List[SimpleTrip], id: str):
         new_routes.append(new_route)
         
     return TransitNetwork(new_routes, id)
+
+def read_network_from_pickle(filename: str):
+    with open(filename, 'rb') as input_file:
+        obj = pickle.load(input_file)
+
+    return obj
     
 
