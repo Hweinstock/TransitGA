@@ -177,7 +177,7 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
     return TransitNetwork(simple_routes, id='0') 
 
 def create_network_from_trips(trips: List[SimpleTrip], id: str):
-    routes_dict = {}
+    routes_dict = {} # maps route-ids to the trips referencing them
     for trip in trips:
         route_id = trip.route_id
         if route_id in routes_dict:
@@ -187,7 +187,7 @@ def create_network_from_trips(trips: List[SimpleTrip], id: str):
     
     new_routes = []
     for route_id in routes_dict:
-        new_route = SimpleRoute(route_id, routes_dict[route_id].name)
+        new_route = SimpleRoute(route_id, None)
         new_route.add_trips(routes_dict[route_id])
         new_routes.append(new_route)
         

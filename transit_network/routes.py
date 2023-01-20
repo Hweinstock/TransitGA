@@ -112,7 +112,10 @@ class GTFSRoute(BaseRoute):
 
 class SimpleRoute(BaseRoute):
 
-    def __init__(self, id: str, name: str):
+    def __init__(self, id: str, name: str or None):
+        #TODO: Better way to handle this?
+        if name is None:
+            name = id
         BaseRoute.__init__(self, id, name)
     
     @property
