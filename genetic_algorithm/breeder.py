@@ -22,8 +22,7 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     new_message = '-'.join(first_trip.id, second_trip.id)
     
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
-                          direction=first_trip.direction, stops=new_stops, shape_points=new_shapes, 
-                          ridership=0)
+                          direction=first_trip.direction, stops=new_stops, shape_points=new_shapes)
 
     
     return new_trip

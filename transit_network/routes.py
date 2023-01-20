@@ -8,8 +8,9 @@ from root_logger import RootLogger
 
 class BaseRoute:
 
-    def __init__(self, id: str):
+    def __init__(self, id: str, name: str):
         self.id = id 
+        self.name = name
         self.trips = []
     
     def add_trips(self, trips: BaseTrip):
@@ -29,8 +30,8 @@ class BaseRoute:
 
 class GTFSRoute(BaseRoute):
     
-    def __init__(self, id: str, name: str, city_name: str, ridership: int):
-        BaseRoute.__init__(self, id=id)
+    def __init__(self, id: str, name: str, ridership: int):
+        BaseRoute.__init__(self, id=id, name=name)
         self.ridership = ridership
         self.shapes_covered = {}
 
@@ -111,8 +112,8 @@ class GTFSRoute(BaseRoute):
 
 class SimpleRoute(BaseRoute):
 
-    def __init__(self, id: str):
-        BaseRoute.__init__(self, id)
+    def __init__(self, id: str, name: str):
+        BaseRoute.__init__(self, id, name)
     
     @property
     def ridership(self):
@@ -122,6 +123,6 @@ class SimpleRoute(BaseRoute):
         BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 def simplify_route(OriginalRoute: GTFSRoute, simple_trips: List[SimpleTrip]) -> SimpleRoute:
-    Simple = SimpleRoute(OriginalRoute.id)
+    Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name)
     Simple.add_trips(simple_trips)
     return Simple

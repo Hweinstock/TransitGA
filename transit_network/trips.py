@@ -44,11 +44,10 @@ class SimpleTrip(BaseTrip):
 
     def __init__(self, trip_id: str, route_id: str, message: str, 
                        direction: int, shape_points: List[List[ShapePoint]],
-                       stops: List[str], ridership: int):
+                       stops: List[str]):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
-        self.ridership = ridership
 
     @property
     def flattened_shape_points(self):
@@ -145,14 +144,16 @@ def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridershi
 
     seperated_shape_points = partition_shape_points(shape_points, new_stops)
     trip_ridership = route_ridership / 2.0
+
+    # Move ridership data to the stops
     assign_ridership_to_stops(new_stops, trip_ridership)
+
     NewTrip = SimpleTrip(trip_id=original_trip.id, 
                               route_id=original_trip.route_id,
                               message=original_trip.message, 
                               direction=original_trip.direction, 
                               shape_points=seperated_shape_points,
-                              stops=new_stops, 
-                              ridership= trip_ridership)
+                              stops=new_stops)
     return NewTrip
 
 
