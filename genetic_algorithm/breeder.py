@@ -36,8 +36,8 @@ def get_child_trip(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simple
             shared_stop = common_transfer_point(A_trip, B_trip)
 
             if shared_stop is not None:
-                RootLogger.log_info((f'Found common transfer point on trips {A_trip.id} on',
-                f'route {A_trip.route_id} and {B_trip.id} on route {B_trip.route_id}.'))
+                RootLogger.log_info((f'Found common transfer point on trips {A_trip.id} on'
+                                     f' route {A_trip.route_id} and {B_trip.id} on route {B_trip.route_id}.'))
                 child_trip = produce_child_trip(A_trip, B_trip, shared_stop) 
                 return index, child_trip # This will break out of both for loops. Ensures we only return 1. 
 
@@ -51,8 +51,8 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, inc_id: bool = 
     index, child_trip = get_child_trip(first_parent_trips, second_parent_trips)
     
     if child_trip is None:
-        RootLogger.log_error((f'Failed to breed networks {Net_A.id} and {Net_B.id}, no common stops found among trips.',
-            f'returning the first parent instead.'))
+        RootLogger.log_error((f'Failed to breed networks {Net_A.id} and {Net_B.id}, no common stops found among trips.'
+                              f' Returning the first parent instead.'))
         return Net_A 
 
     else:
