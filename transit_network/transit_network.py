@@ -110,8 +110,8 @@ class TransitNetwork:
 
         stop_rows = [s.to_gtfs_row() for s in self.stops]
         rows_to_file(stop_rows, STOP_FILE_HEADERS, 'stops')
-
-        shutil.make_archive('output_gtfs', 'zip', folder)
+        RootLogger.log_info(f'Constructed GTFS files, now zipping into {folder}.zip')
+        shutil.make_archive(folder, 'zip', folder)
 
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 

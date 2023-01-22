@@ -3,15 +3,19 @@ import gtfs_kit as gk
 from pathlib import Path
 import warnings 
 import pandas as pd
+from typing import List
 
-def generate_diagram(zip_path: str, output_filename: str):
+
+def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] = None):
+    output_filename = f'{output_filename}.html'
     warnings.simplefilter('ignore')
     path = Path(zip_path)
     feed = gk.read_feed(path, dist_units='km')
-    stop_route = feed.map_routes(feed.routes.route_id.iloc[:], include_stops=True)
+
+    if route_ids is None:
+        route_ids = feed.routes.route_id.iloc[:]
+    stop_route = feed.map_routes(route_ids, include_stops=True)
     stop_route.save(output_filename)
-
-
 
 # warnings.simplefilter('ignore')
 

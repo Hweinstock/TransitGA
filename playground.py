@@ -11,11 +11,11 @@ This script is purely for informal testing and 'playing' with new code.
 Network = read_network_from_pickle('test')
 Network2 = Network.get_copy()
 Network3 = breed_networks(Network, Network2)
-#Network.to_gtfs('parentA')
-#Network3.to_gtfs('childA')
+Network.write_to_gtfs('parentA')
+Network3.write_to_gtfs('childA')
 
-#generate_diagram('parentA.zip', 'parentA')
-#generate_diagram('childA.zip', 'childA')
+generate_diagram('parentA.zip', 'test_diagrams/parentA-shape', ['12', '9'])
+generate_diagram('childA.zip', 'test_diagrams/childA-shape', ['12-9'])
 
 
 

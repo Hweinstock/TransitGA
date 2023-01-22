@@ -17,15 +17,16 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     first_index = first_trip.get_index_of_stop_id(shared_stop)
     second_index = second_trip.get_index_of_stop_id(shared_stop)
 
-    new_stops = first_trip.stops[:first_index] + second_trip.stops[first_index:]
+    new_stops = first_trip.stops[:first_index] + second_trip.stops[second_index:]
     new_shapes = first_trip.shape_points[:first_index] + second_trip.shape_points[second_index:]
-    new_route = '-'.join([first_trip.route_id, second_trip.route_id])
-    new_id = '-'.join([first_trip.id, second_trip.id])
-    new_message = '-'.join([first_trip.id, second_trip.id])
+    new_route = ':'.join([first_trip.route_id, second_trip.route_id])
+    new_id = ':'.join([first_trip.id, second_trip.id])
+    new_message = ':'.join([first_trip.id, second_trip.id])
     
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
                           direction=first_trip.direction, stops=new_stops, shape_points=new_shapes)
 
+    
     
     return new_trip
 
@@ -41,7 +42,7 @@ def get_child_trip(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simple
                 child_trip = produce_child_trip(A_trip, B_trip, shared_stop) 
                 return index, child_trip # This will break out of both for loops. Ensures we only return 1. 
 
-def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, inc_id: bool = False) -> TransitNetwork or None:
+def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, inc_id: bool = True) -> TransitNetwork or None:
     RootLogger.log_debug(f'Breeding networks {Net_A.id} and {Net_B.id}')
     first_parent, second_parent = determine_parent_order(Net_A, Net_B)
 
