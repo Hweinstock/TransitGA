@@ -92,7 +92,7 @@ class GTFSRoute(BaseRoute):
         max_trips = [None, None]
 
         for cur_trip in trip_objects:
-            stops = cur_trip.update_stops(stop_times_df, stops_df)
+            stops = cur_trip.get_stops(stop_times_df, stops_df)
             trip_len = len(stops)
             trip_dir = cur_trip.direction
 

@@ -26,8 +26,6 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
                           direction=first_trip.direction, stops=new_stops, shape_points=new_shapes)
 
-    
-    
     return new_trip
 
 def get_child_trip(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Tuple[int, SimpleTrip]:
@@ -62,7 +60,7 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, inc_id: bool = 
         if inc_id:
             new_id = str(int(Net_A.id) + 1)
         else:
-            new_id = '-'.join([Net_A.id, Net_B.id])
+            new_id = ':'.join([Net_A.id, Net_B.id])
         RootLogger.log_debug(f'Successfully breeded networks {Net_A.id} and {Net_B.id}')
         return create_network_from_trips(new_trips, new_id)
 

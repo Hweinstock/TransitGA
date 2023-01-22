@@ -48,6 +48,7 @@ class SimpleTrip(BaseTrip):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
+        self.set_sequence_values_for_stops()
 
     @property
     def flattened_shape_points(self):
@@ -56,6 +57,12 @@ class SimpleTrip(BaseTrip):
     @property
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
+
+    def set_sequence_values_for_stops(self):
+        # We set the trip sequence values for stop, this is used in exporting to gtfs. 
+        for index, stop in enumerate(self.stops):
+        # want start sequence to start at 1 -> n
+            stop.trip_sequences[self.id] = index + 1 
 
     def does_share_stop_with(self, other_trip) -> bool:
         # TODO: More efficient way to do this I believe. 
@@ -92,8 +99,8 @@ class GTFSTrip(BaseTrip):
 
     def set_stops(self, stops: List[Stop], shapes_df: pd.DataFrame):
         self.stops = stops
-    
-    def update_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
+
+    def get_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
         Return a list of stop ids associated with trip. 
 
@@ -136,11 +143,6 @@ class GTFSTrip(BaseTrip):
         ridership: {self.ridership}'
 
 def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridership: int, shape_points: List[ShapePoint]) -> SimpleTrip:
-    
-    # We set the trip sequence values for stop, this is used in exporting to gtfs. 
-    for index, stop in enumerate(new_stops):
-        # want start sequence to start at 1 -> n
-        stop.trip_sequences[original_trip.id] = index + 1 
 
     seperated_shape_points = partition_shape_points(shape_points, new_stops)
     trip_ridership = route_ridership / 2.0

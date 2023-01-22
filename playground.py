@@ -15,7 +15,7 @@ Network.write_to_gtfs('parentA')
 Network3.write_to_gtfs('childA')
 
 generate_diagram('parentA.zip', 'test_diagrams/parentA-shape', ['12', '9'])
-generate_diagram('childA.zip', 'test_diagrams/childA-shape', ['12-9'])
+generate_diagram('childA.zip', 'test_diagrams/childA-shape', ['12:9'])
 
 
 
