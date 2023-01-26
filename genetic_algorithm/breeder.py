@@ -12,7 +12,7 @@ def determine_parent_order(Net_A: TransitNetwork, Net_B: TransitNetwork):
     else:
         return Net_B, Net_A
 
-def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_stop: int) -> SimpleTrip:
+def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_stop: str) -> SimpleTrip:
     
     first_index = first_trip.get_index_of_stop_id(shared_stop)
     second_index = second_trip.get_index_of_stop_id(shared_stop)
@@ -29,16 +29,20 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     return new_trip
 
 def get_child_trip(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Tuple[int, SimpleTrip]:
-
-    for index, A_trip in enumerate(parent_A_trips):
-        for B_trip in parent_B_trips:
+    all_shared_stops = []
+    for A_index, A_trip in enumerate(parent_A_trips):
+        for B_index, B_trip in enumerate(parent_B_trips):
             shared_stop = common_transfer_point(A_trip, B_trip)
-
             if shared_stop is not None:
-                RootLogger.log_info((f'Found common transfer point on trips {A_trip.id} on'
-                                     f' route {A_trip.route_id} and {B_trip.id} on route {B_trip.route_id}.'))
-                child_trip = produce_child_trip(A_trip, B_trip, shared_stop) 
-                return index, child_trip # This will break out of both for loops. Ensures we only return 1. 
+                all_shared_stops.append((A_index, B_index, shared_stop))
+
+
+    # Randomly select one of the shared stops and breed off that one. 
+    sel_A_index, sel_B_index, sel_stop_id = random.choices(all_shared_stops, k=1)[0]
+    sel_A_trip, sel_B_trip = (parent_A_trips[sel_A_index], parent_B_trips[sel_B_index])
+    RootLogger.log_info((f'Found {len(all_shared_stops)} shared stops for trips {sel_A_trip.id} and {sel_B_trip.id} at stop {sel_stop_id}'))
+    child_trip = produce_child_trip(sel_A_trip, sel_B_trip, sel_stop_id) 
+    return sel_A_index, child_trip
 
 def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, new_id: None or str = None) -> TransitNetwork:
     RootLogger.log_debug(f'Breeding networks {Net_A.id} and {Net_B.id}')

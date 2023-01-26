@@ -10,7 +10,7 @@ from preprocessing.partition_shape_points import partition_shape_points
 
 class BaseTrip:
     
-    def __init__(self, trip_id, route_id, message, direction):
+    def __init__(self, trip_id: str, route_id: str, message: str, direction: int):
         self.id = trip_id
         self.route_id = route_id
         self.message = message
@@ -64,7 +64,7 @@ class SimpleTrip(BaseTrip):
         # want start sequence to start at 1 -> n
             stop.trip_sequences[self.id] = index + 1 
 
-    def does_share_stop_with(self, other_trip) -> bool:
+    def does_share_stop_with(self, other_trip) -> str or None:
         # TODO: More efficient way to do this I believe. 
         for id_1 in self.unique_stop_ids:
             for id_2 in other_trip.unique_stop_ids:
@@ -167,7 +167,7 @@ def assign_ridership_to_stops(StopList: List[Stop], trip_ridership: int):
     for stop in StopList:
         stop.ridership += trip_ridership / num_of_stops
 
-def common_transfer_point(trip_A: SimpleTrip, trip_B: SimpleTrip) -> bool: 
+def common_transfer_point(trip_A: SimpleTrip, trip_B: SimpleTrip) -> str or None:
     # Trips must be the same direction
     if trip_A.direction != trip_B.direction:
         return None 
