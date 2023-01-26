@@ -108,7 +108,7 @@ class GTFSRoute(BaseRoute):
         return max_trips
     
     def __str__(self):
-        BaseRoute.__str__(self) + f', ridership: {self.ridership}'
+        return BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 class SimpleRoute(BaseRoute):
 
@@ -123,7 +123,7 @@ class SimpleRoute(BaseRoute):
         return sum([t.ridership for t in self.trips])
     
     def __str__(self):
-        BaseRoute.__str__(self) + f', ridership: {self.ridership}'
+        return BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 def simplify_route(OriginalRoute: GTFSRoute, simple_trips: List[SimpleTrip]) -> SimpleRoute:
     Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name)

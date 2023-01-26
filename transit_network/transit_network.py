@@ -71,7 +71,9 @@ class TransitNetwork:
         num_trips = len(self.trips)
         num_stops = len(self.stops)
 
-        return f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
+        routes_str = "\n".join([str(r) for r in self.routes])
+        report_str = f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
+        return routes_str + report_str
 
     def write_to_pickle(self, filename=id):
         with open(filename, 'wb') as output:
@@ -193,7 +195,7 @@ def create_network_from_trips(trips: List[SimpleTrip], id: str):
         
     return TransitNetwork(new_routes, id)
 
-def read_network_from_pickle(filename: str):
+def read_network_from_pickle(filename: str) -> TransitNetwork:
     with open(filename, 'rb') as input_file:
         obj = pickle.load(input_file)
 

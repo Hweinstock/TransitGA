@@ -40,8 +40,10 @@ def get_child_trip(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simple
                 child_trip = produce_child_trip(A_trip, B_trip, shared_stop) 
                 return index, child_trip # This will break out of both for loops. Ensures we only return 1. 
 
-def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, inc_id: bool = True) -> TransitNetwork or None:
+def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, new_id: None or str = None) -> TransitNetwork:
     RootLogger.log_debug(f'Breeding networks {Net_A.id} and {Net_B.id}')
+
+    # Randomly choose one them to be the first parent. (i.e. which route starts in the crossover)
     first_parent, second_parent = determine_parent_order(Net_A, Net_B)
 
     first_parent_trips = first_parent.trips 
@@ -57,10 +59,9 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, inc_id: bool = 
     else:
         new_trips = first_parent_trips[:index] + [child_trip] + first_parent_trips[index+1:]
 
-        if inc_id:
-            new_id = str(int(Net_A.id) + 1)
-        else:
+        if new_id is None:
             new_id = ':'.join([Net_A.id, Net_B.id])
+            
         RootLogger.log_debug(f'Successfully breeded networks {Net_A.id} and {Net_B.id}')
         return create_network_from_trips(new_trips, new_id)
 

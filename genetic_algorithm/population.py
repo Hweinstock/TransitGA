@@ -10,6 +10,3 @@ class Population:
         self.population = networks
         self.population_size = len(networks)
         self.iteration_number = 1
-    
-    
-        
