@@ -9,11 +9,14 @@ def generate_population(initial_network: TransitNetwork, population_size: int) -
     RootLogger.log_debug(f'Generating initial population of size {population_size} from {initial_network.id}')
 
     current_population = [initial_network]
+    RootLogger.log_info('Generating Initial Population...')
     for i in range(population_size-1):
+        RootLogger.log_debug(f'Generated {i} of {population_size-1}.')
         # Randomly sample two parents from the current population, and do so until we fill population. 
         [parent_a, parent_b] = choices(current_population, k=2)
-        baby_network = breed_networks(parent_a, parent_b, i)
+        baby_network = breed_networks(parent_a, parent_b, str(i))
         current_population.append(baby_network)
+    RootLogger.log_info('Done Generating Initial Population.')
     
     return current_population
 

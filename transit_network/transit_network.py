@@ -61,10 +61,11 @@ class TransitNetwork:
 
     @property 
     def ridership(self):
-        #413064996.3834995
-        #144576773
-        #72288386
         return sum([s.ridership for s in self.stops])
+    
+    @property
+    def coverage(self):
+        return len(self.stops)
     
     def __str__(self):
         num_routes = len(self.routes)
