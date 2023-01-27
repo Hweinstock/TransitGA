@@ -75,7 +75,7 @@ class TransitNetwork:
         report_str = f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
         return routes_str + report_str
 
-    def write_to_gtfs(self, folder='output_gtfs'):
+    def write_to_gtfs(self, folder: str):
 
         def rows_to_file(rows, headers, filename):
             df = pd.DataFrame(rows, columns=headers)
@@ -86,7 +86,6 @@ class TransitNetwork:
 
             with open(text_file, 'w') as output:
                 output.write(raw_csv_text)
-
         if not os.path.exists(folder):
             os.makedirs(folder)
 
@@ -172,7 +171,7 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
         simple_route = simplify_route(route, new_trips)
         simple_routes.append(simple_route)
 
-    return TransitNetwork(simple_routes, id='0') 
+    return TransitNetwork(simple_routes, id='-1') 
 
 def create_network_from_trips(trips: List[SimpleTrip], id: str):
     routes_dict = {} # maps route-ids to the trips referencing them

@@ -2,6 +2,8 @@ from preprocessing.ridership_data import RidershipData, RawRidershipData
 from preprocessing.gtfs_data import GTFSData
 from transit_network.transit_network import create_network_from_GTFSRoutes, TransitNetwork
 
+from utility import pickle_object
+
 
 def generate_compression_metrics(Gtfs: GTFSData, SimplifiedNetwork: TransitNetwork) -> str:
     original_num_routes = Gtfs.num_routes
@@ -27,6 +29,7 @@ def create_simplified_gtfs_SFMTA():
     SF_GTFS.set_trips_for_all_routes(matched_routes)
 
     Network = create_network_from_GTFSRoutes(matched_routes, SF_GTFS.read_data().shapes)
+    name = 'initial_network'
     print(generate_compression_metrics(SF_GTFS, Network))
-    Network.write_to_pickle('test')
-    Network.write_to_gtfs()
+    pickle_object(Network, name)
+    Network.write_to_gtfs(name)
