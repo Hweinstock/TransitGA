@@ -3,7 +3,6 @@ import pandas as pd
 import os
 import shutil
 from copy import deepcopy
-import pickle
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
@@ -55,9 +54,9 @@ class TransitNetwork:
         all_stops = {}
         for trip in self.trips:
             for stop in trip.stops:
-                if stop not in all_stops:
-                    all_stops[stop] = True 
-        return list(all_stops.keys())
+                if stop.id not in all_stops:
+                    all_stops[stop.id] = stop 
+        return list(all_stops.values())
 
     @property 
     def ridership(self):
@@ -75,10 +74,6 @@ class TransitNetwork:
         routes_str = "\n".join([str(r) for r in self.routes])
         report_str = f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
         return routes_str + report_str
-
-    def write_to_pickle(self, filename=id):
-        with open(filename, 'wb') as output:
-            pickle.dump(self, output)
 
     def write_to_gtfs(self, folder='output_gtfs'):
 
@@ -195,11 +190,5 @@ def create_network_from_trips(trips: List[SimpleTrip], id: str):
         new_routes.append(new_route)
         
     return TransitNetwork(new_routes, id)
-
-def read_network_from_pickle(filename: str) -> TransitNetwork:
-    with open(filename, 'rb') as input_file:
-        obj = pickle.load(input_file)
-
-    return obj
     
 

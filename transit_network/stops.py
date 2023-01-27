@@ -114,6 +114,9 @@ class Stop:
     def to_gtfs_row(self):
         return [self.id, self.name, self.location_lat, self.location_lon, self.parent_id]
 
+    def __eq__(self, other) -> bool:
+        return other.id == self.id 
+         
     def __str__(self) -> str:
         return f'(stop_id: {self.id}, stop_name: {self.name}, parent_stop: {self.parent_id}, routes: {self.routes})'
     

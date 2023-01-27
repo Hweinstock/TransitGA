@@ -4,6 +4,7 @@ from statistics import mean, median, stdev
 
 from transit_network.transit_network import TransitNetwork
 from root_logger import RootLogger
+from utility import pickle_object
 
 def scale_to_prob_dist(weights: List[float]) -> List[float]:
     s = sum(weights)
@@ -22,6 +23,7 @@ class Population:
         self.iteration_number = 1
         self.performance_dict = {}
         self.per_round_metrics = []
+        self.write_to_pickle = pickle_object
     
     def evaluate_population(self):
         for member in self.population:
@@ -114,7 +116,10 @@ class Population:
             RootLogger.log_debug(f'On iteration {self.iteration_number} of {max_iteration}.')
             self.update_population()
             self.iteration_number += 1
+        RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         return self.per_round_metrics
+    
+        
 
 
 

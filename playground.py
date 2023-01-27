@@ -1,23 +1,25 @@
 from simplify_gtfs import create_simplified_gtfs_SFMTA
-from transit_network.transit_network import read_network_from_pickle
+from transit_network.transit_network import TransitNetwork
 from genetic_algorithm.breeder import breed_networks
 from graph_gtfs import generate_diagram
 from genetic_algorithm.initial_population_generator import generate_population
 from genetic_algorithm.fitness_function import evaluate_network
 from genetic_algorithm.breeder import breed_networks
 from genetic_algorithm.population import Population
+from utility import read_object_from_file, pickle_object
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
 
 #create_simplified_gtfs_SFMTA()
 
-Network = read_network_from_pickle('test')
+Network = read_object_from_file('test')
 
 initial_pop = generate_population(Network, 100)
-myPopulation = Population(initial_pop, evaluate_network, breed_networks)
-res = myPopulation.run(10)
-print(res)
+MyPopulation = Population(initial_pop, evaluate_network, breed_networks)
+pickle_object(MyPopulation, 'test3')
+# res = myPopulation.run(10)
+# print(res)
 
 #myPopulation.population[23].write_to_gtfs('random_network')
 # generate_diagram('random_network.zip', 'test_diagrams/random')
