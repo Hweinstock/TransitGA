@@ -16,8 +16,9 @@ Network = read_network_from_pickle('test')
 
 initial_pop = generate_population(Network, 100)
 myPopulation = Population(initial_pop, evaluate_network, breed_networks)
-did_update = myPopulation.update_population()
-print(did_update)
+res = myPopulation.run(10)
+print(res)
+
 #myPopulation.population[23].write_to_gtfs('random_network')
 # generate_diagram('random_network.zip', 'test_diagrams/random')
 

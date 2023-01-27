@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import numpy as np
+from statistics import mean, median, stdev
 
 from transit_network.transit_network import TransitNetwork
 from root_logger import RootLogger
@@ -10,7 +11,6 @@ def scale_to_prob_dist(weights: List[float]) -> List[float]:
 
 class Population:
 
-    max_iteration = 100 
     mutation_rate = 0.1
     elitist_cutoff = 0.5
 
@@ -21,6 +21,7 @@ class Population:
         self.breeding_function = breeding_function
         self.iteration_number = 1
         self.performance_dict = {}
+        self.per_round_metrics = []
     
     def evaluate_population(self):
         for member in self.population:
@@ -29,6 +30,8 @@ class Population:
             if id in self.performance_dict:
                 RootLogger.log_warning(f'Population members with duplicate ids found in population. Overwriting fitness.')
             self.performance_dict[id] = score 
+        
+        self.set_performance_metrics()
     
     def select_parents(self, pool: List[TransitNetwork]) -> Tuple[TransitNetwork, TransitNetwork]:
         weights = scale_to_prob_dist([self.performance_dict[m.id] for m in pool])
@@ -53,14 +56,12 @@ class Population:
             return
         return matching_members[0]
     
-    def update_population(self) -> bool:
-        if self.iteration_number >= self.max_iteration:
-            return False 
-
+    def update_population(self):
         new_population = self.get_next_population()
         self.population = new_population
         self.performance_dict = {}
-        return True
+        RootLogger.log_debug('New population updated successfully.')
+        self.iteration_number += 1
 
     def get_next_population(self):
         RootLogger.log_info(f'Generating next Population...')
@@ -84,6 +85,36 @@ class Population:
 
         RootLogger.log_info(f'Done generating next Population...')
         return new_population
+
+    def set_performance_metrics(self):
+        metrics = self.generate_metrics()
+        self.per_round_metrics.append(metrics)
+
+    def generate_metrics(self):
+        if self.performance_dict == {}:
+            print('it is empty')
+        best_performer = max(self.performance_dict, key=self.performance_dict.get)
+        best_score = max(self.performance_dict.values()) 
+
+        avg_score = mean(self.performance_dict.values())
+        med_score = median(self.performance_dict.values())
+
+        stdev_score = stdev(self.performance_dict.values())
+
+        return {
+            'best_performer': best_performer, 
+            'best_fitness': best_score, 
+            'avg_score': avg_score, 
+            'med_score': med_score,
+            'stdev': stdev_score
+        }
+    def run(self, max_iteration: int):
+        RootLogger.log_info(f'Running population for {max_iteration} iterations.')
+        while self.iteration_number <= max_iteration:
+            RootLogger.log_debug(f'On iteration {self.iteration_number} of {max_iteration}.')
+            self.update_population()
+            self.iteration_number += 1
+        return self.per_round_metrics
 
 
 
