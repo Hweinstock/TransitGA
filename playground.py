@@ -1,36 +1,36 @@
-from preprocessing.ridership_data import RidershipData, RawRidershipData
-from preprocessing.gtfs_data import GTFSData
-from transit_network.transit_network import create_network_from_GTFSRoutes, TransitNetwork
+from simplify_gtfs import create_simplified_gtfs_SFMTA
+from transit_network.transit_network import TransitNetwork
+from genetic_algorithm.breeder import breed_networks
+from graph_gtfs import generate_diagram
+from genetic_algorithm.initial_population_generator import generate_population
+from genetic_algorithm.fitness_function import evaluate_network
+from genetic_algorithm.breeder import breed_networks
+from genetic_algorithm.population import Population
+from utility import read_object_from_file, pickle_object
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
 
-def generate_compression_metrics(Gtfs: GTFSData, SimplifiedNetwork: TransitNetwork) -> str:
-    original_num_routes = Gtfs.num_routes
-    original_num_trips = Gtfs.num_trips
-    original_num_stops = Gtfs.num_stops 
+#create_simplified_gtfs_SFMTA()
 
-    new_num_routes = SimplifiedNetwork.num_routes
-    new_num_trips = SimplifiedNetwork.num_trips
-    new_num_stops = SimplifiedNetwork.num_stops 
+Network = read_object_from_file('initial_network.pkl')
+#MyPopulation = read_object_from_file('test3')
+initial_pop = generate_population(Network, 100)
+MyPopulation = Population(initial_pop, evaluate_network, breed_networks)
+pickle_object(MyPopulation, 'initial_pop')
+#res = MyPopulation.run(10)
+#print(res)
 
-    return f'Reduced number of routes from {original_num_routes} to {new_num_routes}, \n \
-             Reduced number of trips from {original_num_trips} to {new_num_trips}, \n \
-             Reduced number of stops from {original_num_stops} to {new_num_stops}. '
+#myPopulation.population[23].write_to_gtfs('random_network')
+# generate_diagram('random_network.zip', 'test_diagrams/random')
 
-RRD = RawRidershipData('data/ridership_data/SFMTA.xlsx', 'SF')
-RD = RidershipData(RRD)
-RD.export_data()
+# Network2 = Network.get_copy()
+# Network3 = breed_networks(Network, Network2)
+# Network.write_to_gtfs('parentA')
+# Network3.write_to_gtfs('childA')
 
-SF_GTFS = GTFSData('data/gtfs_data/SFMTA.zip', 'SF')
+# generate_diagram('parentA.zip', 'test_diagrams/parentA-shape', ['12', '9'])
+# generate_diagram('childA.zip', 'test_diagrams/childA-shape', ['12:9'])
 
-matched_routes = RD.get_matched_ids_from_gtfs(SF_GTFS)
-SF_GTFS.set_trips_for_all_routes(matched_routes)
 
-Network = create_network_from_GTFSRoutes(matched_routes, SF_GTFS.read_data().shapes)
-print(generate_compression_metrics(SF_GTFS, Network))
-# Next step is to trim the shapes associated with each route. 
 
-# first_trip = trips_from_routes['1'][0]
-# stops_from_trip = SF_GTFS.get_stops_for_trip_id(first_trip)
-# Want to sub parent station for station id when possible. 

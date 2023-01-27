@@ -74,8 +74,7 @@ class RidershipData(DataBase):
                 route_long_name = route['route_long_name']
                 ridership = row['total_ridership']
                 new_route = GTFSRoute(id=route_id, 
-                                  name=route_long_name, 
-                                  city_name=self.city_name, 
+                                  name=route_long_name,  
                                   ridership=ridership)
                 matched_routes.append(new_route)
         

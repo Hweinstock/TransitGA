@@ -6,10 +6,11 @@ import pandas as pd
 from transit_network.stops import Stop, stop_from_stop_row_data
 from transit_network.shapes import ShapePoint
 from root_logger import RootLogger
+from preprocessing.partition_shape_points import partition_shape_points
 
 class BaseTrip:
     
-    def __init__(self, trip_id, route_id, message, direction):
+    def __init__(self, trip_id: str, route_id: str, message: str, direction: int):
         self.id = trip_id
         self.route_id = route_id
         self.message = message
@@ -26,18 +27,50 @@ class BaseTrip:
         
         result_str += str(self.stops[-1][0])
         return result_str + ']'
+    
+    def get_index_of_stop_id(self, target_id: str):
+        for index, cur_stop in enumerate(self.stops):
+            if cur_stop.id == target_id: 
+                return index 
+
+        RootLogger.log_error(f'Unable to locate shared stop {target_id} in trip {self.id}')
+        return None 
+    
+    def __eq__(self, other_obj: object) -> bool:
+        return other_obj.id == self.id
 
 
 class SimpleTrip(BaseTrip):
 
-    def __init__(self, trip_id, route_id, message, direction, shape_points, stops, ridership):
+    def __init__(self, trip_id: str, route_id: str, message: str, 
+                       direction: int, shape_points: List[List[ShapePoint]],
+                       stops: List[str]):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
+        self.set_sequence_values_for_stops()
 
     @property
     def flattened_shape_points(self):
         return [Point for partition in self.shape_points for Point in partition]
+    
+    @property
+    def unique_stop_ids(self):
+        return [stop.id for stop in self.stops]
+
+    def set_sequence_values_for_stops(self):
+        # We set the trip sequence values for stop, this is used in exporting to gtfs. 
+        for index, stop in enumerate(self.stops):
+        # want start sequence to start at 1 -> n
+            stop.trip_sequences[self.id] = index + 1 
+
+    def does_share_stop_with(self, other_trip) -> str or None:
+        # TODO: More efficient way to do this I believe. 
+        for id_1 in self.unique_stop_ids:
+            for id_2 in other_trip.unique_stop_ids:
+                if id_1 == id_2:
+                    return id_1
+        return None 
 
     def to_gtfs_row(self):
         # Give all trips service id 0, since we don't care about what time they run, only geometry. 
@@ -66,8 +99,8 @@ class GTFSTrip(BaseTrip):
 
     def set_stops(self, stops: List[Stop], shapes_df: pd.DataFrame):
         self.stops = stops
-    
-    def update_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
+
+    def get_stops(self, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> List[Stop]:
         """
         Return a list of stop ids associated with trip. 
 
@@ -93,9 +126,9 @@ class GTFSTrip(BaseTrip):
             if len(stop_data.index) > 1:
                 RootLogger.log_warning(f'Matched multiple stop with id {stop_id} on trip {self.id} from route {self.route_id}, dropping rest of them.')
             else:
-                RootLogger.log_info(f'Successfully matched stop with id {stop_id} to trip {self.id}')
+                RootLogger.log_debug(f'Successfully matched stop with id {stop_id} to trip {self.id}')
             stop_row = stop_data.iloc[0]
-            stop_obj = stop_from_stop_row_data(stop_row)
+            stop_obj = stop_from_stop_row_data(stop_row, self.route_id)
             stations.append((stop_obj, trip_sequence))
 
         self.stops = stations
@@ -109,70 +142,20 @@ class GTFSTrip(BaseTrip):
         direction: {self.direction}, \
         ridership: {self.ridership}'
 
-
-def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) -> List[List[ShapePoint]]:
-    partition = []
-    cur_stop_points = []
-
-    num_stops = len(stops)
-    num_points = len(shape_points)
-
-    cur_closest_stop_index = 0
-    prev_dist_to_stop = 0
-
-    local_min = float('inf')
-    for point in shape_points:
-        # Current stop that is closest
-        closest_stop = stops[cur_closest_stop_index]
-
-        # Distance from stop to ShapePoint 
-        cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
-        local_min = min(local_min, cur_dist_to_cur_stop)
-        if cur_dist_to_cur_stop == 0.0:
-            RootLogger.log_debug(f'Found shape point on top of stop!')
-
-        # If this distance is increasing i.e. we are moving away from stop, move to next stop. 
-        if cur_dist_to_cur_stop > prev_dist_to_stop:
-            partition.append(cur_stop_points)
-
-            cur_stop_points = []
-            cur_closest_stop_index += 1
-            if cur_closest_stop_index == num_stops:
-                cur_closest_stop_index -= 1
-                RootLogger.log_warning(f'Hit final stop, but at point {point.sequence_num} out of {num_points}. \
-                    decrementing cur_closest_stop_index')
-
-            closest_stop = stops[cur_closest_stop_index]
-            cur_dist_to_cur_stop = closest_stop.distance_to_point(point)
-
-        prev_dist_to_stop = cur_dist_to_cur_stop
-        cur_stop_points.append(point)
-    
-    # Add final stop
-    partition.append(cur_stop_points)
-    cur_closest_stop_index += 1
-    RootLogger.log_debug(f'Found minimum distance: {local_min}')
-    if cur_closest_stop_index < num_stops:
-        RootLogger.log_error(f'Invalid partition generated for stops. Made it to stop {cur_closest_stop_index} out of {num_stops}')
-    return partition
-
 def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridership: int, shape_points: List[ShapePoint]) -> SimpleTrip:
-    
-    # We set the trip sequence values for stop, this is used in exporting to gtfs. 
-    for index, stop in enumerate(new_stops):
-        # want start sequence to start at 1 -> n
-        stop.trip_sequences[original_trip.id] = index + 1 
 
     seperated_shape_points = partition_shape_points(shape_points, new_stops)
     trip_ridership = route_ridership / 2.0
+
+    # Move ridership data to the stops
     assign_ridership_to_stops(new_stops, trip_ridership)
+
     NewTrip = SimpleTrip(trip_id=original_trip.id, 
                               route_id=original_trip.route_id,
                               message=original_trip.message, 
                               direction=original_trip.direction, 
                               shape_points=seperated_shape_points,
-                              stops=new_stops, 
-                              ridership= trip_ridership)
+                              stops=new_stops)
     return NewTrip
 
 
@@ -183,3 +166,20 @@ def assign_ridership_to_stops(StopList: List[Stop], trip_ridership: int):
     # This rewards transfer stops by counting them on each route they transfer for. 
     for stop in StopList:
         stop.ridership += trip_ridership / num_of_stops
+
+def common_transfer_point(trip_A: SimpleTrip, trip_B: SimpleTrip) -> str or None:
+    # Trips must be the same direction
+    if trip_A.direction != trip_B.direction:
+        return None 
+
+    # Trip ids must be distinct (not breeding trip with itself)
+    if trip_A.id == trip_B.id:
+        return None 
+    
+    shared_stop = trip_A.does_share_stop_with(trip_B)
+    
+    # No common transfer stops
+    if shared_stop is None:
+        return shared_stop 
+    
+    return shared_stop

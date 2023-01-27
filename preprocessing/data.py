@@ -1,4 +1,5 @@
 from pathlib import Path
+from os import path
 
 class DataBase:
     """
@@ -12,7 +13,7 @@ class DataBase:
 
     def export_data(self, filename= None):
         if filename is None:
-            filename = self.city_name + '.csv'
+            filename = Path('data', self.city_name + '.csv')
         
         self.read_data().to_csv(filename)
 

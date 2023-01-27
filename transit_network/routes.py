@@ -8,10 +8,9 @@ from root_logger import RootLogger
 
 class BaseRoute:
 
-    def __init__(self, id: str, name: str, city_name: str):
+    def __init__(self, id: str, name: str):
         self.id = id 
         self.name = name
-        self.city_name = city_name
         self.trips = []
     
     def add_trips(self, trips: BaseTrip):
@@ -23,16 +22,17 @@ class BaseRoute:
     def __str__(self):
         return f'(route_id: {self.id}, route_name: {self.name}, trips: {self.display_trips()})'
     
-    def to_gtfs_row(self):
+    def to_gtfs_row(self) -> List[str]:
         # 3 marks the route type (bus), which is the only type parsed. 
-        return [self.id, self.name, self.name, 3]
-
-
+        return [self.id, self.name, self.name, '3']
+    
+    def __eq__(self, other) -> bool:
+        return other.id == self.id 
 
 class GTFSRoute(BaseRoute):
     
-    def __init__(self, id: str, name: str, city_name: str, ridership: int):
-        BaseRoute.__init__(self, id=id, name=name, city_name=city_name)
+    def __init__(self, id: str, name: str, ridership: int):
+        BaseRoute.__init__(self, id=id, name=name)
         self.ridership = ridership
         self.shapes_covered = {}
 
@@ -93,7 +93,7 @@ class GTFSRoute(BaseRoute):
         max_trips = [None, None]
 
         for cur_trip in trip_objects:
-            stops = cur_trip.update_stops(stop_times_df, stops_df)
+            stops = cur_trip.get_stops(stop_times_df, stops_df)
             trip_len = len(stops)
             trip_dir = cur_trip.direction
 
@@ -109,21 +109,24 @@ class GTFSRoute(BaseRoute):
         return max_trips
     
     def __str__(self):
-        BaseRoute.__str__(self) + f', ridership: {self.ridership}'
+        return BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 class SimpleRoute(BaseRoute):
 
-    def __init__(self, id: str, name: str, city_name: str):
-        BaseRoute.__init__(self, id, name, city_name)
+    def __init__(self, id: str, name: str or None):
+        #TODO: Better way to handle this?
+        if name is None:
+            name = id
+        BaseRoute.__init__(self, id, name)
     
     @property
     def ridership(self):
         return sum([t.ridership for t in self.trips])
     
     def __str__(self):
-        BaseRoute.__str__(self) + f', ridership: {self.ridership}'
+        return BaseRoute.__str__(self) + f', ridership: {self.ridership}'
 
 def simplify_route(OriginalRoute: GTFSRoute, simple_trips: List[SimpleTrip]) -> SimpleRoute:
-    Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name, OriginalRoute.city_name)
+    Simple = SimpleRoute(OriginalRoute.id, OriginalRoute.name)
     Simple.add_trips(simple_trips)
     return Simple
