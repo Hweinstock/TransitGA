@@ -14,10 +14,17 @@ This script is purely for informal testing and 'playing' with new code.
 #create_simplified_gtfs_SFMTA()
 
 Network = read_object_from_file('initial_network.pkl')
-#MyPopulation = read_object_from_file('test3')
-initial_pop = generate_population(Network, 100)
-MyPopulation = Population(initial_pop, evaluate_network, breed_networks)
-pickle_object(MyPopulation, 'initial_pop')
+Network2 = Network.get_copy()
+baby1, baby2 = breed_networks(Network, Network2)
+baby1.write_to_gtfs('test_diagrams/baby1GTFS')
+baby2.write_to_gtfs('test_diagrams/baby2GTFS')
+
+# generate_diagram('test_diagrams/baby1GTFS.zip', 'test_diagrams/baby1')
+# generate_diagram('test_diagrams/baby2GTFS.zip', 'test_diagrams/baby2', ['14R:48'])
+# MyPopulation = read_object_from_file('test3')
+# initial_pop = generate_population(Network, 100)
+# MyPopulation = Population(initial_pop, evaluate_network, breed_networks)
+#pickle_object(MyPopulation, 'initial_pop')
 #res = MyPopulation.run(10)
 #print(res)
 

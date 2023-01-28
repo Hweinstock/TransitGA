@@ -43,10 +43,10 @@ class Population:
                                                      p=weights)
         return parent_1, parent_2
     
-    def breed_child(self, pool_of_parents: List[TransitNetwork]) -> TransitNetwork:
+    def breed_children(self, pool_of_parents: List[TransitNetwork]) -> Tuple[TransitNetwork, TransitNetwork]:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
-        new_child = self.breeding_function(parent_1, parent_2)
-        return new_child 
+        new_child_A, new_child_B = self.breeding_function(parent_1, parent_2)
+        return new_child_A, new_child_B
     
     def get_member_by_id(self, sel_id: str) -> TransitNetwork or None:
         matching_members = [m for m in self.population if m.id == sel_id]

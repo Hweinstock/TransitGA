@@ -48,8 +48,9 @@ class SimpleTrip(BaseTrip):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.stops = stops
         self.shape_points = shape_points
+        self.dead = False
         self.set_sequence_values_for_stops()
-
+        
     @property
     def flattened_shape_points(self):
         return [Point for partition in self.shape_points for Point in partition]
@@ -58,6 +59,9 @@ class SimpleTrip(BaseTrip):
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
 
+    def verify_stops(self) -> bool:
+        print(self.stops)
+        
     def set_sequence_values_for_stops(self):
         # We set the trip sequence values for stop, this is used in exporting to gtfs. 
         for index, stop in enumerate(self.stops):
@@ -157,7 +161,6 @@ def simplify_trip(original_trip: GTFSTrip, new_stops: List[Stop], route_ridershi
                               shape_points=seperated_shape_points,
                               stops=new_stops)
     return NewTrip
-
 
 def assign_ridership_to_stops(StopList: List[Stop], trip_ridership: int):
     num_of_stops = len(StopList)

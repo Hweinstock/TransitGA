@@ -11,3 +11,5 @@
 - General: Going with uniform approximation of stop distribution. This should be something slightly more advanced. 
 
 - General: How should we handle duplcate shape_id routes? Right now we take all. Best option would be to take the trip with most stops of certain shape?
+
+-Trips or routes can have the same id, but be different in the case theat they are breeded from the same trips/routes at different stops. 
