@@ -39,9 +39,6 @@ def partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) ->
     return partition
 
 
-
-
-
 def old_partition_shape_points(shape_points: List[ShapePoint], stops: List[Stop]) -> List[List[ShapePoint]]:
     partition = []
     cur_stop_points = []

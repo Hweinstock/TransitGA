@@ -4,7 +4,7 @@ from transit_network.routes import GTFSRoute
 from transit_network.stops import Stop
 from root_logger import RootLogger
 
-TRANSFER_THRESHOLD = 0.001
+TRANSFER_THRESHOLD = 100.0
 
 def flatten(lst: List[List[any]]) -> List[any]:
     return [item for sublist in lst for item in sublist]
@@ -21,7 +21,6 @@ def should_merge(stopA: Stop, stopB: Stop) -> bool:
         return True 
     
     return False
-
 
 def merge_stops(stops: List[Stop]) -> List[Stop]:
 

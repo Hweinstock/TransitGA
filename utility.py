@@ -1,5 +1,7 @@
 import pickle 
+import geopy.distance
 from pathlib import Path 
+from typing import Tuple
 
 from root_logger import RootLogger
 
@@ -17,3 +19,9 @@ def read_object_from_file(filename: str) -> object:
         obj = pickle.load(input_file)
 
     return obj
+
+def sphere_distance(coords_1: Tuple[float, float], coords_2: Tuple[float, float]) -> float:
+    # returns distance in meters. 
+    # https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude/43211266#43211266
+    km_dist = geopy.distance.geodesic(coords_1, coords_2).km 
+    return km_dist * 1000

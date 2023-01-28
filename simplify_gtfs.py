@@ -18,7 +18,7 @@ def generate_compression_metrics(Gtfs: GTFSData, SimplifiedNetwork: TransitNetwo
              Reduced number of trips from {original_num_trips} to {new_num_trips}, \n \
              Reduced number of stops from {original_num_stops} to {new_num_stops}. '
 
-def create_simplified_gtfs_SFMTA():
+def create_simplified_gtfs_SFMTA(export_name='initial_network'):
     RRD = RawRidershipData('data/ridership_data/SFMTA.xlsx', 'SF')
     RD = RidershipData(RRD)
     RD.export_data()
@@ -29,7 +29,6 @@ def create_simplified_gtfs_SFMTA():
     SF_GTFS.set_trips_for_all_routes(matched_routes)
 
     Network = create_network_from_GTFSRoutes(matched_routes, SF_GTFS.read_data().shapes)
-    name = 'initial_network'
     print(generate_compression_metrics(SF_GTFS, Network))
-    pickle_object(Network, name)
-    Network.write_to_gtfs(name)
+    pickle_object(Network, export_name)
+    Network.write_to_gtfs(export_name)

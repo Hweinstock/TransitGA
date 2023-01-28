@@ -123,7 +123,6 @@ class TransitNetwork:
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 
     transfer_stops_obj = new_determine_transfers(routes)
-    print('# of transfer stops', len(transfer_stops_obj))
     id_to_obj_map = map_ids_to_obj(transfer_stops_obj)
     unique_shapes = {}
     # Update stop objects so that they all have transfer points set. 

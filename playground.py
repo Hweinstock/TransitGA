@@ -11,7 +11,8 @@ from utility import read_object_from_file, pickle_object
 This script is purely for informal testing and 'playing' with new code. 
 """
 
-#create_simplified_gtfs_SFMTA()
+#create_simplified_gtfs_SFMTA('new_initial_net')
+generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 
 # Network = read_object_from_file('initial_network.pkl')
 # print(Network.ridership_density_score)
@@ -24,9 +25,9 @@ This script is purely for informal testing and 'playing' with new code.
 # generate_diagram('test_diagrams/baby1GTFS.zip', 'test_diagrams/baby1')
 # generate_diagram('test_diagrams/baby2GTFS.zip', 'test_diagrams/baby2', ['14R:48'])
 
-MyPopulation = read_object_from_file('initial_pop.pkl')
-res = MyPopulation.run(100)
-print(res)
+# MyPopulation = read_object_from_file('initial_pop.pkl')
+# res = MyPopulation.run(100)
+# print(res)
 
 #myPopulation.population[23].write_to_gtfs('random_network')
 # generate_diagram('random_network.zip', 'test_diagrams/random')
