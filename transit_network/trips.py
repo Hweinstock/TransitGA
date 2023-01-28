@@ -59,9 +59,15 @@ class SimpleTrip(BaseTrip):
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
 
-    def verify_stops(self) -> bool:
-        print(self.stops)
+    def count_intersections(self):
+        unique_trips = {} 
+        for stop in self.stops:
+            for other_trip in stop.trip_sequences.keys():
+                if other_trip not in unique_trips:
+                    unique_trips[other_trip] = True 
         
+        return len(unique_trips)
+
     def set_sequence_values_for_stops(self):
         # We set the trip sequence values for stop, this is used in exporting to gtfs. 
         for index, stop in enumerate(self.stops):

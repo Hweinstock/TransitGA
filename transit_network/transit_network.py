@@ -65,7 +65,17 @@ class TransitNetwork:
     @property
     def coverage(self):
         return len(self.stops)
-    
+
+    @property
+    def ridership_density_score(self):
+        score = 0
+        for trip in self.trips:
+            intersections = trip.count_intersections()
+            ridership = trip.ridership 
+
+            score += intersections * ridership
+        return score 
+
     def __str__(self):
         num_routes = len(self.routes)
         num_trips = len(self.trips)

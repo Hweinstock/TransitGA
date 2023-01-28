@@ -81,9 +81,10 @@ class Population:
         RootLogger.log_info(f'Producing {children_needed} to fill out population.')
         while children_needed > 0:
             RootLogger.log_info(f'{children_needed} more children to go.')
-            new_child = self.breed_child(top_performers)
-            new_population.append(new_child)
-            children_needed -= 1
+            new_child_A, new_child_B = self.breed_children(top_performers)
+            new_population.append(new_child_A)
+            new_population.append(new_child_B)
+            children_needed -= 2
 
         RootLogger.log_info(f'Done generating next Population...')
         return new_population
