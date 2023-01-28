@@ -25,7 +25,7 @@ This script is purely for informal testing and 'playing' with new code.
 # generate_diagram('test_diagrams/baby2GTFS.zip', 'test_diagrams/baby2', ['14R:48'])
 
 MyPopulation = read_object_from_file('initial_pop.pkl')
-res = MyPopulation.run(10)
+res = MyPopulation.run(100)
 print(res)
 
 #myPopulation.population[23].write_to_gtfs('random_network')

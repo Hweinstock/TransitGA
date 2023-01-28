@@ -95,8 +95,8 @@ def get_child_trips(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simpl
     #Go from ids -> trip obj so that we can mark which trips to remove. 
     parent_trip_A = get_trip_by_id(parent_A_trips, trip_A_id)
     parent_trip_B = get_trip_by_id(parent_B_trips, trip_B_id)
-    parent_trip_A.dead = True 
-    parent_trip_B.dead = True
+    # parent_trip_A.dead = True 
+    # parent_trip_B.dead = True
 
     child_trip_A = produce_child_trip(parent_trip_A, parent_trip_B, shared_stop_id) 
     child_trip_B = produce_child_trip(parent_trip_B, parent_trip_A, shared_stop_id)
@@ -121,7 +121,13 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
         return Net_A, Net_B
 
     else:
-        child_trip_A, child_trip_B  = children 
+        child_trip_A, child_trip_B  = children
+        # Randomly choose two trips to replace. 
+        random_trip_A = random.choice(net_A_trips)
+        random_trip_B = random.choice(net_B_trips)
+        random_trip_A.dead = True
+        random_trip_B.dead = True 
+
         new_trips_A = [t if not t.dead else child_trip_A for t in net_A_trips]
         new_trips_B = [t if not t.dead else child_trip_B for t in net_B_trips]
         
