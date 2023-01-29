@@ -7,6 +7,17 @@ from copy import deepcopy
 from typing import List, Tuple
 
 MAX_RETRY_COUNT = 50
+PROB_MUTATION = 0.5 
+DELTA_MUTATION = 4
+
+def kill_random_trips(trips: List[SimpleTrip]):
+    r_val = random.uniform(0, 1)
+    if r_val >= PROB_MUTATION:
+        num_killed = random.choice(range(1, DELTA_MUTATION+1))
+        dead_trips = random.choices(trips, k=num_killed)
+
+        for trip in dead_trips:
+            trip.dead = True 
 
 def get_trip_by_id(collection: List[SimpleTrip], target_id: str) -> SimpleTrip or None:
     filter_results = [t for t in collection if t.id == target_id]
@@ -95,8 +106,6 @@ def get_child_trips(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simpl
     #Go from ids -> trip obj so that we can mark which trips to remove. 
     parent_trip_A = get_trip_by_id(parent_A_trips, trip_A_id)
     parent_trip_B = get_trip_by_id(parent_B_trips, trip_B_id)
-    # parent_trip_A.dead = True 
-    # parent_trip_B.dead = True
 
     child_trip_A = produce_child_trip(parent_trip_A, parent_trip_B, shared_stop_id) 
     child_trip_B = produce_child_trip(parent_trip_B, parent_trip_A, shared_stop_id)
@@ -123,13 +132,11 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
     else:
         child_trip_A, child_trip_B  = children
         # Randomly choose two trips to replace. 
-        random_trip_A = random.choice(net_A_trips)
-        random_trip_B = random.choice(net_B_trips)
-        random_trip_A.dead = True
-        random_trip_B.dead = True 
+        kill_random_trips(net_A_trips)
+        kill_random_trips(net_B_trips) 
 
-        new_trips_A = [t if not t.dead else child_trip_A for t in net_A_trips]
-        new_trips_B = [t if not t.dead else child_trip_B for t in net_B_trips]
+        new_trips_A = [t for t in net_A_trips if not t.dead] + [child_trip_A]
+        new_trips_B = [t for t in net_A_trips if not t.dead] + [child_trip_B]
         
 
         # Generate 'breeded' ids if none provided. 

@@ -20,7 +20,6 @@ def evaluate_network(net: TransitNetwork):
     
     return ridership_val + routes_val + coverage_val + ridership_density_val
 
-
 def evaluate_network_new(net: TransitNetwork):
 
     pass   
