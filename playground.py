@@ -12,9 +12,15 @@ This script is purely for informal testing and 'playing' with new code.
 """
 
 #create_simplified_gtfs_SFMTA('new_initial_net')
-generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
+#generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 
-# Network = read_object_from_file('initial_network.pkl')
+Network = read_object_from_file('initial_network.pkl')
+initial_population = generate_population(Network, 100)
+MyPopulation = Population(initial_population, evaluate_network, breed_networks)
+res = MyPopulation.run(100)
+print(res)
+
+
 # print(Network.ridership_density_score)
 # print(Network.ridership_density_score)
 # Network2 = Network.get_copy()

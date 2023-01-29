@@ -80,7 +80,7 @@ class Population:
         children_needed = self.population_size - elitist_num 
         RootLogger.log_info(f'Producing {children_needed} to fill out population.')
         while children_needed > 0:
-            RootLogger.log_info(f'{children_needed} more children to go.')
+            RootLogger.log_debug(f'{children_needed} more children to go.')
             new_child_A, new_child_B = self.breed_children(top_performers)
             new_population.append(new_child_A)
             new_population.append(new_child_B)
@@ -114,7 +114,7 @@ class Population:
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
         while self.iteration_number <= max_iteration:
-            RootLogger.log_debug(f'On iteration {self.iteration_number} of {max_iteration}.')
+            RootLogger.log_info(f'On iteration {self.iteration_number} of {max_iteration}.')
             self.update_population()
             self.iteration_number += 1
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')

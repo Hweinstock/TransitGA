@@ -6,6 +6,11 @@ from root_logger import RootLogger
 from preprocessing.data import DataBase
 from transit_network.routes import GTFSRoute
 
+ROUTE_FILE_HEADERS = ['route_id' ,'route_short_name', 'route_long_name', 'route_type']
+TRIPS_FILE_HEADERS = ['route_id', 'service_id', 'trip_id', 'direction_id', 'shape_id', 'trip_headsign']
+STOP_TIMES_FILE_HEADERS = ['trip_id', 'arrival_time', 'departure_time', 'stop_id', 'stop_sequence']
+STOP_FILE_HEADERS = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'parent_station']
+SHAPES_FILE_HEADERS = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_sequence']
 
 class GTFSData(DataBase):
 

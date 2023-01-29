@@ -3,17 +3,14 @@ from transit_network.trips import common_transfer_point, SimpleTrip
 from root_logger import RootLogger
 import random 
 from copy import deepcopy
+import genetic_algorithm.params as params
 
 from typing import List, Tuple
 
-MAX_RETRY_COUNT = 50
-PROB_MUTATION = 0.5 
-DELTA_MUTATION = 4
-
 def kill_random_trips(trips: List[SimpleTrip]):
     r_val = random.uniform(0, 1)
-    if r_val >= PROB_MUTATION:
-        num_killed = random.choice(range(1, DELTA_MUTATION+1))
+    if r_val >= params.PROB_MUTATION:
+        num_killed = random.choice(range(1, params.DELTA_MUTATION+1))
         dead_trips = random.choices(trips, k=num_killed)
 
         for trip in dead_trips:
@@ -61,7 +58,7 @@ def get_child_trips_rand(parent_A_trips: List[SimpleTrip], parent_B_trips: List[
     times_tried = 0
     parent_trip_A = None 
     parent_trip_B = None
-    while times_tried < MAX_RETRY_COUNT:
+    while times_tried < params.MAX_RETRY_COUNT:
         rand_A = random.choice(parent_A_trips)
         rand_B = random.choice(parent_B_trips)
         if rand_A != rand_B:
