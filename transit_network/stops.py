@@ -1,7 +1,7 @@
 from typing import List, Dict
-from math import dist 
 
 from root_logger import RootLogger
+from utility import sphere_distance
 from transit_network.shapes import ShapePoint
 
 def stop_from_stop_row_data(row, route_id):
@@ -47,7 +47,7 @@ class Stop:
         y_1 = self.location_lon
         y_2 = other_stop.location_lon
 
-        return dist([x_1, y_1], [x_2, y_2])
+        return sphere_distance([x_1, y_1], [x_2, y_2])
         
     def distance_to_point(self, point: ShapePoint) -> float:
         x_1 = self.location_lat
@@ -56,7 +56,7 @@ class Stop:
         y_1 = self.location_lon
         y_2 = point.lon
 
-        return dist([x_1, y_1], [x_2, y_2])
+        return sphere_distance([x_1, y_1], [x_2, y_2])
 
     def merge_with(self, second_stop):
         if self.id == second_stop.id:

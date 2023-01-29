@@ -5,8 +5,11 @@ import warnings
 import pandas as pd
 from typing import List
 
+from root_logger import RootLogger
+
 
 def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] = None):
+    RootLogger.log_debug(f'Generating diagram for {zip_path} with routes restricted to {route_ids}...')
     output_filename = f'{output_filename}.html'
     warnings.simplefilter('ignore')
     path = Path(zip_path)
@@ -16,6 +19,7 @@ def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] =
         route_ids = feed.routes.route_id.iloc[:]
     stop_route = feed.map_routes(route_ids, include_stops=True)
     stop_route.save(output_filename)
+    RootLogger.log_debug(f'Diagram saved to {output_filename}.')
 
 # warnings.simplefilter('ignore')
 

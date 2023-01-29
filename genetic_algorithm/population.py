@@ -43,10 +43,10 @@ class Population:
                                                      p=weights)
         return parent_1, parent_2
     
-    def breed_child(self, pool_of_parents: List[TransitNetwork]) -> TransitNetwork:
+    def breed_children(self, pool_of_parents: List[TransitNetwork]) -> Tuple[TransitNetwork, TransitNetwork]:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
-        new_child = self.breeding_function(parent_1, parent_2)
-        return new_child 
+        new_child_A, new_child_B = self.breeding_function(parent_1, parent_2)
+        return new_child_A, new_child_B
     
     def get_member_by_id(self, sel_id: str) -> TransitNetwork or None:
         matching_members = [m for m in self.population if m.id == sel_id]
@@ -80,10 +80,11 @@ class Population:
         children_needed = self.population_size - elitist_num 
         RootLogger.log_info(f'Producing {children_needed} to fill out population.')
         while children_needed > 0:
-            RootLogger.log_info(f'{children_needed} more children to go.')
-            new_child = self.breed_child(top_performers)
-            new_population.append(new_child)
-            children_needed -= 1
+            RootLogger.log_debug(f'{children_needed} more children to go.')
+            new_child_A, new_child_B = self.breed_children(top_performers)
+            new_population.append(new_child_A)
+            new_population.append(new_child_B)
+            children_needed -= 2
 
         RootLogger.log_info(f'Done generating next Population...')
         return new_population
@@ -113,7 +114,7 @@ class Population:
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
         while self.iteration_number <= max_iteration:
-            RootLogger.log_debug(f'On iteration {self.iteration_number} of {max_iteration}.')
+            RootLogger.log_info(f'On iteration {self.iteration_number} of {max_iteration}.')
             self.update_population()
             self.iteration_number += 1
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')

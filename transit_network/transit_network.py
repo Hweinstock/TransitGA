@@ -9,14 +9,9 @@ from transit_network.stops import Stop, map_ids_to_obj
 from transit_network.trips import GTFSTrip, simplify_trip, SimpleTrip
 from transit_network.shapes import ShapePoint, get_shapes_from_df
 from preprocessing.determine_transfers import new_determine_transfers
+import preprocessing.gtfs_data as GTFS
 
 from root_logger import RootLogger
-
-ROUTE_FILE_HEADERS = ['route_id' ,'route_short_name', 'route_long_name', 'route_type']
-TRIPS_FILE_HEADERS = ['route_id', 'service_id', 'trip_id', 'direction_id', 'shape_id', 'trip_headsign']
-STOP_TIMES_FILE_HEADERS = ['trip_id', 'arrival_time', 'departure_time', 'stop_id', 'stop_sequence']
-STOP_FILE_HEADERS = ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'parent_station']
-SHAPES_FILE_HEADERS = ['shape_id', 'shape_pt_lat', 'shape_pt_lon', 'shape_pt_sequence']
 
 class TransitNetwork:
 
@@ -65,7 +60,17 @@ class TransitNetwork:
     @property
     def coverage(self):
         return len(self.stops)
-    
+
+    @property
+    def ridership_density_score(self):
+        score = 0
+        for trip in self.trips:
+            intersections = trip.count_intersections()
+            ridership = trip.ridership 
+
+            score += intersections * ridership
+        return score 
+
     def __str__(self):
         num_routes = len(self.routes)
         num_trips = len(self.trips)
@@ -90,44 +95,37 @@ class TransitNetwork:
             os.makedirs(folder)
 
         route_rows = [r.to_gtfs_row() for r in self.routes]
-        rows_to_file(route_rows, ROUTE_FILE_HEADERS, 'routes')
+        rows_to_file(route_rows, GTFS.ROUTE_FILE_HEADERS, 'routes')
 
         trip_rows = [t.to_gtfs_row() for t in self.trips]
-        rows_to_file(trip_rows, TRIPS_FILE_HEADERS, 'trips')
+        rows_to_file(trip_rows, GTFS.TRIPS_FILE_HEADERS, 'trips')
 
         shapes_rows = []
         for trip in self.trips:
             shapes_rows += trip.get_shapes_rows()
-        rows_to_file(shapes_rows, SHAPES_FILE_HEADERS, 'shapes')
+        rows_to_file(shapes_rows, GTFS.SHAPES_FILE_HEADERS, 'shapes')
 
         stop_times_rows = []
         for s in self.stops:
             stop_times_rows += s.to_stop_time_gtfs_rows()
-        rows_to_file(stop_times_rows, STOP_TIMES_FILE_HEADERS, 'stop_times')
+        rows_to_file(stop_times_rows, GTFS.STOP_TIMES_FILE_HEADERS, 'stop_times')
 
         stop_rows = [s.to_gtfs_row() for s in self.stops]
-        rows_to_file(stop_rows, STOP_FILE_HEADERS, 'stops')
+        rows_to_file(stop_rows, GTFS.STOP_FILE_HEADERS, 'stops')
         RootLogger.log_info(f'Constructed GTFS files, now zipping into {folder}.zip')
         shutil.make_archive(folder, 'zip', folder)
 
 def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFrame) -> TransitNetwork:
 
     transfer_stops_obj = new_determine_transfers(routes)
-    print('# of transfer stops', len(transfer_stops_obj))
     id_to_obj_map = map_ids_to_obj(transfer_stops_obj)
-    unique_shapes = {}
     # Update stop objects so that they all have transfer points set. 
     simple_routes = []
     for route in routes:
         RootLogger.log_info(f'Simplifying trips for route {route.id}')
         new_trips = []
         for trip in route.trips:
-            # Currently not using. 
-            # if trip.shape_id in unique_shapes:
-            #     RootLogger.log_warning(f'Found duplicate shaped trip {trip.id} on route {route.id}. Dropping this trip.')
-            #     continue 
-            # else:
-            #     unique_shapes[trip.shape_id] = True
+
 
             new_stops = [] 
 
