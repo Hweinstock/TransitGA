@@ -1,6 +1,6 @@
 ##  Breeder
 MAX_RETRY_COUNT = 50
-PROB_MUTATION = 0.5
+PROB_MUTATION = 0.25
 DELTA_MUTATION = 2
 
 ##  Fitness Function

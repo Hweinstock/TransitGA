@@ -2,7 +2,7 @@ from typing import List, Tuple
 import numpy as np
 from statistics import mean, median, stdev
 
-from transit_network.transit_network import TransitNetwork
+from genetic_algorithm.chromosome import Chromosome
 from root_logger import RootLogger
 from utility import pickle_object
 
@@ -15,7 +15,7 @@ class Population:
     mutation_rate = 0.1
     elitist_cutoff = 0.5
 
-    def __init__(self, networks: List[TransitNetwork], fitness_function, breeding_function):
+    def __init__(self, networks: List[Chromosome], fitness_function, breeding_function):
         self.population = networks
         self.population_size = len(networks)
         self.fitness_function = fitness_function
@@ -26,30 +26,37 @@ class Population:
         self.write_to_pickle = pickle_object
     
     def evaluate_population(self):
-        for member in self.population:
-            id = member.id 
-            score = self.fitness_function(member)
-            if id in self.performance_dict:
+        for index, member in enumerate(self.population):
+            # Assign the member a unique_id equal to index. 
+            member.unique_id = index
+            score = self.fitness_function(member.obj)
+
+            # Check that this is the first time we see this id. 
+            if member.unique_id in self.performance_dict:
                 RootLogger.log_warning(f'Population members with duplicate ids found in population. Overwriting fitness.')
-            self.performance_dict[id] = score 
+            self.performance_dict[member.unique_id] = score 
         
         self.set_performance_metrics()
     
-    def select_parents(self, pool: List[TransitNetwork]) -> Tuple[TransitNetwork, TransitNetwork]:
-        weights = scale_to_prob_dist([self.performance_dict[m.id] for m in pool])
+    def select_parents(self, pool: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
+        weights = scale_to_prob_dist([self.performance_dict[m.unique_id] for m in pool])
 
         [parent_1, parent_2] = np.random.choice(pool, 
                                                      size=2, replace=False, 
                                                      p=weights)
         return parent_1, parent_2
     
-    def breed_children(self, pool_of_parents: List[TransitNetwork]) -> Tuple[TransitNetwork, TransitNetwork]:
+    def breed_children(self, pool_of_parents: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
-        new_child_A, new_child_B = self.breeding_function(parent_1, parent_2)
-        return new_child_A, new_child_B
+        
+        # Extract out the objects from the chromosomes. 
+        new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj)
+        new_member_A = Chromosome(new_child_A, parent_A_id=parent_1.get_family_history(), parent_B_id=parent_2.get_family_history())
+        new_member_B = Chromosome(new_child_B, parent_A_id=parent_1.get_family_history(), parent_B_id=parent_2.get_family_history())
+        return new_member_A, new_member_B
     
-    def get_member_by_id(self, sel_id: str) -> TransitNetwork or None:
-        matching_members = [m for m in self.population if m.id == sel_id]
+    def get_member_by_id(self, sel_id: str) -> Chromosome or None:
+        matching_members = [m for m in self.population if m.unique_id == sel_id]
         if len(matching_members) > 1:
             RootLogger.log_error(f'Multiple Networks found with the same id {sel_id}. Selecting randomly.')
         
@@ -73,7 +80,7 @@ class Population:
         # Select best performing networks
         RootLogger.log_debug(f'Performing Elitist Selection on population.')
         elitist_num = int(self.elitist_cutoff*self.population_size)
-        top_performers = sorted(self.population, key=lambda mem: self.performance_dict[mem.id], reverse=True)[:elitist_num]
+        top_performers = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id], reverse=True)[:elitist_num]
         new_population += top_performers
 
         # Compute Children
@@ -120,11 +127,9 @@ class Population:
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         return self.per_round_metrics
     
-        
+    
 
-
-
-
+    
 
 
         

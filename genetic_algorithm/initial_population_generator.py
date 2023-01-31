@@ -5,6 +5,9 @@ import pprint
 
 from transit_network.transit_network import TransitNetwork
 from root_logger import RootLogger
+from genetic_algorithm.population import Population
+from genetic_algorithm.chromosome import Chromosome
+from genetic_algorithm.fitness_function import evaluate_network 
 from genetic_algorithm.breeder import breed_networks
 
 class NetworkMetrics:
@@ -41,7 +44,8 @@ def generate_population(initial_network: TransitNetwork, population_size: int, d
         current_population.append(baby_network_B)
 
     if do_print_metrics:
-        print_metrics(generate_metrics(initial_network, current_population))
+        metrics = generate_metrics(initial_network, current_population)
+        print_metrics(metrics)
     RootLogger.log_info('Done Generating Initial Population.')
     
     return current_population
@@ -78,3 +82,7 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
 def print_metrics(metrics: Dict[str, float]) -> None:
     pprint.pprint(metrics)
 
+def initiate_population_from_network(network: TransitNetwork, size: int) -> Population:
+    initial_networks = generate_population(network, size)
+    initial_population = [Chromosome(net) for net in initial_networks]
+    return Population(initial_population, evaluate_network, breed_networks)

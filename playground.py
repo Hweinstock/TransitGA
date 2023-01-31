@@ -1,12 +1,5 @@
-from simplify_gtfs import create_simplified_gtfs_SFMTA
-from transit_network.transit_network import TransitNetwork
-from genetic_algorithm.breeder import breed_networks
-from graph_gtfs import generate_diagram
-from genetic_algorithm.initial_population_generator import generate_population
-from genetic_algorithm.fitness_function import evaluate_network
-from genetic_algorithm.breeder import breed_networks
-from genetic_algorithm.population import Population
-from utility import read_object_from_file, pickle_object
+from genetic_algorithm.initial_population_generator import initiate_population_from_network
+from utility import read_object_from_file
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
@@ -15,9 +8,8 @@ This script is purely for informal testing and 'playing' with new code.
 #generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 
 Network = read_object_from_file('initial_network.pkl')
-initial_population = generate_population(Network, 100)
-MyPopulation = Population(initial_population, evaluate_network, breed_networks)
-res = MyPopulation.run(100)
+Pop = initiate_population_from_network(Network, 100)
+res = Pop.run(100)
 print(res)
 
 
