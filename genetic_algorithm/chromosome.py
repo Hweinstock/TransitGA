@@ -8,6 +8,7 @@ class Chromosome:
         self.parent_A_id = parent_A_id 
         self.parent_B_id = parent_B_id 
         self.unique_id = None # This value changes based on iteration. 
+        self.num_times_parent = 0
 
     def get_family_history(self):
         if self.parent_A_id is None or self.parent_B_id is None:

@@ -48,6 +48,10 @@ class Population:
     
     def breed_children(self, pool_of_parents: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
+
+        # Tracking number of times they have been parent. 
+        parent_1.num_times_parent += 1
+        parent_2.num_times_parent += 1
         
         # Extract out the objects from the chromosomes. 
         new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj)
