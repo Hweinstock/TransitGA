@@ -129,7 +129,6 @@ class Population:
         while self.iteration_number <= max_iteration:
             RootLogger.log_info(f'On iteration {self.iteration_number} of {max_iteration}.')
             self.update_population()
-            self.iteration_number += 1
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True
         return self.per_round_metrics

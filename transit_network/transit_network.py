@@ -76,9 +76,9 @@ class TransitNetwork:
         num_trips = len(self.trips)
         num_stops = len(self.stops)
 
-        routes_str = "\n".join([str(r) for r in self.routes])
+        # routes_str = "\n".join([str(r) for r in self.routes])
         report_str = f'(TransitNetwork[routes: {num_routes}, trips: {num_trips}, stops: {num_stops}, ridership: {self.ridership}])'
-        return routes_str + report_str
+        return report_str
 
     def write_to_gtfs(self, folder: str):
 

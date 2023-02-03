@@ -2,6 +2,7 @@ from typing import List, Tuple, Dict
 from random import choices
 from statistics import mean, median, stdev
 import pprint
+from math import ceil
 
 from transit_network.transit_network import TransitNetwork
 from root_logger import RootLogger
@@ -33,19 +34,31 @@ def generate_population(initial_network: TransitNetwork, population_size: int, d
     current_population = [initial_network]
     RootLogger.log_info('Generating Initial Population...')
     babys_to_breed = population_size - 1.0
-    for i in range(int(babys_to_breed/2.0)):
+    for i in range(ceil(babys_to_breed/2.0)):
         RootLogger.log_debug(f'Generated {2*i} of {population_size-1}.')
 
         # Randomly sample two parents from the current population, and do so until we fill population. 
         [parent_a, parent_b] = choices(current_population, k=2)
         baby_network_A, baby_network_B = breed_networks(parent_a, parent_b, str(i))
+        
         # Add babies to new population. 
         current_population.append(baby_network_A)
         current_population.append(baby_network_B)
 
+    if len(current_population) != population_size:
+        if len(current_population) == population_size + 1:
+            # Remove last generated child network. 
+            current_population.pop(-1)
+        else:
+            RootLogger.log_error(f'Wanted population of size {population_size}, got one of size {len(current_population)}.')
+
+
     if do_print_metrics:
-        metrics = generate_metrics(initial_network, current_population)
-        print_metrics(metrics)
+        if len(current_population) <= 2:
+            RootLogger.log_warning(f'Population size of {len(current_population)} to small to generate metrics.')
+        else:
+            metrics = generate_metrics(initial_network, current_population)
+            print_metrics(metrics)
     RootLogger.log_info('Done Generating Initial Population.')
     
     return current_population
