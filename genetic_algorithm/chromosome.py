@@ -11,7 +11,8 @@ class Chromosome:
         self.num_times_parent = 0
 
     def get_family_history(self):
-        if self.parent_A_id is None or self.parent_B_id is None:
-            return self.original_id 
-        else:
-            return f"({self.parent_A_id}):({self.parent_B_id})"
+        return ''
+        # if self.parent_A_id is None or self.parent_B_id is None:
+        #     return self.original_id 
+        # else:
+        #     return f"({self.parent_A_id}):({self.parent_B_id})"

@@ -7,6 +7,13 @@ import genetic_algorithm.params as params
 
 from typing import List, Tuple
 
+class Family:
+    def __init__(self, child_A: SimpleTrip, child_B: SimpleTrip, parent_A: SimpleTrip, parent_B: SimpleTrip):
+        self.child_A = child_A 
+        self.child_B = child_B 
+        self.parent_A = parent_A 
+        self.parent_B = parent_B
+
 def kill_random_trips(trips: List[SimpleTrip]):
     r_val = random.uniform(0, 1)
     if r_val >= params.PROB_MUTATION:
@@ -53,7 +60,7 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     RootLogger.log_debug(f'Successfuly created child trip {new_id} on new troute {new_route}')
     return new_trip
 
-def get_child_trips_rand(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Tuple[SimpleTrip, SimpleTrip, SimpleTrip, SimpleTrip] or None:
+def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Family or None:
     RootLogger.log_debug('Attempting to randomly sample overlapping trips...')
     times_tried = 0
     parent_trip_A = None 
@@ -81,7 +88,12 @@ def get_child_trips_rand(parent_A_trips: List[SimpleTrip], parent_B_trips: List[
     child_trip_A = produce_child_trip(parent_trip_A, parent_trip_B, shared_stop_id) 
     child_trip_B = produce_child_trip(parent_trip_B, parent_trip_A, shared_stop_id)
 
-    return child_trip_A, child_trip_B
+    fam = Family(child_A=child_trip_A, 
+           child_B=child_trip_B, 
+           parent_A=parent_trip_A, 
+           parent_B=parent_trip_B)
+
+    return fam
 
 def get_child_trips(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Tuple[SimpleTrip, SimpleTrip, SimpleTrip, SimpleTrip] or None:
     
@@ -119,21 +131,18 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
     net_A_trips = Net_A.trips 
     net_B_trips = Net_B.trips
 
-    children = get_child_trips_rand(net_A_trips, net_B_trips)
+    family = get_family(net_A_trips, net_B_trips)
     
-    if children is None:
+    if family is None:
         RootLogger.log_warning((f'Failed to breed networks {Net_A.id} and {Net_B.id}, no common stops found among trips.'
                               f' Returning parents instead.'))
         return Net_A, Net_B
 
-    else:
-        child_trip_A, child_trip_B  = children
-        # Randomly choose two trips to replace. 
-        kill_random_trips(net_A_trips)
-        kill_random_trips(net_B_trips) 
+    else: 
+        # Kill parents
 
-        new_trips_A = [t for t in net_A_trips if not t.dead] + [child_trip_A]
-        new_trips_B = [t for t in net_A_trips if not t.dead] + [child_trip_B]
+        new_trips_A = [t for t in net_A_trips if t != family.parent_A] + [family.child_A]
+        new_trips_B = [t for t in net_A_trips if t != family.parent_B] + [family.child_B]
         
 
         # Generate 'breeded' ids if none provided. 
