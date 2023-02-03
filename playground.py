@@ -1,5 +1,6 @@
 from genetic_algorithm.initial_population_generator import initiate_population_from_network
 from utility import read_object_from_file
+from graph_metrics import plot_per_round_metrics
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
@@ -10,7 +11,8 @@ This script is purely for informal testing and 'playing' with new code.
 Network = read_object_from_file('initial_network.pkl')
 Pop = initiate_population_from_network(Network, 100)
 res = Pop.run(100)
-print(res)
+filename = Pop.export_metrics()
+plot_per_round_metrics(filename)
 
 
 # print(Network.ridership_density_score)

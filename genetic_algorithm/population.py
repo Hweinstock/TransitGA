@@ -1,5 +1,6 @@
 from typing import List, Tuple
 import numpy as np
+import pandas as pd
 from statistics import mean, median, stdev
 
 from genetic_algorithm.chromosome import Chromosome
@@ -24,6 +25,7 @@ class Population:
         self.performance_dict = {}
         self.per_round_metrics = []
         self.write_to_pickle = pickle_object
+        self.done_running = False
     
     def evaluate_population(self):
         for index, member in enumerate(self.population):
@@ -129,7 +131,21 @@ class Population:
             self.update_population()
             self.iteration_number += 1
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
+        self.done_running = True
         return self.per_round_metrics
+    
+    def export_metrics(self, filename='results.csv') -> str:
+        if not self.done_running:
+            RootLogger.log_warning(f'Generating Metrics for unfinished population object...')
+        RootLogger.log_info(f'Outputting metrics to {filename}...')
+
+        df = pd.DataFrame(self.per_round_metrics)
+        df.to_csv(filename, index_label='iteration')
+
+        RootLogger.log_info(f'Done outputting metrics to {filename}!')
+        return filename
+        
+            
     
     
 
