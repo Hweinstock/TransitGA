@@ -1,6 +1,6 @@
 from genetic_algorithm.initial_population_generator import initiate_population_from_network
 from utility import read_object_from_file
-from graph_metrics import plot_per_round_metrics
+from graph_metrics import plot_per_round_metrics, plot_all_stats, plot_time
 from genetic_algorithm.breeder import breed_networks
 """
 This script is purely for informal testing and 'playing' with new code. 
@@ -10,7 +10,8 @@ This script is purely for informal testing and 'playing' with new code.
 #generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 
 Network = read_object_from_file('new_initial_net.pkl')
-Network2 = read_object_from_file('new_initial_net.pkl')
+print(Network)
+#Network2 = read_object_from_file('new_initial_net.pkl')
 
 # net1, net2 = breed_networks(Network, Network2)
 # net3, net4 = breed_networks(net1, net2)
@@ -18,9 +19,10 @@ Network2 = read_object_from_file('new_initial_net.pkl')
 # print(net1, net2, net3, net4, net5, net6)
 
 Pop = initiate_population_from_network(Network, 1000)
-# res = Pop.run(50)
-# filename = Pop.export_metrics()
-# plot_per_round_metrics(filename, 'plot2.png')
+res = Pop.run(75)
+filename = Pop.export_metrics()
+plot_all_stats(filename)
+plot_time(filename)
 
 
 # print(Network.ridership_density_score)

@@ -58,8 +58,8 @@ class Population:
         
         # Extract out the objects from the chromosomes. 
         new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj)
-        new_member_A = Chromosome(new_child_A, parent_A_id=parent_1.get_family_history(), parent_B_id=parent_2.get_family_history())
-        new_member_B = Chromosome(new_child_B, parent_A_id=parent_1.get_family_history(), parent_B_id=parent_2.get_family_history())
+        new_member_A = Chromosome(new_child_A, parent_A_id=parent_1, parent_B_id=parent_2)
+        new_member_B = Chromosome(new_child_B, parent_A_id=parent_1, parent_B_id=parent_2)
         return new_member_A, new_member_B
     
     def get_member_by_id(self, sel_id: str) -> Chromosome or None:
@@ -79,6 +79,10 @@ class Population:
         RootLogger.log_debug('New population updated successfully.')
         self.iteration_number += 1
 
+    def dispose_of_dead_chromosomes(self, dead_chromosomes: List[Chromosome]):
+        for chrom in dead_chromosomes:
+            del chrom
+
     def get_next_population(self):
         RootLogger.log_info(f'Generating next Population...')
         new_population = []
@@ -87,7 +91,11 @@ class Population:
         # Select best performing networks
         RootLogger.log_debug(f'Performing Elitist Selection on population.')
         elitist_num = int(self.elitist_cutoff*self.population_size)
-        top_performers = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id], reverse=True)[:elitist_num]
+        sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id], reverse=True)
+        top_performers = sorted_by_performance[:elitist_num]
+        bot_performers = sorted_by_performance[elitist_num:]
+        self.dispose_of_dead_chromosomes(bot_performers)
+
         new_population += top_performers
 
         # Compute Children
