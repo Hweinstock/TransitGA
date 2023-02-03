@@ -13,10 +13,15 @@ from genetic_algorithm.breeder import breed_networks
 
 class NetworkMetrics:
     def __init__(self, network: TransitNetwork):
+        self.network = network
         self.network_id = network.id
         self.route_ids = [r.id for r in network.routes]
         self.trip_ids = [t.id for t in network.trips]
         self.stop_ids = [s.id for s in network.stops]
+
+    @property 
+    def fitness(self):
+        return evaluate_network(self.network)
     
     def similarity(self, other) -> Tuple[float, float, float]:
         if self.network_id == other.network_id:
@@ -27,6 +32,8 @@ class NetworkMetrics:
         stops_similarity = (len(set(self.stop_ids) & set(other.stop_ids)) * 2.0) / (len(self.stop_ids) + len(other.stop_ids))
 
         return routes_similarity, trips_similarity, stops_similarity
+    
+    
 
 def generate_population(initial_network: TransitNetwork, population_size: int, do_print_metrics: bool = True) -> List[TransitNetwork]:
     RootLogger.log_debug(f'Generating initial population of size {population_size} from {initial_network.id}')
@@ -67,16 +74,21 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
     RootLogger.log_debug(f"Generating metrics for initial population generator from network {initial_network.id}.")
     original_metric = NetworkMetrics(initial_network)
     all_metrics = []
+    fitness_scores = []
+    original_fitness = evaluate_network(initial_network)
 
     for other_network in final_population:
+
         if other_network != initial_network: # Don't want this to skew this data. 
             other_net_metric = NetworkMetrics(other_network)
             similarity_scores = original_metric.similarity(other_net_metric)
             all_metrics.append(similarity_scores)
+            fitness_scores.append(other_net_metric.fitness)
     
     route_similarities = [row[0] for row in all_metrics]
     trip_similarities = [row[1] for row in all_metrics]
     stop_similarities = [row[2] for row in all_metrics]
+    fitness_ratios = [f/original_fitness for f in fitness_scores]
 
     metrics = {
         'r_sim_mean': mean(route_similarities), 
@@ -88,6 +100,9 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
         's_sim_mean': mean(stop_similarities), 
         's_sim_med': median(stop_similarities),
         's_sim_stdev': stdev(stop_similarities), 
+        'fit_sim_mean': mean(fitness_ratios), 
+        'fit_sim_med': median(fitness_ratios),
+        'fit_sim_stdev': stdev(fitness_ratios),
     }
     RootLogger.log_debug("Done generating metrics for network population.")
     return metrics

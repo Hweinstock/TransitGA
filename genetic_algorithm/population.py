@@ -2,6 +2,7 @@ from typing import List, Tuple
 import numpy as np
 import pandas as pd
 from statistics import mean, median, stdev
+import time
 
 from genetic_algorithm.chromosome import Chromosome
 from root_logger import RootLogger
@@ -126,9 +127,14 @@ class Population:
         }
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
+
         while self.iteration_number <= max_iteration:
+            start_time = time.time()
             RootLogger.log_info(f'On iteration {self.iteration_number} of {max_iteration}.')
             self.update_population()
+            end_time = time.time()
+            # Append time to metrics
+            self.per_round_metrics[-1]['time'] = end_time - start_time
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True
         return self.per_round_metrics

@@ -18,9 +18,9 @@ Network2 = read_object_from_file('new_initial_net.pkl')
 # print(net1, net2, net3, net4, net5, net6)
 
 Pop = initiate_population_from_network(Network, 1000)
-res = Pop.run(100)
-filename = Pop.export_metrics()
-plot_per_round_metrics(filename, 'plot1.png')
+# res = Pop.run(50)
+# filename = Pop.export_metrics()
+# plot_per_round_metrics(filename, 'plot2.png')
 
 
 # print(Network.ridership_density_score)
