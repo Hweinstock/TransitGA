@@ -1,5 +1,5 @@
 from genetic_algorithm.initial_population_generator import initiate_population_from_network
-from utility import read_object_from_file
+from utility import read_object_from_file, pickle_object
 from graph_metrics import plot_per_round_metrics, plot_all_stats, plot_time, plot_all_fitness_stats
 from genetic_algorithm.breeder import breed_networks
 """
@@ -18,9 +18,10 @@ print(Network)
 # net5, net6 = breed_networks(net3, net4)
 # print(net1, net2, net3, net4, net5, net6)
 
-Pop = initiate_population_from_network(Network, 1000)
-res = Pop.run(30)
+Pop = initiate_population_from_network(Network, 100)
+res = Pop.run(200)
 results_filename = Pop.export_metrics()
+pickle_object(Pop, '200i100p')
 plot_all_stats(results_filename)
 plot_all_fitness_stats(results_filename)
 plot_time(results_filename)

@@ -51,15 +51,18 @@ class Population:
                                                      p=weights)
         return parent_1, parent_2
     
-    def breed_children(self, pool_of_parents: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
+    def breed_children(self, pool_of_parents: List[Chromosome], child_num: int) -> Tuple[Chromosome, Chromosome]:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
 
         # Tracking number of times they have been parent. 
         parent_1.num_times_parent += 1
         parent_2.num_times_parent += 1
+
+        id_A = f'{self.iteration_number}:{child_num}'
+        id_B = f'{self.iteration_number}:{child_num + 1}'
         
         # Extract out the objects from the chromosomes. 
-        new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj)
+        new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj, new_id_A=id_A, new_id_B=id_B)
         new_member_A = Chromosome(new_child_A, parent_A_id=parent_1, parent_B_id=parent_2)
         new_member_B = Chromosome(new_child_B, parent_A_id=parent_1, parent_B_id=parent_2)
         return new_member_A, new_member_B
@@ -104,7 +107,7 @@ class Population:
         RootLogger.log_info(f'Producing {children_needed} to fill out population.')
         while children_needed > 0:
             RootLogger.log_debug(f'{children_needed} more children to go.')
-            new_child_A, new_child_B = self.breed_children(top_performers)
+            new_child_A, new_child_B = self.breed_children(top_performers, children_needed)
             new_population.append(new_child_A)
             new_population.append(new_child_B)
             children_needed -= 2
@@ -135,24 +138,9 @@ class Population:
             result[f'avg_{metric}'] = avg_metric
             result[f'med_{metric}'] = med_metric
             result[f'stddev_{metric}'] = stdev_metric
-        
-
-
-
-        # fitness_scores = [k.fitness for k in current_fitness_metrics.values()]
-        # avg_score, med_score, stdev_score = get_stats(fitness_scores)
-
-        # rirdership_values = [k.ridership_val for k in current_fitness_metrics.values()]
-        # avg_ridership, med_ridership, stdev_ridership = get_stats(rirdership_values)
-
-        # num_routes_values = [k.routes_val for k in current_fitness_metrics.values()]
-        # avg_num_routes, med_num_routes, stdev_num_routes = get_stats(num_routes_values)
-
-        # coverage_values = [k.coverage_val for k in current_fitness_metrics.values()]
-        # avg_coverage, med_coverage, stdev_coverage = get_stats(coverage_values)
-
 
         return result
+
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
 

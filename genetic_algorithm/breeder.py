@@ -49,11 +49,13 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     second_index = second_trip.get_index_of_stop_id(shared_stop)
 
     # We deepcopy because we don't want to be modifying the same stop objects for all of them. 
+    RootLogger.log_debug(f'Crafting parameters for new child trip...')
     new_stops = deepcopy(first_trip.stops[:first_index] + second_trip.stops[second_index:])
     new_shapes = deepcopy(first_trip.shape_points[:first_index] + second_trip.shape_points[second_index:])
     new_route = ':'.join([first_trip.route_id, second_trip.route_id])
     new_id = ':'.join([first_trip.id, second_trip.id])
     new_message = ':'.join([first_trip.id, second_trip.id])
+    RootLogger.log_debug(f'Parameters complete, new id is {new_id}')
 
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
                           direction=first_trip.direction, stops=new_stops, shape_points=new_shapes)
@@ -72,8 +74,8 @@ def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip
             shared_stop_id = common_transfer_point(rand_A, rand_B)
             if shared_stop_id is not None:
                 RootLogger.log_debug(f'Attempt {times_tried + 1} succeeded to sample overlap!')
-                with open('retry_counts.txt', 'a') as output:
-                    output.write(str(times_tried)+ '\n')
+                # with open('retry_counts.txt', 'a') as output:
+                #     output.write(str(times_tried)+ '\n')
                 parent_trip_A = rand_A
                 parent_trip_B = rand_B
                 break 
@@ -140,10 +142,13 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
 
     else: 
         # Kill parents
+        RootLogger.log_debug(f'Crafting new trips for children networks...')
 
         new_trips_A = [t for t in net_A_trips if t != family.parent_A] + [family.child_A]
         new_trips_B = [t for t in net_A_trips if t != family.parent_B] + [family.child_B]
-        
+        del family.parent_A 
+        del family.parent_B
+        RootLogger.log_debug(f'Done crafting new trips for children networks...')
 
         # Generate 'breeded' ids if none provided. 
         if new_id_A is None:

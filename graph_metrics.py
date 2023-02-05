@@ -23,7 +23,7 @@ def plot_all_fitness_stats(filename, output_file='fitness_plot.png'):
     x = df[INTERATION_HEADER]
     avg_overall = df[get_header(FITNESS_HEADER, 'avg')]
     ridership = df[get_header(RIDERSHIP_HEADER, 'avg')]
-    num_routes = df[get_header(NUM_ROUTES_HEADER, 'avg')]
+    num_routes = df[get_header(NUM_ROUTES_HEADER, 'avg')].apply(lambda x: abs(x))
     coverage = df[get_header(COVERAGE_HEADER, 'avg')]
     ridership_density = df[get_header(RIDERSHIP_DENSITY_HEADER, 'avg')]
 
@@ -32,7 +32,7 @@ def plot_all_fitness_stats(filename, output_file='fitness_plot.png'):
     print(ridership)
     ax1.scatter(x, avg_overall, c='black', marker="o", label='overall')
     ax1.scatter(x, ridership, c='blue', marker="o", label='ridership')
-    ax1.scatter(x, num_routes, c='green', marker="o", label='num_routes')
+    ax1.scatter(x, num_routes, c='green', marker="o", label='num_routes(-1)')
     ax1.scatter(x, coverage, c='red', marker="o", label='coverage')
     ax1.scatter(x, ridership_density, c='orange', marker="o", label='ridership_density')
 

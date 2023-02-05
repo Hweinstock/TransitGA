@@ -23,7 +23,7 @@ def generate_population(initial_network: TransitNetwork, population_size: int, d
 
         # Randomly sample two parents from the current population, and do so until we fill population. 
         [parent_a, parent_b] = choices(current_population, k=2)
-        baby_network_A, baby_network_B = breed_networks(parent_a, parent_b, str(i))
+        baby_network_A, baby_network_B = breed_networks(parent_a, parent_b, str(i), str(2*i))
         
         # Add babies to new population. 
         current_population.append(baby_network_A)

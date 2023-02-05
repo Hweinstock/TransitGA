@@ -2,7 +2,7 @@ import logging
 from colorama import Fore, Back, Style
 
 class RootLogger:
-    LEVEL = logging.INFO
+    LEVEL = logging.DEBUG
 
     def log_info(msg):
         logging.info(f'{Fore.BLUE}{msg}{Style.RESET_ALL}')
@@ -16,4 +16,9 @@ class RootLogger:
     def log_error(msg):
         logging.error(f'{Fore.RED}{msg}{Style.RESET_ALL}')
 
-logging.basicConfig(level=RootLogger.LEVEL)
+#logging.basicConfig(level=RootLogger.LEVEL)
+logging.basicConfig(filename='log.txt',
+                    filemode='w',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=RootLogger.LEVEL)
