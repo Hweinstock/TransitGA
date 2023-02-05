@@ -1,5 +1,9 @@
 import matplotlib.pyplot as plt 
 import pandas as pd 
+import os 
+
+from utility import pickle_object
+from genetic_algorithm.population import Population
 
 INTERATION_HEADER = 'iteration'
 FITNESS_HEADER = 'fitness'
@@ -10,15 +14,27 @@ NUM_ROUTES_HEADER = 'routes_val'
 COVERAGE_HEADER = 'coverage_val'
 RIDERSHIP_DENSITY_HEADER = 'ridership_density_val'
 
+def graph_all_metrics(Population: Population, results_csv: str, output_folder: str= None):
+    if output_folder is None:
+        output_folder = f'{Population.iteration_number-1}i{Population.population_size}p/'
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+
+    plot_per_round_metrics(results_csv, os.path.join(output_folder, 'fitness_trend.png'))
+    plot_all_fitness_metrics(results_csv, os.path.join(output_folder, 'fitness_breakdown.png'))
+    plot_time(results_csv, os.path.join(output_folder, 'time.png'))
+
+    pickle_object(Population, os.path.join(output_folder, 'population.pkl'))
+
 def get_header(base: str, add_on: str):
     return add_on + '_' + base
 
-def plot_per_round_metrics(filename, output_file='plot1.png'):
+def plot_per_round_avg(filename, output_file='plot1.png'):
     df = pd.read_csv(filename)
     plt.plot(df[INTERATION_HEADER], df[get_header(FITNESS_HEADER, 'avg')])
     plt.savefig(output_file)
 
-def plot_all_fitness_stats(filename, output_file='fitness_plot.png'):
+def plot_all_fitness_metrics(filename, output_file='fitness_plot.png'):
     df = pd.read_csv(filename)
     x = df[INTERATION_HEADER]
     avg_overall = df[get_header(FITNESS_HEADER, 'avg')]
@@ -29,7 +45,6 @@ def plot_all_fitness_stats(filename, output_file='fitness_plot.png'):
 
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
-    print(ridership)
     ax1.scatter(x, avg_overall, c='black', marker="o", label='overall')
     ax1.scatter(x, ridership, c='blue', marker="o", label='ridership')
     ax1.scatter(x, num_routes, c='green', marker="o", label='num_routes(-1)')
@@ -41,7 +56,7 @@ def plot_all_fitness_stats(filename, output_file='fitness_plot.png'):
     plt.clf()
     
 
-def plot_all_stats(filename, output_file='plot_comb.png'):
+def plot_per_round_metrics(filename, output_file='plot_comb.png'):
     df = pd.read_csv(filename)
     x = df[INTERATION_HEADER]
     avg = df[get_header(FITNESS_HEADER, 'avg')]

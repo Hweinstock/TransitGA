@@ -119,7 +119,7 @@ class Population:
         metrics = self.generate_metrics(current_fitness_metrics)
         self.per_round_metrics.append(metrics)
 
-    def generate_metrics(self, current_fitness_metrics):
+    def generate_metrics(self, current_fitness_metrics) -> str:
         
         # def get_stats(data: List) -> Tuple[float, float, float]:
         #     return mean(data), median(data), stdev(data)
