@@ -5,6 +5,7 @@ from statistics import mean, median, stdev
 import time
 
 from genetic_algorithm.chromosome import Chromosome
+from genetic_algorithm.network_metrics import NetworkMetrics
 from root_logger import RootLogger
 from utility import pickle_object
 
@@ -17,7 +18,7 @@ class Population:
     mutation_rate = 0.1
     elitist_cutoff = 0.5
 
-    def __init__(self, networks: List[Chromosome], fitness_function, breeding_function):
+    def __init__(self, networks: List[Chromosome], initial_metrics: NetworkMetrics, fitness_function, breeding_function):
         self.population = networks
         self.population_size = len(networks)
         self.fitness_function = fitness_function
@@ -26,6 +27,7 @@ class Population:
         self.performance_dict = {}
         self.per_round_metrics = []
         self.write_to_pickle = pickle_object
+        self.initial_metrics = initial_metrics
         self.done_running = False
     
     def evaluate_population(self):

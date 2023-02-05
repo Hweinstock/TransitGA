@@ -1,7 +1,7 @@
 from transit_network.transit_network import TransitNetwork
 import genetic_algorithm.params as params
 
-def evaluate_network(net: TransitNetwork):
+def evaluate_network(net: TransitNetwork) -> float:
     # Need to scale these. 
     ridership_val = (net.ridership / params.ORIGINAL_RIDERSHIP) * params.RIDERSHIP_LAMBDA
     routes_val = (len(net.routes) / params.ORIGINAL_ROUTES) * params.NUM_ROUTES_LAMBDA

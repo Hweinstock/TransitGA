@@ -10,31 +10,8 @@ from genetic_algorithm.population import Population
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.fitness_function import evaluate_network 
 from genetic_algorithm.breeder import breed_networks
-
-class NetworkMetrics:
-    def __init__(self, network: TransitNetwork):
-        self.network = network
-        self.network_id = network.id
-        self.route_ids = [r.id for r in network.routes]
-        self.trip_ids = [t.id for t in network.trips]
-        self.stop_ids = [s.id for s in network.stops]
-
-    @property 
-    def fitness(self):
-        return evaluate_network(self.network)
+from genetic_algorithm.network_metrics import NetworkMetrics
     
-    def similarity(self, other) -> Tuple[float, float, float]:
-        if self.network_id == other.network_id:
-            RootLogger.log_warning('Comparing Networks with identical ids.')
-
-        routes_similarity = (len(set(self.route_ids) & set(other.route_ids)) * 2.0) / (len(self.route_ids) + len(other.route_ids))
-        trips_similarity = (len(set(self.trip_ids) & set(other.trip_ids)) * 2.0) / (len(self.trip_ids) + len(other.trip_ids))
-        stops_similarity = (len(set(self.stop_ids) & set(other.stop_ids)) * 2.0) / (len(self.stop_ids) + len(other.stop_ids))
-
-        return routes_similarity, trips_similarity, stops_similarity
-    
-    
-
 def generate_population(initial_network: TransitNetwork, population_size: int, do_print_metrics: bool = True) -> List[TransitNetwork]:
     RootLogger.log_debug(f'Generating initial population of size {population_size} from {initial_network.id}')
 
@@ -112,5 +89,6 @@ def print_metrics(metrics: Dict[str, float]) -> None:
 
 def initiate_population_from_network(network: TransitNetwork, size: int) -> Population:
     initial_networks = generate_population(network, size)
+    init_network_metrics = NetworkMetrics(network)
     initial_population = [Chromosome(net) for net in initial_networks]
-    return Population(initial_population, evaluate_network, breed_networks)
+    return Population(initial_population, init_network_metrics, evaluate_network, breed_networks)

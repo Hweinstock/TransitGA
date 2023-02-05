@@ -19,7 +19,7 @@ print(Network)
 # print(net1, net2, net3, net4, net5, net6)
 
 Pop = initiate_population_from_network(Network, 1000)
-res = Pop.run(75)
+res = Pop.run(10)
 filename = Pop.export_metrics()
 plot_all_stats(filename)
 plot_time(filename)
