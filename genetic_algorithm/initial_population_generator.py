@@ -10,31 +10,8 @@ from genetic_algorithm.population import Population
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.fitness_function import evaluate_network 
 from genetic_algorithm.breeder import breed_networks
-
-class NetworkMetrics:
-    def __init__(self, network: TransitNetwork):
-        self.network = network
-        self.network_id = network.id
-        self.route_ids = [r.id for r in network.routes]
-        self.trip_ids = [t.id for t in network.trips]
-        self.stop_ids = [s.id for s in network.stops]
-
-    @property 
-    def fitness(self):
-        return evaluate_network(self.network)
+from genetic_algorithm.network_metrics import NetworkMetrics
     
-    def similarity(self, other) -> Tuple[float, float, float]:
-        if self.network_id == other.network_id:
-            RootLogger.log_warning('Comparing Networks with identical ids.')
-
-        routes_similarity = (len(set(self.route_ids) & set(other.route_ids)) * 2.0) / (len(self.route_ids) + len(other.route_ids))
-        trips_similarity = (len(set(self.trip_ids) & set(other.trip_ids)) * 2.0) / (len(self.trip_ids) + len(other.trip_ids))
-        stops_similarity = (len(set(self.stop_ids) & set(other.stop_ids)) * 2.0) / (len(self.stop_ids) + len(other.stop_ids))
-
-        return routes_similarity, trips_similarity, stops_similarity
-    
-    
-
 def generate_population(initial_network: TransitNetwork, population_size: int, do_print_metrics: bool = True) -> List[TransitNetwork]:
     RootLogger.log_debug(f'Generating initial population of size {population_size} from {initial_network.id}')
 
@@ -46,7 +23,7 @@ def generate_population(initial_network: TransitNetwork, population_size: int, d
 
         # Randomly sample two parents from the current population, and do so until we fill population. 
         [parent_a, parent_b] = choices(current_population, k=2)
-        baby_network_A, baby_network_B = breed_networks(parent_a, parent_b, str(i))
+        baby_network_A, baby_network_B = breed_networks(parent_a, parent_b, str(i), str(2*i))
         
         # Add babies to new population. 
         current_population.append(baby_network_A)
@@ -75,7 +52,7 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
     original_metric = NetworkMetrics(initial_network)
     all_metrics = []
     fitness_scores = []
-    original_fitness = evaluate_network(initial_network)
+    original_fitness = evaluate_network(initial_network, original_metric).fitness
 
     for other_network in final_population:
 
@@ -83,7 +60,8 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
             other_net_metric = NetworkMetrics(other_network)
             similarity_scores = original_metric.similarity(other_net_metric)
             all_metrics.append(similarity_scores)
-            fitness_scores.append(other_net_metric.fitness)
+            other_fitness = evaluate_network(other_network, original_metric).fitness
+            fitness_scores.append(other_fitness)
     
     route_similarities = [row[0] for row in all_metrics]
     trip_similarities = [row[1] for row in all_metrics]
@@ -112,5 +90,6 @@ def print_metrics(metrics: Dict[str, float]) -> None:
 
 def initiate_population_from_network(network: TransitNetwork, size: int) -> Population:
     initial_networks = generate_population(network, size)
+    init_network_metrics = NetworkMetrics(network)
     initial_population = [Chromosome(net) for net in initial_networks]
-    return Population(initial_population, evaluate_network, breed_networks)
+    return Population(initial_population, init_network_metrics, evaluate_network, breed_networks)

@@ -5,6 +5,7 @@ from statistics import mean, median, stdev
 import time
 
 from genetic_algorithm.chromosome import Chromosome
+from genetic_algorithm.network_metrics import NetworkMetrics
 from root_logger import RootLogger
 from utility import pickle_object
 
@@ -17,7 +18,7 @@ class Population:
     mutation_rate = 0.1
     elitist_cutoff = 0.5
 
-    def __init__(self, networks: List[Chromosome], fitness_function, breeding_function):
+    def __init__(self, networks: List[Chromosome], initial_metrics: NetworkMetrics, fitness_function, breeding_function):
         self.population = networks
         self.population_size = len(networks)
         self.fitness_function = fitness_function
@@ -26,38 +27,42 @@ class Population:
         self.performance_dict = {}
         self.per_round_metrics = []
         self.write_to_pickle = pickle_object
+        self.initial_metrics = initial_metrics
         self.done_running = False
     
     def evaluate_population(self):
+        self.performance_dict = {}
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index
-            score = self.fitness_function(member.obj)
+            FitnessObj = self.fitness_function(member.obj, self.initial_metrics)
 
             # Check that this is the first time we see this id. 
             if member.unique_id in self.performance_dict:
                 RootLogger.log_warning(f'Population members with duplicate ids found in population. Overwriting fitness.')
-            self.performance_dict[member.unique_id] = score 
-        
-        self.set_performance_metrics()
+            self.performance_dict[member.unique_id] = FitnessObj
+        self.set_performance_metrics(self.performance_dict)
     
     def select_parents(self, pool: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
-        weights = scale_to_prob_dist([self.performance_dict[m.unique_id] for m in pool])
+        weights = scale_to_prob_dist([self.performance_dict[m.unique_id].fitness for m in pool])
 
         [parent_1, parent_2] = np.random.choice(pool, 
                                                      size=2, replace=False, 
                                                      p=weights)
         return parent_1, parent_2
     
-    def breed_children(self, pool_of_parents: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
+    def breed_children(self, pool_of_parents: List[Chromosome], child_num: int) -> Tuple[Chromosome, Chromosome]:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
 
         # Tracking number of times they have been parent. 
         parent_1.num_times_parent += 1
         parent_2.num_times_parent += 1
+
+        id_A = f'{self.iteration_number}:{child_num}'
+        id_B = f'{self.iteration_number}:{child_num + 1}'
         
         # Extract out the objects from the chromosomes. 
-        new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj)
+        new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj, new_id_A=id_A, new_id_B=id_B)
         new_member_A = Chromosome(new_child_A, parent_A_id=parent_1, parent_B_id=parent_2)
         new_member_B = Chromosome(new_child_B, parent_A_id=parent_1, parent_B_id=parent_2)
         return new_member_A, new_member_B
@@ -75,7 +80,6 @@ class Population:
     def update_population(self):
         new_population = self.get_next_population()
         self.population = new_population
-        self.performance_dict = {}
         RootLogger.log_debug('New population updated successfully.')
         self.iteration_number += 1
 
@@ -91,7 +95,7 @@ class Population:
         # Select best performing networks
         RootLogger.log_debug(f'Performing Elitist Selection on population.')
         elitist_num = int(self.elitist_cutoff*self.population_size)
-        sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id], reverse=True)
+        sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id].fitness, reverse=True)
         top_performers = sorted_by_performance[:elitist_num]
         bot_performers = sorted_by_performance[elitist_num:]
         self.dispose_of_dead_chromosomes(bot_performers)
@@ -103,7 +107,7 @@ class Population:
         RootLogger.log_info(f'Producing {children_needed} to fill out population.')
         while children_needed > 0:
             RootLogger.log_debug(f'{children_needed} more children to go.')
-            new_child_A, new_child_B = self.breed_children(top_performers)
+            new_child_A, new_child_B = self.breed_children(top_performers, children_needed)
             new_population.append(new_child_A)
             new_population.append(new_child_B)
             children_needed -= 2
@@ -111,28 +115,32 @@ class Population:
         RootLogger.log_info(f'Done generating next Population...')
         return new_population
 
-    def set_performance_metrics(self):
-        metrics = self.generate_metrics()
+    def set_performance_metrics(self, current_fitness_metrics):
+        metrics = self.generate_metrics(current_fitness_metrics)
         self.per_round_metrics.append(metrics)
 
-    def generate_metrics(self):
-        if self.performance_dict == {}:
-            print('it is empty')
-        best_performer = max(self.performance_dict, key=self.performance_dict.get)
-        best_score = max(self.performance_dict.values()) 
+    def generate_metrics(self, current_fitness_metrics) -> str:
+        
+        # def get_stats(data: List) -> Tuple[float, float, float]:
+        #     return mean(data), median(data), stdev(data)
+        result = {}
+        best_performer = max(current_fitness_metrics, key=lambda iter: current_fitness_metrics[iter].fitness)
+        best_score = current_fitness_metrics[best_performer].fitness
+        result['best_performer'] = best_performer
+        result['best_fitness'] = best_score
 
-        avg_score = mean(self.performance_dict.values())
-        med_score = median(self.performance_dict.values())
+        tracking_metrics = current_fitness_metrics[0].get_metrics_list()
 
-        stdev_score = stdev(self.performance_dict.values())
+        metric_dicts = [f.to_dict() for f in current_fitness_metrics.values()]
+        for metric in tracking_metrics:
+            metric_values = [d[metric] for d in metric_dicts]
+            avg_metric, med_metric, stdev_metric = mean(metric_values), median(metric_values), stdev(metric_values)
+            result[f'avg_{metric}'] = avg_metric
+            result[f'med_{metric}'] = med_metric
+            result[f'stddev_{metric}'] = stdev_metric
 
-        return {
-            'best_performer': best_performer, 
-            'best_fitness': best_score, 
-            'avg_score': avg_score, 
-            'med_score': med_score,
-            'stdev': stdev_score
-        }
+        return result
+
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
 
@@ -147,16 +155,17 @@ class Population:
         self.done_running = True
         return self.per_round_metrics
     
-    def export_metrics(self, filename='results.csv') -> str:
+    def export_metrics(self, metrics_filename='results.csv') -> Tuple[str, str]:
         if not self.done_running:
             RootLogger.log_warning(f'Generating Metrics for unfinished population object...')
-        RootLogger.log_info(f'Outputting metrics to {filename}...')
+        RootLogger.log_info(f'Outputting metrics to {metrics_filename}...')
 
         df = pd.DataFrame(self.per_round_metrics)
-        df.to_csv(filename, index_label='iteration')
+        df.to_csv(metrics_filename, index_label='iteration')
 
-        RootLogger.log_info(f'Done outputting metrics to {filename}!')
-        return filename
+        RootLogger.log_info(f'Done outputting metrics to {metrics_filename}!')
+
+        return metrics_filename
         
             
     
