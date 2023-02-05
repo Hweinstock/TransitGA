@@ -34,7 +34,7 @@ class Population:
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index
-            score = self.fitness_function(member.obj)
+            score = self.fitness_function(member.obj, self.initial_metrics)
 
             # Check that this is the first time we see this id. 
             if member.unique_id in self.performance_dict:

@@ -24,15 +24,15 @@ class TransitNetwork:
         return deepcopy(self)
 
     @property
-    def num_stops(self):
+    def num_stops(self) -> int:
         return len(self.stops)
     
     @property
-    def num_trips(self):
+    def num_trips(self) -> int:
         return len(self.trips)
     
     @property
-    def num_routes(self):
+    def num_routes(self) -> int:
         return len(self.routes)
 
     @property
@@ -54,15 +54,15 @@ class TransitNetwork:
         return list(all_stops.values())
 
     @property 
-    def ridership(self):
+    def ridership(self) -> float:
         return sum([s.ridership for s in self.stops])
     
     @property
-    def coverage(self):
+    def coverage(self) -> int:
         return len(self.stops)
 
     @property
-    def ridership_density_score(self):
+    def ridership_density_score(self) -> float:
         score = 0
         for trip in self.trips:
             intersections = trip.count_intersections()
