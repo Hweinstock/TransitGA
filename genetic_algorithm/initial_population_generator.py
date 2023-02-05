@@ -52,7 +52,7 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
     original_metric = NetworkMetrics(initial_network)
     all_metrics = []
     fitness_scores = []
-    original_fitness = evaluate_network(initial_network, original_metric)
+    original_fitness = evaluate_network(initial_network, original_metric).fitness
 
     for other_network in final_population:
 
@@ -60,7 +60,7 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
             other_net_metric = NetworkMetrics(other_network)
             similarity_scores = original_metric.similarity(other_net_metric)
             all_metrics.append(similarity_scores)
-            other_fitness = evaluate_network(other_network, original_metric)
+            other_fitness = evaluate_network(other_network, original_metric).fitness
             fitness_scores.append(other_fitness)
     
     route_similarities = [row[0] for row in all_metrics]

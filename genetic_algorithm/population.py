@@ -31,20 +31,20 @@ class Population:
         self.done_running = False
     
     def evaluate_population(self):
+        self.performance_dict = {}
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index
-            score = self.fitness_function(member.obj, self.initial_metrics)
+            FitnessObj = self.fitness_function(member.obj, self.initial_metrics)
 
             # Check that this is the first time we see this id. 
             if member.unique_id in self.performance_dict:
                 RootLogger.log_warning(f'Population members with duplicate ids found in population. Overwriting fitness.')
-            self.performance_dict[member.unique_id] = score 
-        
-        self.set_performance_metrics()
+            self.performance_dict[member.unique_id] = FitnessObj
+        self.set_performance_metrics(self.performance_dict)
     
     def select_parents(self, pool: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
-        weights = scale_to_prob_dist([self.performance_dict[m.unique_id] for m in pool])
+        weights = scale_to_prob_dist([self.performance_dict[m.unique_id].fitness for m in pool])
 
         [parent_1, parent_2] = np.random.choice(pool, 
                                                      size=2, replace=False, 
@@ -77,7 +77,6 @@ class Population:
     def update_population(self):
         new_population = self.get_next_population()
         self.population = new_population
-        self.performance_dict = {}
         RootLogger.log_debug('New population updated successfully.')
         self.iteration_number += 1
 
@@ -93,7 +92,7 @@ class Population:
         # Select best performing networks
         RootLogger.log_debug(f'Performing Elitist Selection on population.')
         elitist_num = int(self.elitist_cutoff*self.population_size)
-        sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id], reverse=True)
+        sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id].fitness, reverse=True)
         top_performers = sorted_by_performance[:elitist_num]
         bot_performers = sorted_by_performance[elitist_num:]
         self.dispose_of_dead_chromosomes(bot_performers)
@@ -113,28 +112,47 @@ class Population:
         RootLogger.log_info(f'Done generating next Population...')
         return new_population
 
-    def set_performance_metrics(self):
-        metrics = self.generate_metrics()
+    def set_performance_metrics(self, current_fitness_metrics):
+        metrics = self.generate_metrics(current_fitness_metrics)
         self.per_round_metrics.append(metrics)
 
-    def generate_metrics(self):
-        if self.performance_dict == {}:
-            print('it is empty')
-        best_performer = max(self.performance_dict, key=self.performance_dict.get)
-        best_score = max(self.performance_dict.values()) 
+    def generate_metrics(self, current_fitness_metrics):
+        
+        # def get_stats(data: List) -> Tuple[float, float, float]:
+        #     return mean(data), median(data), stdev(data)
+        result = {}
+        best_performer = max(current_fitness_metrics, key=lambda iter: current_fitness_metrics[iter].fitness)
+        best_score = current_fitness_metrics[best_performer].fitness
+        result['best_performer'] = best_performer
+        result['best_fitness'] = best_score
 
-        avg_score = mean(self.performance_dict.values())
-        med_score = median(self.performance_dict.values())
+        tracking_metrics = current_fitness_metrics[0].get_metrics_list()
 
-        stdev_score = stdev(self.performance_dict.values())
+        metric_dicts = [f.to_dict() for f in current_fitness_metrics.values()]
+        for metric in tracking_metrics:
+            metric_values = [d[metric] for d in metric_dicts]
+            avg_metric, med_metric, stdev_metric = mean(metric_values), median(metric_values), stdev(metric_values)
+            result[f'avg_{metric}'] = avg_metric
+            result[f'med_{metric}'] = med_metric
+            result[f'stddev_{metric}'] = stdev_metric
+        
 
-        return {
-            'best_performer': best_performer, 
-            'best_fitness': best_score, 
-            'avg_score': avg_score, 
-            'med_score': med_score,
-            'stdev': stdev_score
-        }
+
+
+        # fitness_scores = [k.fitness for k in current_fitness_metrics.values()]
+        # avg_score, med_score, stdev_score = get_stats(fitness_scores)
+
+        # rirdership_values = [k.ridership_val for k in current_fitness_metrics.values()]
+        # avg_ridership, med_ridership, stdev_ridership = get_stats(rirdership_values)
+
+        # num_routes_values = [k.routes_val for k in current_fitness_metrics.values()]
+        # avg_num_routes, med_num_routes, stdev_num_routes = get_stats(num_routes_values)
+
+        # coverage_values = [k.coverage_val for k in current_fitness_metrics.values()]
+        # avg_coverage, med_coverage, stdev_coverage = get_stats(coverage_values)
+
+
+        return result
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
 
@@ -149,16 +167,17 @@ class Population:
         self.done_running = True
         return self.per_round_metrics
     
-    def export_metrics(self, filename='results.csv') -> str:
+    def export_metrics(self, metrics_filename='results.csv') -> Tuple[str, str]:
         if not self.done_running:
             RootLogger.log_warning(f'Generating Metrics for unfinished population object...')
-        RootLogger.log_info(f'Outputting metrics to {filename}...')
+        RootLogger.log_info(f'Outputting metrics to {metrics_filename}...')
 
         df = pd.DataFrame(self.per_round_metrics)
-        df.to_csv(filename, index_label='iteration')
+        df.to_csv(metrics_filename, index_label='iteration')
 
-        RootLogger.log_info(f'Done outputting metrics to {filename}!')
-        return filename
+        RootLogger.log_info(f'Done outputting metrics to {metrics_filename}!')
+
+        return metrics_filename
         
             
     
