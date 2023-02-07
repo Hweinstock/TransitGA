@@ -8,7 +8,7 @@ from typing import List
 from root_logger import RootLogger
 
 
-def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] = None):
+def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] = None, include_stops=True):
     RootLogger.log_debug(f'Generating diagram for {zip_path} with routes restricted to {route_ids}...')
     output_filename = f'{output_filename}.html'
     warnings.simplefilter('ignore')
@@ -17,7 +17,7 @@ def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] =
 
     if route_ids is None:
         route_ids = feed.routes.route_id.iloc[:]
-    stop_route = feed.map_routes(route_ids, include_stops=True)
+    stop_route = feed.map_routes(route_ids, include_stops=include_stops)
     stop_route.save(output_filename)
     RootLogger.log_debug(f'Diagram saved to {output_filename}.')
 
