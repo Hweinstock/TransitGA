@@ -59,7 +59,7 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
 
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
                           direction=first_trip.direction, stops=new_stops, shape_points=new_shapes)
-    RootLogger.log_debug(f'Successfuly created child trip {new_id} on new troute {new_route}')
+    RootLogger.log_debug(f'Successfuly created child trip {new_id} on new route {new_route}')
     return new_trip
 
 def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Family or None:

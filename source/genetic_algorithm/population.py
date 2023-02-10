@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from statistics import mean, median, stdev
 import time
+import os
 
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.network_metrics import NetworkMetrics
@@ -151,21 +152,24 @@ class Population:
             end_time = time.time()
             # Append time to metrics
             self.per_round_metrics[-1]['time'] = end_time - start_time
+            RootLogger.log_info(f'Iteration complete, took {end_time - start_time}s')
+            
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True
         return self.per_round_metrics
     
-    def export_metrics(self, metrics_filename='results.csv') -> Tuple[str, str]:
+    def export_metrics(self, metrics_filename='results.csv', output_directory='') -> Tuple[str, str]:
+        output_file = os.path.join(output_directory, metrics_filename)
         if not self.done_running:
             RootLogger.log_warning(f'Generating Metrics for unfinished population object...')
-        RootLogger.log_info(f'Outputting metrics to {metrics_filename}...')
+        RootLogger.log_info(f'Outputting metrics to {output_file}...')
 
         df = pd.DataFrame(self.per_round_metrics)
-        df.to_csv(metrics_filename, index_label='iteration')
+        df.to_csv(output_file, index_label='iteration')
 
-        RootLogger.log_info(f'Done outputting metrics to {metrics_filename}!')
+        RootLogger.log_info(f'Done outputting metrics to {output_file}!')
 
-        return metrics_filename
+        return output_file
         
             
     
