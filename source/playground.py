@@ -10,7 +10,7 @@ This script is purely for informal testing and 'playing' with new code.
 #create_simplified_gtfs_SFMTA('new_initial_net')
 #generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 
-# Network = read_object_from_file('new_initial_net.pkl')
+Network = read_object_from_file('data/new_initial_net/new_initial_net.pkl')
 # print(Network)
 #Network2 = read_object_from_file('new_initial_net.pkl')
 
@@ -19,13 +19,14 @@ This script is purely for informal testing and 'playing' with new code.
 # net5, net6 = breed_networks(net3, net4)
 # print(net1, net2, net3, net4, net5, net6)
 
-# Pop = initiate_population_from_network(Network, 1000)
-# res = Pop.run(100)
+Pop = initiate_population_from_network(Network, 1000)
+res = Pop.run(100)
 # filename = Pop.export_metrics()
 # graph_all_metrics(Population=Pop, results_csv=filename)
 
 
-Population = read_object_from_file('output/100i1000p/population.pkl')
+# Population = read_object_from_file('output/100i1000p/population.pkl')
+# Population
 # net = Population.population[583]
 # net.obj.write_to_gtfs('75i1000p/randGTFS')
 # generate_diagram('100i1000p/randGTFS.zip', '100i1000p/networkSIMP', route_ids=['45:48:23:91:6:1:91:30:19:48:91:1:91:8:7:91:48:23:91:6:1:91'], include_stops=False)
