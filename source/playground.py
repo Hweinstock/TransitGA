@@ -25,10 +25,10 @@ This script is purely for informal testing and 'playing' with new code.
 # graph_all_metrics(Population=Pop, results_csv=filename)
 
 
-# Population = read_object_from_file('75i1000p/population.pkl')
+Population = read_object_from_file('output/100i1000p/population.pkl')
 # net = Population.population[583]
 # net.obj.write_to_gtfs('75i1000p/randGTFS')
-generate_diagram('100i1000p/randGTFS.zip', '100i1000p/networkSIMP', route_ids=['45:48:23:91:6:1:91:30:19:48:91:1:91:8:7:91:48:23:91:6:1:91'], include_stops=False)
+# generate_diagram('100i1000p/randGTFS.zip', '100i1000p/networkSIMP', route_ids=['45:48:23:91:6:1:91:30:19:48:91:1:91:8:7:91:48:23:91:6:1:91'], include_stops=False)
 #generate_diagram('new_initial_net.zip', 'new_initial_net', include_stops=False)
 
 # Pop = read_object_from_file('75i1000p(1)/population.pkl')
