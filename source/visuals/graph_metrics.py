@@ -23,6 +23,7 @@ def graph_all_metrics(Population: Population, results_csv: str, output_folder: s
     RootLogger.log_debug(f'Graphing all metrics for results file {results_csv} and exporting to {output_folder}...')
     if output_folder is None:
         output_folder = f'{Population.iteration_number-1}i{Population.population_size}p/'
+        
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 

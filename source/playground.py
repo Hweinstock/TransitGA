@@ -1,16 +1,15 @@
-from genetic_algorithm.initial_population_generator import initiate_population_from_network
-from utility import read_object_from_file, pickle_object
-from graph_metrics import graph_all_metrics
-from graph_gtfs import generate_diagram
-from genetic_algorithm.breeder import breed_networks
+# from genetic_algorithm.initial_population_generator import initiate_population_from_network
+# from utility import read_object_from_file, pickle_object
+# from graph_metrics import graph_all_metrics
+# from graph_gtfs import generate_diagram
+# from genetic_algorithm.breeder import breed_networks
+# import os
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
 
 #create_simplified_gtfs_SFMTA('new_initial_net')
 #generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
-
-Network = read_object_from_file('data/new_initial_net/new_initial_net.pkl')
 # print(Network)
 #Network2 = read_object_from_file('new_initial_net.pkl')
 
@@ -18,11 +17,6 @@ Network = read_object_from_file('data/new_initial_net/new_initial_net.pkl')
 # net3, net4 = breed_networks(net1, net2)
 # net5, net6 = breed_networks(net3, net4)
 # print(net1, net2, net3, net4, net5, net6)
-
-Pop = initiate_population_from_network(Network, 1000)
-res = Pop.run(100)
-# filename = Pop.export_metrics()
-# graph_all_metrics(Population=Pop, results_csv=filename)
 
 
 # Population = read_object_from_file('output/100i1000p/population.pkl')
