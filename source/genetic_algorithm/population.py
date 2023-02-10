@@ -152,6 +152,8 @@ class Population:
             end_time = time.time()
             # Append time to metrics
             self.per_round_metrics[-1]['time'] = end_time - start_time
+            RootLogger.log_info(f'Iteration complete, took {end_time - start_time}s')
+            
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True
         return self.per_round_metrics
