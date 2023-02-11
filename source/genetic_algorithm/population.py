@@ -32,17 +32,27 @@ class Population:
         self.done_running = False
     
     def evaluate_population(self):
+        RootLogger.log_debug('Evaluating population...')
         self.performance_dict = {}
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index
-            FitnessObj = self.fitness_function(member.obj, self.initial_metrics)
+
+            # If we haven't evaluated this chromosome yet, evaluate, otherwise use old score. 
+            if member.FitnessObj is not None: 
+                FitnessObj = member.FitnessObj
+            else:
+                FitnessObj = self.fitness_function(member.obj, self.initial_metrics)
+                member.FitnessObj = FitnessObj
 
             # Check that this is the first time we see this id. 
             if member.unique_id in self.performance_dict:
                 RootLogger.log_warning(f'Population members with duplicate ids found in population. Overwriting fitness.')
             self.performance_dict[member.unique_id] = FitnessObj
+        
+        # Update metrics
         self.set_performance_metrics(self.performance_dict)
+        RootLogger.log_debug('Done evaluating population!')
     
     def select_parents(self, pool: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
         weights = scale_to_prob_dist([self.performance_dict[m.unique_id].fitness for m in pool])
@@ -153,7 +163,7 @@ class Population:
             # Append time to metrics
             self.per_round_metrics[-1]['time'] = end_time - start_time
             RootLogger.log_info(f'Iteration complete, took {end_time - start_time}s')
-            
+
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True
         return self.per_round_metrics

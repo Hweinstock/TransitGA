@@ -1,11 +1,12 @@
 from transit_network.transit_network import TransitNetwork, create_network_from_trips
 from transit_network.trips import common_transfer_point, SimpleTrip
 from root_logger import RootLogger
-import random 
-from copy import deepcopy
 import genetic_algorithm.params as params
 
 from typing import List, Tuple
+import uuid
+import random 
+from copy import deepcopy
 
 class Family:
     def __init__(self, child_A: SimpleTrip, child_B: SimpleTrip, parent_A: SimpleTrip, parent_B: SimpleTrip):
@@ -52,9 +53,11 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     RootLogger.log_debug(f'Crafting parameters for new child trip...')
     new_stops = deepcopy(first_trip.stops[:first_index] + second_trip.stops[second_index:])
     new_shapes = deepcopy(first_trip.shape_points[:first_index] + second_trip.shape_points[second_index:])
-    new_route = ':'.join([first_trip.route_id, second_trip.route_id])
-    new_id = ':'.join([first_trip.id, second_trip.id])
-    new_message = ':'.join([first_trip.id, second_trip.id])
+
+    # We generate global unique ids for performance reasons. 
+    new_route = uuid.uuid4()
+    new_id = uuid.uuid4()
+    new_message = '' # Remove the message for performance reasons. 
     RootLogger.log_debug(f'Parameters complete, new id is {new_id}')
 
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
