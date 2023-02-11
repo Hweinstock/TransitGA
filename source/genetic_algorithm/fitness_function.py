@@ -24,7 +24,6 @@ class Fitness:
         return list(self.to_dict().keys())
 
 def evaluate_network(net: TransitNetwork, initial_metrics: NetworkMetrics) -> float:
-    # Need to scale these. 
     ridership_val = (net.ridership / initial_metrics.ridership) * params.RIDERSHIP_LAMBDA
     routes_val = (len(net.routes) / initial_metrics.num_routes) * params.NUM_ROUTES_LAMBDA
     coverage_val = (net.coverage / initial_metrics.coverage) * params.COVERAGE_LAMBDA

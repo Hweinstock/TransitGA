@@ -19,24 +19,31 @@ class TransitNetwork:
         self.id = id
         self.routes = routes
 
+        # Pre-compute all of these such that we don't recompute.
+        self.trips = self.get_trips()
+        self.stops = self.get_stops()
+        self.num_routes = self.get_num_routes()
+        self.num_trips = self.get_num_trips()
+        self.num_stops = self.get_num_stops()
+        self.num_trips = self.get_num_trips()
+        self.ridership = self.get_ridership()
+        self.coverage = self.get_coverage()
+        self.ridership_density_score = self.get_ridership_density_score()
+
     def get_copy(self):
         # Make this a deepcopy. 
         return deepcopy(self)
 
-    @property
-    def num_stops(self) -> int:
+    def get_num_stops(self) -> int:
         return len(self.stops)
     
-    @property
-    def num_trips(self) -> int:
+    def get_num_trips(self) -> int:
         return len(self.trips)
     
-    @property
-    def num_routes(self) -> int:
+    def get_num_routes(self) -> int:
         return len(self.routes)
 
-    @property
-    def trips(self) -> List[GTFSTrip]:
+    def get_trips(self) -> List[GTFSTrip]:
         all_trips = []
         for route in self.routes:
             route_trips = route.trips 
@@ -44,8 +51,7 @@ class TransitNetwork:
         
         return all_trips 
     
-    @property
-    def stops(self) -> List[Stop]:
+    def get_stops(self) -> List[Stop]:
         all_stops = {}
         for trip in self.trips:
             for stop in trip.stops:
@@ -53,16 +59,14 @@ class TransitNetwork:
                     all_stops[stop.id] = stop 
         return list(all_stops.values())
 
-    @property 
-    def ridership(self) -> float:
+    def get_ridership(self) -> float:
         return sum([s.ridership for s in self.stops])
     
-    @property
-    def coverage(self) -> int:
+    def get_coverage(self) -> int:
         return len(self.stops)
 
-    @property
-    def ridership_density_score(self) -> float:
+    def get_ridership_density_score(self) -> float:
+
         score = 0
         for trip in self.trips:
             intersections = trip.count_intersections()

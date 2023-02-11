@@ -4,11 +4,12 @@
 # from graph_gtfs import generate_diagram
 # from genetic_algorithm.breeder import breed_networks
 # import os
+from simplify_gtfs import create_simplified_gtfs_SFMTA
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
 
-#create_simplified_gtfs_SFMTA('new_initial_net')
+create_simplified_gtfs_SFMTA('output/new_initial_net')
 #generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 # print(Network)
 #Network2 = read_object_from_file('new_initial_net.pkl')
