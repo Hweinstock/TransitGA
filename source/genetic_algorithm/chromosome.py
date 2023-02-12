@@ -1,7 +1,7 @@
 
 class Chromosome:
 
-    def __init__(self, obj: object, parent_A_id = None, parent_B_id = None):
+    def __init__(self, obj: object, parent_A_id: str = None, parent_B_id: str = None):
         self.obj = obj 
         self.original_id = obj.id
 

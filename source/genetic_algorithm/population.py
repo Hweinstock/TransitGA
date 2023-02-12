@@ -30,6 +30,7 @@ class Population:
         self.write_to_pickle = pickle_object
         self.initial_metrics = initial_metrics
         self.done_running = False
+        self.running_time = 0.0
     
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
@@ -62,21 +63,19 @@ class Population:
                                                      p=weights)
         return parent_1, parent_2
     
-    def breed_children(self, pool_of_parents: List[Chromosome], child_num: int) -> Tuple[Chromosome, Chromosome]:
+    def breed_children(self, pool_of_parents: List[Chromosome], child_num: int) -> Chromosome:
         parent_1, parent_2 = self.select_parents(pool_of_parents)
 
         # Tracking number of times they have been parent. 
         parent_1.num_times_parent += 1
         parent_2.num_times_parent += 1
 
-        id_A = f'{self.iteration_number}:{child_num}'
-        id_B = f'{self.iteration_number}:{child_num + 1}'
+        new_id = f'{self.iteration_number}:{child_num}'
         
         # Extract out the objects from the chromosomes. 
-        new_child_A, new_child_B = self.breeding_function(parent_1.obj, parent_2.obj, new_id_A=id_A, new_id_B=id_B)
-        new_member_A = Chromosome(new_child_A, parent_A_id=parent_1, parent_B_id=parent_2)
-        new_member_B = Chromosome(new_child_B, parent_A_id=parent_1, parent_B_id=parent_2)
-        return new_member_A, new_member_B
+        new_child = self.breeding_function(parent_1.obj, parent_2.obj, new_id=new_id)
+        new_member = Chromosome(new_child, parent_A_id=parent_1.unique_id, parent_B_id=parent_2.unique_id)
+        return new_member
     
     def get_member_by_id(self, sel_id: str) -> Chromosome or None:
         matching_members = [m for m in self.population if m.unique_id == sel_id]
@@ -118,10 +117,9 @@ class Population:
         RootLogger.log_info(f'Producing {children_needed} to fill out population.')
         while children_needed > 0:
             RootLogger.log_debug(f'{children_needed} more children to go.')
-            new_child_A, new_child_B = self.breed_children(top_performers, children_needed)
-            new_population.append(new_child_A)
-            new_population.append(new_child_B)
-            children_needed -= 2
+            new_child =  self.breed_children(top_performers, children_needed)
+            new_population.append(new_child)
+            children_needed -= 1
 
         RootLogger.log_info(f'Done generating next Population...')
         return new_population
@@ -132,8 +130,6 @@ class Population:
 
     def generate_metrics(self, current_fitness_metrics) -> str:
         
-        # def get_stats(data: List) -> Tuple[float, float, float]:
-        #     return mean(data), median(data), stdev(data)
         result = {}
         best_performer = max(current_fitness_metrics, key=lambda iter: current_fitness_metrics[iter].fitness)
         best_score = current_fitness_metrics[best_performer].fitness
@@ -161,8 +157,12 @@ class Population:
             self.update_population()
             end_time = time.time()
             # Append time to metrics
+            self.running_time += (end_time - start_time)
             self.per_round_metrics[-1]['time'] = end_time - start_time
+
             RootLogger.log_info(f'Iteration complete, took {end_time - start_time}s')
+            time_est = (self.running_time / self.iteration_number) * (max_iteration - self.iteration_number)
+            print(f'Estimated {time_est}s remaining for {(max_iteration - self.iteration_number)} rounds.', end="\r", flush=True)
 
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True

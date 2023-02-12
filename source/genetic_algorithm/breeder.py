@@ -11,9 +11,11 @@ from copy import deepcopy
 class Family:
     def __init__(self, child_A: SimpleTrip, child_B: SimpleTrip, parent_A: SimpleTrip, parent_B: SimpleTrip):
         self.child_A = child_A 
-        self.child_B = child_B 
+        self.child_B = child_B
+
         self.parent_A = parent_A 
         self.parent_B = parent_B
+        self.parents = [self.parent_A, self.parent_B]
 
 def kill_random_trips(trips: List[SimpleTrip]):
     r_val = random.uniform(0, 1)
@@ -55,8 +57,8 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     new_shapes = deepcopy(first_trip.shape_points[:first_index] + second_trip.shape_points[second_index:])
 
     # We generate global unique ids for performance reasons. 
-    new_route = uuid.uuid4()
-    new_id = uuid.uuid4()
+    new_route = str(uuid.uuid4())
+    new_id = str(uuid.uuid4())
     new_message = '' # Remove the message for performance reasons. 
     RootLogger.log_debug(f'Parameters complete, new id is {new_id}')
 
@@ -89,12 +91,12 @@ def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip
         RootLogger.log_warning(f'Failed in finding overlap between parents, returning None.')
         return None 
 
-    RootLogger.log_debug(f'Producing children trips for trips {parent_trip_A.id} and {parent_trip_B.id}.')
+    RootLogger.log_debug(f'Producing child trip for trips {parent_trip_A.id} and {parent_trip_B.id}.')
     child_trip_A = produce_child_trip(parent_trip_A, parent_trip_B, shared_stop_id) 
     child_trip_B = produce_child_trip(parent_trip_B, parent_trip_A, shared_stop_id)
 
-    fam = Family(child_A=child_trip_A, 
-           child_B=child_trip_B, 
+    fam = Family(child_A=child_trip_A,
+           child_B=child_trip_B,  
            parent_A=parent_trip_A, 
            parent_B=parent_trip_B)
 
@@ -127,7 +129,7 @@ def get_child_trips(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simpl
     return child_trip_A, child_trip_B
 
 def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork, 
-                   new_id_A: str = None, new_id_B: str = None) -> Tuple[TransitNetwork, TransitNetwork]:
+                   new_id: str = None) -> TransitNetwork:
     
     RootLogger.log_debug(f'Breeding networks {Net_A.id} and {Net_B.id}')
 
@@ -140,29 +142,26 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
     
     if family is None:
         RootLogger.log_warning((f'Failed to breed networks {Net_A.id} and {Net_B.id}, no common stops found among trips.'
-                              f' Returning parents instead.'))
-        return Net_A, Net_B
+                              f' Returning first parent.'))
+        return Net_A
 
     else: 
         # Kill parents
         RootLogger.log_debug(f'Crafting new trips for children networks...')
 
-        new_trips_A = [t for t in net_A_trips if t != family.parent_A] + [family.child_A]
-        new_trips_B = [t for t in net_A_trips if t != family.parent_B] + [family.child_B]
-        del family.parent_A 
-        del family.parent_B
+        child_trips = [t for t in net_A_trips if t not in family.parents] + [family.child_A, family.child_B]
+
+        del family
+
         RootLogger.log_debug(f'Done crafting new trips for children networks...')
 
         # Generate 'breeded' ids if none provided. 
-        if new_id_A is None:
-            new_id_A = ':'.join([Net_A.id, Net_B.id])
-        if new_id_B is None:
-            new_id_B = ':'.join([Net_B.id, Net_A.id])
+        if new_id is None:
+            new_id = ':'.join([Net_A.id, Net_B.id])
             
         RootLogger.log_debug(f'Successfully breeded networks {Net_A.id} and {Net_B.id}')
-        child_network_A = create_network_from_trips(new_trips_A, new_id_A)
-        child_network_B = create_network_from_trips(new_trips_B, new_id_B)
-        return child_network_A, child_network_B
+        child_network = create_network_from_trips(child_trips, new_id)
+        return child_network
 
 
 

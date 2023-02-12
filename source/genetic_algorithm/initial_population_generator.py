@@ -1,5 +1,5 @@
 from typing import List, Tuple, Dict
-from random import choices
+import random
 from statistics import mean, median, stdev
 import pprint
 from math import ceil
@@ -18,16 +18,15 @@ def generate_population(initial_network: TransitNetwork, population_size: int, d
     current_population = [initial_network]
     RootLogger.log_info('Generating Initial Population...')
     babys_to_breed = population_size - 1.0
-    for i in range(ceil(babys_to_breed/2.0)):
-        RootLogger.log_debug(f'Generated {2*i} of {population_size-1}.')
+    for i in range(ceil(babys_to_breed)):
+        RootLogger.log_debug(f'Generated {i} of {population_size-1}.')
 
         # Randomly sample two parents from the current population, and do so until we fill population. 
-        [parent_a, parent_b] = choices(current_population, k=2)
-        baby_network_A, baby_network_B = breed_networks(parent_a, parent_b, str(i), str(2*i))
+        [parent_a, parent_b] = random.choices(current_population, k=2)
+        baby_network = breed_networks(parent_a, parent_b, str(i))
         
         # Add babies to new population. 
-        current_population.append(baby_network_A)
-        current_population.append(baby_network_B)
+        current_population.append(baby_network)
 
     if len(current_population) != population_size:
         if len(current_population) == population_size + 1:
