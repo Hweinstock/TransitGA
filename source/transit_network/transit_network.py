@@ -66,7 +66,6 @@ class TransitNetwork:
         return len(self.stops)
 
     def get_ridership_density_score(self) -> float:
-
         score = 0
         for trip in self.trips:
             intersections = trip.count_intersections()
@@ -74,6 +73,16 @@ class TransitNetwork:
 
             score += intersections * ridership
         return score 
+
+    def lookup_route_by_id(self, id: str) -> SimpleRoute or None:
+        matches = [r for r in self.routes if r.id == id]
+        if len(matches) == 0:
+            RootLogger.log_error(f'Unable to find route with id {id} in network {self.id}.')
+            return None
+        if len(matches) > 1:
+            RootLogger.log_warning(f'Found duplicate routes with id {id} in network {self.id}. Returning first one. ')
+            
+        return matches[0]
 
     def __str__(self):
         num_routes = len(self.routes)

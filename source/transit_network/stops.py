@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from root_logger import RootLogger
 from utility import sphere_distance
-from transit_network.shapes import ShapePoint
+from transit_network.shapes import Coords
 
 def stop_from_stop_row_data(row, route_id):
     id = row['stop_id']
@@ -30,7 +30,7 @@ class Stop:
         self.location = location
     
     def add_transfer_routes(self, new_routes: List[str]):
-        self.routes += new_routes
+        self.routes += [r for r in new_routes if r not in self.routes]
 
     @property
     def location_lat(self):
@@ -49,7 +49,7 @@ class Stop:
 
         return sphere_distance([x_1, y_1], [x_2, y_2])
         
-    def distance_to_point(self, point: ShapePoint) -> float:
+    def distance_to_point(self, point: Coords) -> float:
         x_1 = self.location_lat
         x_2 = point.lat
 

@@ -32,7 +32,7 @@ class BaseTrip:
         for index, cur_stop in enumerate(self.stops):
             if cur_stop.id == target_id: 
                 return index 
-
+        
         RootLogger.log_error(f'Unable to locate shared stop {target_id} in trip {self.id}')
         return None 
     
