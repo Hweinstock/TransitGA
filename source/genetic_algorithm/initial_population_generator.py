@@ -8,9 +8,10 @@ from transit_network.transit_network import TransitNetwork
 from root_logger import RootLogger
 from genetic_algorithm.population import Population
 from genetic_algorithm.chromosome import Chromosome
-from genetic_algorithm.fitness_function import evaluate_network 
+from genetic_algorithm.fitness_function import evaluate_network, evaluate_network_new
 from genetic_algorithm.breeder import breed_networks
 from genetic_algorithm.network_metrics import NetworkMetrics
+from genetic_algorithm.zone_evaluator import ZoneEvaluator
     
 def generate_population(initial_network: TransitNetwork, population_size: int, do_print_metrics: bool = True) -> List[TransitNetwork]:
     RootLogger.log_debug(f'Generating initial population of size {population_size} from {initial_network.id}')
@@ -51,7 +52,9 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
     original_metric = NetworkMetrics(initial_network)
     all_metrics = []
     fitness_scores = []
-    original_fitness = evaluate_network(initial_network, original_metric).fitness
+    ZE = ZoneEvaluator(initial_network)
+    ZE.sample_stops()
+    original_fitness = evaluate_network_new(initial_network, original_metric, ZE).fitness
 
     for other_network in final_population:
 
@@ -59,7 +62,7 @@ def generate_metrics(initial_network: TransitNetwork, final_population: List[Tra
             other_net_metric = NetworkMetrics(other_network)
             similarity_scores = original_metric.similarity(other_net_metric)
             all_metrics.append(similarity_scores)
-            other_fitness = evaluate_network(other_network, original_metric).fitness
+            other_fitness = evaluate_network_new(other_network, original_metric, ZE).fitness
             fitness_scores.append(other_fitness)
     
     route_similarities = [row[0] for row in all_metrics]
@@ -91,4 +94,5 @@ def initiate_population_from_network(network: TransitNetwork, size: int) -> Popu
     initial_networks = generate_population(network, size)
     init_network_metrics = NetworkMetrics(network)
     initial_population = [Chromosome(net) for net in initial_networks]
-    return Population(initial_population, init_network_metrics, evaluate_network, breed_networks)
+    ZoneEV = ZoneEvaluator(network)
+    return Population(initial_population, init_network_metrics, ZoneEV, evaluate_network_new, breed_networks)

@@ -12,7 +12,8 @@ This script is purely for informal testing and 'playing' with new code.
 """
 Network = read_object_from_file('data/new_initial_net/new_initial_net.pkl')
 ZE = ZoneEvaluator(Network)
-score = ZE.evaluate_total_zone_distance(Network)
+ZE.sample_stops()
+score = ZE.evaluate_network(Network)
 print(score)
 
 # create_simplified_gtfs_SFMTA('output/new_initial_net')

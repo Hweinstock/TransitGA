@@ -47,9 +47,9 @@ def examine_best_performer(output_dir: str):
 
 
 if __name__ == '__main__':
-    # num_generations = 2000
-    # population_size = 100
-    # initial_network_path_input = './output/new_initial_net.pkl'
-    # #run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)
+    num_generations = 1000
+    population_size = 100
+    initial_network_path_input = './data/new_initial_net.pkl'
+    run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)
     # examine_best_performer('output/2000i100p')
-    create_simplified_gtfs_SFMTA('data/new_initial_net')
+    # create_simplified_gtfs_SFMTA('data/new_initial_net')

@@ -29,14 +29,12 @@ class ZoneEvaluator:
 
 
     def __init__(self, initial_network: TransitNetwork):
+        self.initial_network = initial_network
         self.pool_of_stops = initial_network.stops 
         self.zone_keys = dict([(z, i) for i, z in enumerate(self.zones)])
         self.stops_in_zone = [self.determine_stops_in_range(z) for z in self.zones]
         self.current_stop_choices = {}
-        self.initial_zone_score = self.evaluate_total_zone_distance(initial_network)
-
-        # Fills self.current_stop_choices with options. 
-        self.sample_stops()
+        self.initial_zone_score = 0
 
     def get_zone_key(self, zone: Zone) -> int:
         return self.zone_keys[zone]
@@ -58,6 +56,8 @@ class ZoneEvaluator:
         for z in self.zones:
             z_key = self.get_zone_key(z) 
             self.current_stop_choices[z_key] = self.sample_stop_for_zone(z)
+        # Update initial_zone_score with new sample
+        self.initial_zone_score = self.evaluate_total_zone_distance(self.initial_network)
     
     def trip_distance_to_zone(self, trip: SimpleTrip, stop_index: int, target_zone: Zone) -> int:
         trip_length = len(trip.stops)
@@ -76,28 +76,35 @@ class ZoneEvaluator:
 
     def route_distance_to_zone(self, route: SimpleRoute, source_stop: Stop, target_zone: Zone) -> int:
         trip_distances = []
+        if route.trips is None:
+            print('heheheheheheh')
         for trip in route.trips:
             stop_index = trip.get_index_of_stop_id(source_stop.id)
             if stop_index is not None:
                 trip_distances.append(self.trip_distance_to_zone(trip, stop_index, target_zone))
-
-        return min(trip_distances)
+        if trip_distances == []:
+            return float('inf')
+        else:
+            return min(trip_distances)
 
 
     def evaluate_zone_distance(self, target_network: TransitNetwork, source_zone: Zone, target_zone: Zone) -> float:
         source_zone_key = self.get_zone_key(source_zone)
         source_stop = self.current_stop_choices[source_zone_key]
         routes_options = source_stop.routes
-        routes_dist = [self.route_distance_to_zone(target_network.lookup_route_by_id(r), source_stop, target_zone) for r in routes_options]
-        distance = min(routes_dist)
+        routes_dist = []
+        for route_id in routes_options:
+            route = target_network.lookup_route_by_id(route_id)
+            if route is not None:
+                route_dist = self.route_distance_to_zone(route, source_stop, target_zone)
+                routes_dist.append(route_dist)
 
-        if distance == float('inf'):
+        if routes_dist == [] or min(routes_dist) == float('inf'):
             RootLogger.log_warning(f'Unable to find route from zone {source_zone}, sending distance of {params.DEFAULT_ZONE_DISTANCE}')
             return params.DEFAULT_ZONE_DISTANCE
         return min(routes_dist)
 
     def evaluate_total_zone_distance(self, target_network: TransitNetwork):
-        self.sample_stops() 
         total_zone_distance = 0.0
 
         for path in self.zone_paths:
@@ -110,7 +117,7 @@ class ZoneEvaluator:
         return total_zone_distance
     
     def evaluate_network(self, target_network: TransitNetwork):
-        return self.evaluate_total_zone_distance(target_network) / self.initial_zone_score
+        return self.evaluate_total_zone_distance(target_network) / (self.initial_zone_score + params.ZONE_EPSILON)
                 
 
             

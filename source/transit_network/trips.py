@@ -33,7 +33,7 @@ class BaseTrip:
             if cur_stop.id == target_id: 
                 return index 
         
-        RootLogger.log_error(f'Unable to locate shared stop {target_id} in trip {self.id}')
+        RootLogger.log_warning(f'Unable to locate shared stop {target_id} in trip {self.id}')
         return None 
     
     def __eq__(self, other_obj: object) -> bool:

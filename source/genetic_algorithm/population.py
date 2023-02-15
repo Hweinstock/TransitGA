@@ -5,6 +5,7 @@ from statistics import mean, median, stdev
 import time
 import os
 
+from genetic_algorithm.zone_evaluator import ZoneEvaluator
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.network_metrics import NetworkMetrics
 from root_logger import RootLogger
@@ -19,7 +20,7 @@ class Population:
     mutation_rate = 0.1
     elitist_cutoff = 0.5
 
-    def __init__(self, networks: List[Chromosome], initial_metrics: NetworkMetrics, fitness_function, breeding_function):
+    def __init__(self, networks: List[Chromosome], initial_metrics: NetworkMetrics, ZoneEvaluator: ZoneEvaluator, fitness_function, breeding_function):
         self.population = networks
         self.population_size = len(networks)
         self.fitness_function = fitness_function
@@ -29,12 +30,14 @@ class Population:
         self.per_round_metrics = []
         self.write_to_pickle = pickle_object
         self.initial_metrics = initial_metrics
+        self.ZoneEvaluator = ZoneEvaluator
         self.done_running = False
         self.running_time = 0.0
     
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
         self.performance_dict = {}
+        self.ZoneEvaluator.sample_stops()
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index
@@ -43,7 +46,7 @@ class Population:
             if member.FitnessObj is not None: 
                 FitnessObj = member.FitnessObj
             else:
-                FitnessObj = self.fitness_function(member.obj, self.initial_metrics)
+                FitnessObj = self.fitness_function(member.obj, self.initial_metrics, self.ZoneEvaluator)
                 member.FitnessObj = FitnessObj
 
             # Check that this is the first time we see this id. 
