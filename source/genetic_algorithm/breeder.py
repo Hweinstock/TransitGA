@@ -2,20 +2,12 @@ from transit_network.transit_network import TransitNetwork, create_network_from_
 from transit_network.trips import common_transfer_point, SimpleTrip
 from root_logger import RootLogger
 import genetic_algorithm.params as params
+from genetic_algorithm.family import Family
 
 from typing import List, Tuple
 import uuid
 import random 
 from copy import deepcopy
-
-class Family:
-    def __init__(self, child_A: SimpleTrip, child_B: SimpleTrip, parent_A: SimpleTrip, parent_B: SimpleTrip):
-        self.child_A = child_A 
-        self.child_B = child_B
-
-        self.parent_A = parent_A 
-        self.parent_B = parent_B
-        self.parents = [self.parent_A, self.parent_B]
 
 def kill_random_trips(trips: List[SimpleTrip]):
     r_val = random.uniform(0, 1)
@@ -151,8 +143,6 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
 
         child_trips = [t for t in net_A_trips if t not in family.parents] + [family.child_A, family.child_B]
 
-        del family
-
         RootLogger.log_debug(f'Done crafting new trips for children networks...')
 
         # Generate 'breeded' ids if none provided. 
@@ -160,7 +150,7 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
             new_id = ':'.join([Net_A.id, Net_B.id])
             
         RootLogger.log_debug(f'Successfully breeded networks {Net_A.id} and {Net_B.id}')
-        child_network = create_network_from_trips(child_trips, new_id)
+        child_network = create_network_from_trips(child_trips, new_id, family)
         return child_network
 
 

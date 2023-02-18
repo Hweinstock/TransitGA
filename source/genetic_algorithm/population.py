@@ -18,7 +18,7 @@ def scale_to_prob_dist(weights: List[float]) -> List[float]:
 class Population:
 
     mutation_rate = 0.1
-    elitist_cutoff = 0.5
+    elitist_cutoff = 0.25
 
     def __init__(self, networks: List[Chromosome], initial_metrics: NetworkMetrics, ZoneEvaluator: ZoneEvaluator, fitness_function, breeding_function):
         self.population = networks
@@ -37,7 +37,7 @@ class Population:
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
         self.performance_dict = {}
-        self.ZoneEvaluator.sample_stops()
+        #self.ZoneEvaluator.sample_stops()
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index

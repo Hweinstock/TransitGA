@@ -7,7 +7,8 @@ from copy import deepcopy
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
 from transit_network.trips import GTFSTrip, simplify_trip, SimpleTrip
-from transit_network.shapes import ShapePoint, get_shapes_from_df
+from transit_network.shapes import get_shapes_from_df
+from genetic_algorithm.family import Family
 from preprocessing.determine_transfers import new_determine_transfers
 import preprocessing.gtfs_data as GTFS
 
@@ -138,14 +139,13 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
         RootLogger.log_info(f'Simplifying trips for route {route.id}')
         new_trips = []
         for trip in route.trips:
-
-
             new_stops = [] 
 
             for stop in trip.stops:
                 stop_id = stop[0].get_id()
                 cur_stop = id_to_obj_map[stop_id]
                 if cur_stop.is_transfer(): 
+                    RootLogger.log_debug(f'Identified transfer stop {cur_stop.id} with {len(cur_stop.routes)} transfers.')
                     new_stops.append(cur_stop)
             
             # We want to add endpoint to the trips
@@ -184,7 +184,7 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
 
     return TransitNetwork(simple_routes, id='-1') 
 
-def create_network_from_trips(trips: List[SimpleTrip], id: str):
+def create_network_from_trips(trips: List[SimpleTrip], id: str, family: Family):
     routes_dict = {} # maps route-ids to the trips referencing them
     for trip in trips:
         route_id = trip.route_id
@@ -192,6 +192,15 @@ def create_network_from_trips(trips: List[SimpleTrip], id: str):
             routes_dict[route_id].append(trip)
         else:
             routes_dict[route_id] = [trip]
+
+    # Update transfers for children/parents. 
+    for child in family.children:
+        for stop in child.stops:
+            stop.add_transfer_routes([child.route_id])
+
+    for parent in family.parents:
+        for stop in parent.stops:
+            stop.remove_route(parent.route_id)
     
     new_routes = []
     for route_id in routes_dict:

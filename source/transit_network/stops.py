@@ -31,6 +31,9 @@ class Stop:
     
     def add_transfer_routes(self, new_routes: List[str]):
         self.routes += [r for r in new_routes if r not in self.routes]
+    
+    def remove_route(self, target_route: str) -> None:
+        self.routes = [r for r in self.routes if r != target_route]
 
     @property
     def location_lat(self):
@@ -78,19 +81,19 @@ class Stop:
                      {self.parent_id} and {second_stop.parent_id}.')
             new_parent = self.parent_id if second_stop.parent_id is None else second_stop.parent_id
         
-        new_routes = self.routes + second_stop.routes 
         new_lat = (self.location_lat + second_stop.location_lat) / 2.0
         new_lon = (self.location_lon + second_stop.location_lon) / 2.0
 
-        return Stop(id= new_id, name=new_name, location=(new_lat, new_lon), parent_id=new_parent, routes=new_routes)
+        # Add routes one at time to avoid duplicates. 
+        NewStop = Stop(id= new_id, name=new_name, location=(new_lat, new_lon), parent_id=new_parent, routes=[])
+        NewStop.add_transfer_routes(self.routes)
+        NewStop.add_transfer_routes(second_stop.routes)
+        return NewStop
 
     def is_transfer(self):
         if len(self.routes) == 0:
-            RootLogger.log_warning(f'Stop {self.id} with parent {self.parent_id} has no routes!')
-        try:
-            num_unique_routes = len(set(self.routes))
-        except TypeError:
-            print(self.routes)
+            RootLogger.log_error(f'Stop {self.id} with parent {self.parent_id} has no routes!')
+        num_unique_routes = len(set(self.routes))
         return num_unique_routes > 1
     
     def get_id(self):
