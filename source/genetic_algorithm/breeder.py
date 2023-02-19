@@ -46,6 +46,9 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
     # We deepcopy because we don't want to be modifying the same stop objects for all of them. 
     RootLogger.log_debug(f'Crafting parameters for new child trip...')
     new_stops = deepcopy(first_trip.stops[:first_index] + second_trip.stops[second_index:])
+
+    # Remove the old routes from the trips.     
+
     new_shapes = deepcopy(first_trip.shape_points[:first_index] + second_trip.shape_points[second_index:])
 
     # We generate global unique ids for performance reasons. 
@@ -56,10 +59,11 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
 
     new_trip = SimpleTrip(trip_id=new_id, route_id=new_route, message=new_message, 
                           direction=first_trip.direction, stops=new_stops, shape_points=new_shapes)
+
     RootLogger.log_debug(f'Successfuly created child trip {new_id} on new route {new_route}')
     return new_trip
 
-def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Family or None:
+def sample_parent_trips(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Tuple[SimpleTrip, SimpleTrip, str]:
     RootLogger.log_debug('Attempting to randomly sample overlapping trips...')
     times_tried = 0
     parent_trip_A = None 
@@ -81,7 +85,12 @@ def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip
 
     if parent_trip_A is None: 
         RootLogger.log_warning(f'Failed in finding overlap between parents, returning None.')
-        return None 
+        return None, None, None
+    
+    return parent_trip_A, parent_trip_B, shared_stop_id
+
+def get_family(parent_A_trips: List[SimpleTrip], parent_B_trips: List[SimpleTrip]) -> Family or None:
+    parent_trip_A, parent_trip_B, shared_stop_id = sample_parent_trips(parent_A_trips, parent_B_trips)
 
     RootLogger.log_debug(f'Producing child trip for trips {parent_trip_A.id} and {parent_trip_B.id}.')
     child_trip_A = produce_child_trip(parent_trip_A, parent_trip_B, shared_stop_id) 
@@ -115,6 +124,7 @@ def get_child_trips(parent_A_trips: List[SimpleTrip], parent_B_trips: List[Simpl
     parent_trip_A = get_trip_by_id(parent_A_trips, trip_A_id)
     parent_trip_B = get_trip_by_id(parent_B_trips, trip_B_id)
 
+    # Children Stops
     child_trip_A = produce_child_trip(parent_trip_A, parent_trip_B, shared_stop_id) 
     child_trip_B = produce_child_trip(parent_trip_B, parent_trip_A, shared_stop_id)
 
@@ -127,8 +137,8 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
 
     # Randomly choose one them to be the first parent. (i.e. which route starts in the crossover)
 
-    net_A_trips = Net_A.trips 
-    net_B_trips = Net_B.trips
+    net_A_trips = deepcopy(Net_A.trips)
+    net_B_trips = deepcopy(Net_B.trips)
 
     family = get_family(net_A_trips, net_B_trips)
     
@@ -138,11 +148,10 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
         return Net_A
 
     else: 
-        # Kill parents
         RootLogger.log_debug(f'Crafting new trips for children networks...')
 
         child_trips = [t for t in net_A_trips if t not in family.parents] + [family.child_A, family.child_B]
-
+        
         RootLogger.log_debug(f'Done crafting new trips for children networks...')
 
         # Generate 'breeded' ids if none provided. 

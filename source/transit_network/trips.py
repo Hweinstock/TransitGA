@@ -50,6 +50,7 @@ class SimpleTrip(BaseTrip):
         self.shape_points = shape_points
         self.dead = False
         self.set_sequence_values_for_stops()
+        self.set_stop_transfer_points()
         
     @property
     def flattened_shape_points(self):
@@ -58,6 +59,9 @@ class SimpleTrip(BaseTrip):
     @property
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
+
+    def does_stop_at(self, stop: str) -> bool:
+        return stop in self.unique_stop_ids
 
     def count_intersections(self):
         unique_trips = {} 
@@ -95,6 +99,10 @@ class SimpleTrip(BaseTrip):
             rows.append(new_row)
     
         return rows
+
+    def set_stop_transfer_points(self):
+        for s in self.stops:
+            s.add_transfer_routes([self.route_id])
         
     @property
     def custom_shape_id(self):

@@ -33,7 +33,10 @@ class Stop:
         self.routes += [r for r in new_routes if r not in self.routes]
     
     def remove_route(self, target_route: str) -> None:
-        self.routes = [r for r in self.routes if r != target_route]
+        self.remove_routes([target_route])
+    
+    def remove_routes(self, target_routes: List[str]) -> None:
+        self.routes = [r for r in self.routes if r not in target_routes]
 
     @property
     def location_lat(self):
