@@ -30,7 +30,7 @@ class TransitNetwork:
         self.ridership = self.get_ridership()
         self.coverage = self.get_coverage()
         self.ridership_density_score = self.get_ridership_density_score()
-        self.set_transfer_points()
+        # self.set_transfer_points()
 
     def get_copy(self):
         # Make this a deepcopy. 
@@ -218,18 +218,28 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
 
     return TransitNetwork(simple_routes, id='-1') 
 
-def create_network_from_trips(trips: List[SimpleTrip], id: str, family: Family):
+def create_network_from_trips(trips: List[SimpleTrip], id: str):
     routes_dict = {} # maps route-ids to the trips referencing them
+
     for trip in trips:
         route_id = trip.route_id
         if route_id in routes_dict:
             routes_dict[route_id].append(trip)
         else:
             routes_dict[route_id] = [trip]
+        
+        for stop in trip.stops:
+            stop.routes = [] # Reset transfer points to none
     
     new_routes = []
     for route_id in routes_dict:
         new_route = SimpleRoute(route_id, None)
+        route_trips = routes_dict[route_id]
+
+        # Set transfer points
+        for trip in route_trips:
+            trip.set_stop_transfer_points()
+
         new_route.add_trips(routes_dict[route_id])
         new_routes.append(new_route)
         

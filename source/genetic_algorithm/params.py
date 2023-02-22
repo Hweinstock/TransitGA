@@ -10,10 +10,11 @@ COVERAGE_LAMBDA = 0.0
 RIDERSHIP_DENSITY_LAMBDA = 0.0
 ZONE_LAMBDA = 0.5
 
-ZONE_RADIUS = 900
+ZONE_RADIUS = 450
 ZONE_EPSILON = 0.5
 DEFAULT_ZONE_DISTANCE = 40
-ZONE_SAMPLE_NUM = 5
+ZONE_SAMPLE_NUM = 3
+
 # Can use to draw: https://www.calcmaps.com/map-radius/
 Z1_LAT = 37.780554
 Z1_LON = -122.472288
@@ -33,6 +34,26 @@ Z3_NAME = "Mission"
 Z4_LAT = 37.738030
 Z4_LON = -122.469079
 Z4_NAME = "West Portal"
+
+Z5_LAT = 37.792728
+Z5_LON = -122.397015
+Z5_NAME = "Embarcadero"
+
+Z6_LAT = 37.794521
+Z6_LON = -122.404864
+Z6_NAME = "Chinatown"
+
+Z7_LAT = 37.784542
+Z7_LON = -122.431252
+Z7_NAME = "Japantown"
+
+Z8_LAT = 37.757698
+Z8_LON =  -122.392687
+Z8_NAME = "Dogpatch"
+
+Z9_LAT = 37.770224
+Z9_LON = -122.445421
+Z9_NAME = "Haight and Ashbury"
 
 
 def sum_of_fitness_coefficients():

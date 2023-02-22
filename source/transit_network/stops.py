@@ -29,6 +29,16 @@ class Stop:
         self.ridership = 0
         self.location = location
     
+    def copy(self):
+        new_stop = Stop(id = self.id, 
+                        name=self.name, 
+                        location=self.location, 
+                        parent_id=self.parent_id, 
+                        routes=self.routes)
+        new_stop.trip_sequences = self.trip_sequences
+        new_stop.ridership = self.ridership
+        return new_stop 
+        
     def add_transfer_routes(self, new_routes: List[str]):
         self.routes += [r for r in new_routes if r not in self.routes]
     

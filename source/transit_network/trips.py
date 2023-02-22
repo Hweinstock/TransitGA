@@ -59,6 +59,16 @@ class SimpleTrip(BaseTrip):
     @property
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
+    
+    def copy(self):
+        new_trip = SimpleTrip(trip_id=self.id, 
+                              route_id=self.route_id, 
+                              message=self.message, 
+                              direction=self.direction, 
+                              shape_points=self.shape_points, 
+                              stops=[stop.copy() for stop in self.stops])
+
+        return new_trip 
 
     def does_stop_at(self, stop: str) -> bool:
         return stop in self.unique_stop_ids

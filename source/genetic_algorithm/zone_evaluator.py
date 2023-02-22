@@ -7,7 +7,7 @@ import genetic_algorithm.params as params
 from root_logger import RootLogger
 
 import random 
-from typing import List
+from typing import List, Tuple
 random.seed(10)
 
 class Zone(Coords):
@@ -18,16 +18,54 @@ class Zone(Coords):
     def __str__(self):
         return self.name
 
+class TransitPath:
+    def __init__(self, first_zone: Zone, second_zone: Zone, weight: float):
+        self.first_zone = first_zone
+        self.second_zone = second_zone 
+        self.weight = weight 
+    
+    def as_tuple(self) -> Tuple[Zone, Zone, float]:
+        return (self.first_zone, self.second_zone, self.weight)
+
 Z1 = Zone(params.Z1_LAT, params.Z1_LON, params.Z1_NAME)
 Z2 = Zone(params.Z2_LAT, params.Z2_LON, params.Z2_NAME)
 Z3 = Zone(params.Z3_LAT, params.Z3_LON, params.Z3_NAME)
 Z4 = Zone(params.Z4_LAT, params.Z4_LON, params.Z4_NAME)
+Z5 = Zone(params.Z5_LAT, params.Z5_LON, params.Z5_NAME)
+Z6 = Zone(params.Z6_LAT, params.Z6_LON, params.Z6_NAME)
+Z7 = Zone(params.Z7_LAT, params.Z7_LON, params.Z7_NAME)
+Z8 = Zone(params.Z8_LAT, params.Z8_LON, params.Z8_NAME)
+Z9 = Zone(params.Z9_LAT, params.Z9_LON, params.Z9_NAME)
+all_zones = [Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9]
+
+def create_paths_to_downtown(DowntownZone: Zone, all_zones: List[Zone], weight: float) -> List[TransitPath]:
+    return [TransitPath(DowntownZone, z, weight) for z in all_zones]
+
+def full_connect_zones(zone_group: List[Zone], weight: float) -> List[TransitPath]:
+    paths = []
+    for index1, z1 in enumerate(zone_group):
+        for z2 in zone_group[index1:]:
+            new_path = TransitPath(z1, z2, weight)
+            paths.append(new_path)
+
+    return paths
 
 class ZoneEvaluator:
     
-    zones = [Z1, Z2, Z3, Z4]
-    zone_paths = [(Z1, Z2, 0.33), (Z3, Z2, 0.33), (Z4, Z2, 0.33)]
+    zones = all_zones
+    zone_paths = [p for p in create_paths_to_downtown(Z2, all_zones, 0.5)] + \
+        [p for p in full_connect_zones([z for z in all_zones if z != Z2], 1.0)]
 
+    # zone_paths = [(Z1, Z2, 1.0), 
+    #               (Z3, Z2, 1.0), 
+    #               (Z4, Z2, 1.0),
+    #               (Z5, Z2, 1.0), 
+    #               (Z6, Z2, 1.0), 
+    #               (Z7, Z2, 1.0), 
+    #               (Z8, Z2, 1.0),
+    #               (Z9, Z2, 1.0), 
+    #               (Z1, Z3, 0.5),
+    #               ()]
 
     def __init__(self, initial_network: TransitNetwork):
         self.initial_network = initial_network
@@ -36,19 +74,21 @@ class ZoneEvaluator:
         self.stops_in_zone = [self.determine_stops_in_range(z) for z in self.zones]
         self.current_stop_choices = {}
         self.initial_zone_score = 0
-        self.sample_stops()
-        self.print_choices()
-        
-    def print_choices(self) -> None:
-        # result_str = '*\n'
-        # for zone in self.zones:
-        #     result_str += str(zone)
-        #     result_str += '\t'
-        #     result_str += str(self.current_stop_choices[self.get_zone_key(zone)])
-        #     result_str += '\n'
 
-        # print(result_str + '*\n')
-        print("This function is not updated to handle variable number of stop samples.")
+        self.sample_stops()
+        self.log_choices()
+        
+    def log_choices(self) -> None:
+
+        result_str = '*\n'
+        for zone in self.zones:
+            result_str += str(zone)
+            for stop_choice in self.current_stop_choices[self.get_zone_key(zone)]:
+                result_str += '\t'
+                result_str += str(stop_choice)
+                result_str += '\n'
+
+        RootLogger.log_info(result_str)
 
     def get_zone_key(self, zone: Zone) -> int:
         return self.zone_keys[zone]
@@ -107,11 +147,11 @@ class ZoneEvaluator:
                 trip_distances.append(self.trip_distance_to_zone(trip, stop_index, target_zone))
         
         if trip_distances == []:
-            RootLogger.log_error(f'Neither trip of route {route.id} contained stop {source_stop} that claimed to have route {route.id}!')
-            raise ValueError
+            error_msg = f'Neither trip of route {route.id} contained stop {source_stop} that claimed to have route {route.id}!'
+            RootLogger.log_error(error_msg)
+            raise ValueError(error_msg)
 
         return min(trip_distances)
-
 
     def evaluate_zone_distance(self, target_network: TransitNetwork, source_zone: Zone, target_zone: Zone) -> float:
         source_zone_key = self.get_zone_key(source_zone)
@@ -142,8 +182,10 @@ class ZoneEvaluator:
                 try:
                     route_dist = self.route_distance_to_zone(route, source_stop, target_zone)
                 except ValueError:
-                    RootLogger.log_error(f'Stops of {target_network.id} are improperly updated.')
-                    raise TypeError
+                    error_msg = f'Stops of network {target_network.id} are improperly updated.'
+                    RootLogger.log_error(error_msg)
+                    raise TypeError(error_msg)
+
                 routes_dist.append(route_dist)
 
         if routes_dist == [] or min(routes_dist) == float('inf'):
@@ -157,7 +199,7 @@ class ZoneEvaluator:
         total_zone_distance = 0.0
 
         for path in self.zone_paths:
-            source_zone, target_zone, weight = path 
+            source_zone, target_zone, weight = path.to_tuple()
 
             dist_1 = self.evaluate_zone_distance(target_network, source_zone, target_zone)
             dist_2 = self.evaluate_zone_distance(target_network, target_zone, source_zone)
@@ -172,7 +214,6 @@ class ZoneEvaluator:
             zone_score = (self.initial_zone_score) / (params.ZONE_EPSILON)
         else:
             zone_score = (self.initial_zone_score) / raw_zone_dist
-        # print(zone_score, self.initial_zone_score, raw_zone_dist)
         return zone_score
                 
 

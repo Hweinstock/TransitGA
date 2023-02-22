@@ -44,7 +44,8 @@ def generate_population(initial_network: TransitNetwork, population_size: int, d
             RootLogger.log_warning(f'Population size of {len(current_population)} to small to generate metrics.')
         else:
             metrics = generate_metrics(initial_network, current_population)
-            print_metrics(metrics)
+            RootLogger.log_info(f'Initial Population Metrics: {metrics}')
+
     RootLogger.log_info('Done Generating Initial Population.')
     return current_population
 

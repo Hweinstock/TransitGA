@@ -7,7 +7,7 @@ class Coords:
         self.lat = lat 
         self.lon = lon
     
-    def get_coords(self):
+    def get_coords(self) -> List[float]:
         return [self.lat, self.lon]
 
 class ShapePoint(Coords):

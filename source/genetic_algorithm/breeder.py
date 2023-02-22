@@ -137,8 +137,8 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
 
     # Randomly choose one them to be the first parent. (i.e. which route starts in the crossover)
 
-    net_A_trips = deepcopy(Net_A.trips)
-    net_B_trips = deepcopy(Net_B.trips)
+    net_A_trips = [t.copy() for t in Net_A.trips]
+    net_B_trips = [t.copy() for t in Net_B.trips]
 
     family = get_family(net_A_trips, net_B_trips)
     
@@ -152,6 +152,7 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
 
         child_trips = [t for t in net_A_trips if t not in family.parents] + [family.child_A, family.child_B]
         
+
         RootLogger.log_debug(f'Done crafting new trips for children networks...')
 
         # Generate 'breeded' ids if none provided. 
@@ -159,7 +160,7 @@ def breed_networks(Net_A: TransitNetwork, Net_B: TransitNetwork,
             new_id = ':'.join([Net_A.id, Net_B.id])
             
         RootLogger.log_debug(f'Successfully breeded networks {Net_A.id} and {Net_B.id}')
-        child_network = create_network_from_trips(child_trips, new_id, family)
+        child_network = create_network_from_trips(child_trips, new_id)
         return child_network
 
 
