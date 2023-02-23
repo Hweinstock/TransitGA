@@ -10,7 +10,7 @@ COVERAGE_LAMBDA = 0.0
 RIDERSHIP_DENSITY_LAMBDA = 0.0
 ZONE_LAMBDA = 0.5
 
-ZONE_RADIUS = 450
+ZONE_RADIUS = 900
 ZONE_EPSILON = 0.5
 DEFAULT_ZONE_DISTANCE = 40
 ZONE_SAMPLE_NUM = 3
@@ -18,42 +18,66 @@ ZONE_SAMPLE_NUM = 3
 # Can use to draw: https://www.calcmaps.com/map-radius/
 Z1_LAT = 37.780554
 Z1_LON = -122.472288
-Z1_NAME = "Richmond"
+Z1_NAME = "Inner Richmond"
+Z1_COLOR = "blue"
 
 # Downtown
-Z2_LAT = 37.792519
-Z2_LON = -122.397427
+Z2_LAT = 37.779743
+Z2_LON = -122.413583
 Z2_NAME = "Downtown"
+Z2_COLOR = "red"
 
 # Mission
 Z3_LAT = 37.752252
 Z3_LON = -122.418125
 Z3_NAME = "Mission"
+Z3_COLOR = "green"
 
 # West Portal
 Z4_LAT = 37.738030
 Z4_LON = -122.469079
 Z4_NAME = "West Portal"
+Z4_COLOR = "purple"
 
 Z5_LAT = 37.792728
 Z5_LON = -122.397015
 Z5_NAME = "Embarcadero"
+Z5_COLOR = "pink"
 
 Z6_LAT = 37.794521
 Z6_LON = -122.404864
 Z6_NAME = "Chinatown"
+Z6_COLOR = "orange"
 
 Z7_LAT = 37.784542
 Z7_LON = -122.431252
-Z7_NAME = "Japantown"
+Z7_NAME = "Pacific Heights/Japantown"
+Z7_COLOR = "cyan"
 
 Z8_LAT = 37.757698
 Z8_LON =  -122.392687
 Z8_NAME = "Dogpatch"
+Z8_COLOR = "lime"
 
 Z9_LAT = 37.770224
 Z9_LON = -122.445421
 Z9_NAME = "Haight and Ashbury"
+Z9_COLOR = "grey"
+
+Z10_LAT = 37.775891
+Z10_LON = -122.496533
+Z10_NAME = "Outer Richmond"
+Z10_COLOR = "teal"
+
+Z11_LAT = 37.761713
+Z11_LON = -122.477040
+Z11_NAME = "Irving/Judah-Sunset"
+Z11_COLOR = "tomato"
+
+Z12_LAT = 37.799901
+Z12_LON = -122.436089
+Z12_NAME = "Marina District"
+Z12_COLOR = "olive"
 
 
 def sum_of_fitness_coefficients():

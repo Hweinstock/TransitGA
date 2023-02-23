@@ -11,9 +11,10 @@ from typing import List, Tuple
 random.seed(10)
 
 class Zone(Coords):
-    def __init__(self, lat: float, lon: float, name: str):
+    def __init__(self, lat: float, lon: float, name: str, color: str):
         Coords.__init__(self, lat, lon)
         self.name = name 
+        self.color = color
     
     def __str__(self):
         return self.name
@@ -27,16 +28,19 @@ class TransitPath:
     def as_tuple(self) -> Tuple[Zone, Zone, float]:
         return (self.first_zone, self.second_zone, self.weight)
 
-Z1 = Zone(params.Z1_LAT, params.Z1_LON, params.Z1_NAME)
-Z2 = Zone(params.Z2_LAT, params.Z2_LON, params.Z2_NAME)
-Z3 = Zone(params.Z3_LAT, params.Z3_LON, params.Z3_NAME)
-Z4 = Zone(params.Z4_LAT, params.Z4_LON, params.Z4_NAME)
-Z5 = Zone(params.Z5_LAT, params.Z5_LON, params.Z5_NAME)
-Z6 = Zone(params.Z6_LAT, params.Z6_LON, params.Z6_NAME)
-Z7 = Zone(params.Z7_LAT, params.Z7_LON, params.Z7_NAME)
-Z8 = Zone(params.Z8_LAT, params.Z8_LON, params.Z8_NAME)
-Z9 = Zone(params.Z9_LAT, params.Z9_LON, params.Z9_NAME)
-all_zones = [Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9]
+Z1 = Zone(params.Z1_LAT, params.Z1_LON, params.Z1_NAME, params.Z1_COLOR)
+Z2 = Zone(params.Z2_LAT, params.Z2_LON, params.Z2_NAME, params.Z2_COLOR)
+Z3 = Zone(params.Z3_LAT, params.Z3_LON, params.Z3_NAME, params.Z3_COLOR)
+Z4 = Zone(params.Z4_LAT, params.Z4_LON, params.Z4_NAME, params.Z4_COLOR)
+Z5 = Zone(params.Z5_LAT, params.Z5_LON, params.Z5_NAME, params.Z5_COLOR)
+Z6 = Zone(params.Z6_LAT, params.Z6_LON, params.Z6_NAME, params.Z6_COLOR)
+Z7 = Zone(params.Z7_LAT, params.Z7_LON, params.Z7_NAME, params.Z7_COLOR)
+Z8 = Zone(params.Z8_LAT, params.Z8_LON, params.Z8_NAME, params.Z8_COLOR)
+Z9 = Zone(params.Z9_LAT, params.Z9_LON, params.Z9_NAME, params.Z9_COLOR)
+Z10 = Zone(params.Z10_LAT, params.Z10_LON, params.Z10_NAME, params.Z10_COLOR)
+Z11 = Zone(params.Z11_LAT, params.Z11_LON, params.Z11_NAME, params.Z11_COLOR)
+Z12 = Zone(params.Z12_LAT, params.Z12_LON, params.Z12_NAME, params.Z12_COLOR)
+all_zones = [Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12]
 
 def create_paths_to_downtown(DowntownZone: Zone, all_zones: List[Zone], weight: float) -> List[TransitPath]:
     return [TransitPath(DowntownZone, z, weight) for z in all_zones]
@@ -53,8 +57,8 @@ def full_connect_zones(zone_group: List[Zone], weight: float) -> List[TransitPat
 class ZoneEvaluator:
     
     zones = all_zones
-    zone_paths = [p for p in create_paths_to_downtown(Z2, all_zones, 0.5)] + \
-        [p for p in full_connect_zones([z for z in all_zones if z != Z2], 1.0)]
+    zone_paths = [p for p in create_paths_to_downtown(Z2, all_zones, 1.0)] + \
+        [p for p in full_connect_zones([z for z in all_zones if z != Z2], 0.5)]
 
     # zone_paths = [(Z1, Z2, 1.0), 
     #               (Z3, Z2, 1.0), 
