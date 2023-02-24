@@ -5,10 +5,12 @@ from transit_network.trips import SimpleTrip
 from transit_network.shapes import Coords
 import genetic_algorithm.params as params
 from root_logger import RootLogger
+from genetic_algorithm.caching import RouteDistanceToZoneKey, AllRouteDistancesToZoneKey
+
 import csv
 
 import random 
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 random.seed(10)
 
 class Zone(Coords):
@@ -75,7 +77,7 @@ SUBURB_ZONES = [z for z in ZONES if z != DOWNTOWN_ZONE]
 
 class ZoneEvaluator:
 
-    zone_paths = [p for p in create_paths_to_downtown(DOWNTOWN_ZONE, SUBURB_ZONES, 1.0)] #+ [p for p in fully_connect_zones(SUBURB_ZONES, 0.5)]
+    zone_paths = [p for p in create_paths_to_downtown(DOWNTOWN_ZONE, SUBURB_ZONES, 1.0)] + [p for p in fully_connect_zones(SUBURB_ZONES, 0.5)]
 
     def __init__(self, initial_network: TransitNetwork):
         self.initial_network = initial_network
@@ -84,6 +86,9 @@ class ZoneEvaluator:
         self.stops_in_zone = [self.determine_stops_in_range(z) for z in ZONES]
         self.current_stop_choices = {}
         self.initial_zone_score = 0
+
+        self.known_route_distances: Dict[RouteDistanceToZoneKey, int] = {}
+        self.known_all_route_distances: Dict[AllRouteDistancesToZoneKey, int] = {}
 
         self.sample_stops()
         self.log_choices()
@@ -97,7 +102,7 @@ class ZoneEvaluator:
                 result_str += str(stop_choice)
                 result_str += '\n'
 
-        RootLogger.log_info(result_str)
+        RootLogger.log_debug(result_str)
 
     def get_zone_key(self, zone: Zone) -> int:
         return self.zone_keys[zone]
@@ -111,7 +116,7 @@ class ZoneEvaluator:
         if stops == []:
             RootLogger.log_error(f'Failed to find stops within range {params.ZONE_RADIUS} of {zone.get_coords()}')
         else:
-            RootLogger.log_info(f'Found {len(stops)} stops within range {params.ZONE_RADIUS} of {zone.get_coords()}')
+            RootLogger.log_debug(f'Found {len(stops)} stops within range {params.ZONE_RADIUS} of {zone.get_coords()}')
         return stops
     
     def sample_stop_for_zone(self, zone: Zone): 
@@ -161,6 +166,37 @@ class ZoneEvaluator:
             raise ValueError(error_msg)
 
         return min(trip_distances)
+    
+    def all_routes_distances_to_zone(self, target_network: TransitNetwork, route_options: List[str], source_stop: str, target_zone: str) -> List[int]:
+
+        AllRouteKey = str(AllRouteDistancesToZoneKey(route_options, source_stop, target_zone))
+        if AllRouteKey in self.known_all_route_distances:
+            return self.known_all_route_distances[AllRouteKey]
+        
+        # Compute Distance
+        routes_dist = []
+        for route_id in route_options:
+            # Check if we are already computed this distance. 
+            RouteKey = str(RouteDistanceToZoneKey(route_id, source_stop, target_zone.name))
+            if RouteKey in self.known_route_distances:
+                    routes_dist.append(self.known_route_distances[RouteKey])
+            else:
+                route = target_network.lookup_route_by_id(route_id)
+
+                # Handle the case where stop transfers are not updated properly. 
+                # TODO: simplify this since error shouldn't happen anymore. 
+                try:
+                    route_dist = self.route_distance_to_zone(route, source_stop, target_zone)
+                except ValueError:
+                    error_msg = f'Stops of network {target_network.id} are improperly updated.'
+                    RootLogger.log_error(error_msg)
+                    raise TypeError(error_msg)
+
+                self.known_route_distances[RouteKey] = route_dist
+                routes_dist.append(route_dist)
+
+        self.known_all_route_distances[AllRouteKey] = routes_dist
+        return routes_dist
 
     def evaluate_zone_distance(self, target_network: TransitNetwork, source_zone: Zone, target_zone: Zone) -> float:
         source_zone_key = self.get_zone_key(source_zone)
@@ -170,7 +206,6 @@ class ZoneEvaluator:
 
         # Look at all stops sampled. 
         for source_stop in all_source_stops:
-
             # If the stop got removed at some point, just skip it in calculations
             if not target_network.has_stop(source_stop):
                 continue 
@@ -178,24 +213,38 @@ class ZoneEvaluator:
             route_options = target_network.get_stop_transfers(source_stop)
             all_route_options += route_options
 
-            # Error cases
-            if route_options == [] and target_network.has_stop(source_stop):
-                stop_route_id, stop_trip_id = target_network.search_for_stop(source_stop)
-                RootLogger.log_error(f'Found stop {source_stop.id} with no routes in network {target_network.id}!')
-                if stop_route_id != None and stop_trip_id != None:
-                    RootLogger.log_error(f'Network contained stop on route {stop_route_id} and trip {stop_trip_id}, but has no transfers.')
+            new_distances = self.all_routes_distances_to_zone(target_network, route_options, source_stop, target_zone)
+            routes_dist += new_distances
+            # same route_options, same source_stop, same source_zone, same target_zone => same values
+            
+            # # Error cases
+            # if route_options == [] and target_network.has_stop(source_stop):
+            #     stop_route_id, stop_trip_id = target_network.search_for_stop(source_stop)
+            #     RootLogger.log_error(f'Found stop {source_stop.id} with no routes in network {target_network.id}!')
+            #     if stop_route_id != None and stop_trip_id != None:
+            #         RootLogger.log_error(f'Network contained stop on route {stop_route_id} and trip {stop_trip_id}, but has no transfers.')
             
             # Compute Distance
-            for route_id in route_options:
-                route = target_network.lookup_route_by_id(route_id)
-                try:
-                    route_dist = self.route_distance_to_zone(route, source_stop, target_zone)
-                except ValueError:
-                    error_msg = f'Stops of network {target_network.id} are improperly updated.'
-                    RootLogger.log_error(error_msg)
-                    raise TypeError(error_msg)
+            # for route_id in route_options:
+            #     # Check if we are already computed this distance. 
+            #     RouteKey = str(RouteDistanceToZoneKey(route_id, source_stop, target_zone.name))
+            #     if RouteKey in self.known_route_distances:
+            #         routes_dist.append(self.known_route_distances[RouteKey])
+            #     else:
+            #         route = target_network.lookup_route_by_id(route_id)
 
-                routes_dist.append(route_dist)
+            #         # Handle the case where stop transfers are not updated properly. 
+            #         # TODO: simplify this since error shouldn't happen anymore. 
+            #         try:
+            #             route_dist = self.route_distance_to_zone(route, source_stop, target_zone)
+            #         except ValueError:
+            #             error_msg = f'Stops of network {target_network.id} are improperly updated.'
+            #             RootLogger.log_error(error_msg)
+            #             raise TypeError(error_msg)
+
+            #         self.known_route_distances[RouteKey] = route_dist
+            #         routes_dist.append(route_dist)
+
 
         if routes_dist == [] or min(routes_dist) == float('inf'):
             RootLogger.log_debug(f'Unable to find route from {source_zone} to {target_zone}, giving distance of {params.DEFAULT_ZONE_DISTANCE}')
@@ -217,6 +266,7 @@ class ZoneEvaluator:
         return total_zone_distance
     
     def evaluate_network(self, target_network: TransitNetwork):
+        RootLogger.log_info(f'Evaluating network {target_network.id} in ZoneEvaluator...')
         raw_zone_dist = self.evaluate_total_zone_distance(target_network)
         if raw_zone_dist == 0:
             RootLogger.log_warning(f'Initial network achieved score of 0, setting to {params.ZONE_EPSILON}.')

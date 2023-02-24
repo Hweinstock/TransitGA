@@ -48,7 +48,7 @@ def examine_best_performer(output_dir: str):
 
 if __name__ == '__main__':
     # plot_zones()
-    num_generations = 100
+    num_generations = 10
     population_size = 100
     initial_network_path_input = './data/new_initial_net.pkl'
     run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)
