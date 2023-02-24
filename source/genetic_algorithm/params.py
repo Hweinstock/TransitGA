@@ -15,7 +15,7 @@ ZONE_EPSILON = 0.5
 DEFAULT_ZONE_DISTANCE = 40
 ZONE_SAMPLE_NUM = 3
 
-ZONE_FILE = 'data/zone_file.csv'
+ZONE_FILE = '../data/zone_file.csv'
 # Can use to draw: https://www.calcmaps.com/map-radius/
 Z1_LAT = 37.780554
 Z1_LON = -122.472288

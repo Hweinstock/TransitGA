@@ -1,4 +1,5 @@
 from utility import read_object_from_file
+from args_parser import cmdline_args
 from genetic_algorithm.initial_population_generator import initiate_population_from_network 
 from visuals.graph_metrics import graph_all_metrics
 from visuals.graph_gtfs import generate_diagram
@@ -45,12 +46,10 @@ def examine_best_performer(output_dir: str):
     generate_diagram(zip_path, os.path.join(output_dir, "best performer"), include_stops=False)
     RootLogger.log_info(f'Done!')
 
-
 if __name__ == '__main__':
     # plot_zones()
-    num_generations = 10
-    population_size = 100
-    initial_network_path_input = './data/new_initial_net.pkl'
-    run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)
-    # examine_best_performer('output/50i100p')
+    args = cmdline_args()
+    run_from_network(args.num_generations, args.population_size, initial_network_path=args.initial_network)
+    if args.best_performer:
+        examine_best_performer('output/50i100p')
     # create_simplified_gtfs_SFMTA('data/new_initial_net')
