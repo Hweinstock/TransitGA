@@ -7,11 +7,18 @@
 from simplify_gtfs import create_simplified_gtfs_SFMTA
 from utility import read_object_from_file
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
-from visuals.plot_zones import convert_zones_to_df, next_step
-from genetic_algorithm.zone_evaluator import all_zones
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
+# import csv 
+
+# headers = temp_all_zones[0].attributes
+# rows = [z.to_row() for z in temp_all_zones]
+# with open('zone_file.csv', 'w') as output:
+#     csv_writer = csv.writer(output)
+#     csv_writer.writerow(headers)
+#     csv_writer.writerows(rows)
+
 # Network = read_object_from_file('data/new_initial_net/new_initial_net.pkl')
 # ZE = ZoneEvaluator(Network)
 # ZE.sample_stops()

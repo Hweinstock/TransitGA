@@ -49,6 +49,10 @@ def produce_child_trip(first_trip: SimpleTrip, second_trip: SimpleTrip, shared_s
 
     # Remove the old routes from the trips.     
 
+    # Attempt at smoothing bred routes, in testing this worked really well. 
+    first_index = (first_index + 1) if first_index != len(first_trip.shape_points) else first_index
+    second_index = (second_index + 1) if second_index != len(second_trip.shape_points) else second_index
+
     new_shapes = deepcopy(first_trip.shape_points[:first_index] + second_trip.shape_points[second_index:])
 
     # We generate global unique ids for performance reasons. 

@@ -5,19 +5,38 @@ from transit_network.trips import SimpleTrip
 from transit_network.shapes import Coords
 import genetic_algorithm.params as params
 from root_logger import RootLogger
+import csv
 
 import random 
 from typing import List, Tuple
 random.seed(10)
 
 class Zone(Coords):
-    def __init__(self, lat: float, lon: float, name: str, color: str):
+    attributes = ["name", "lat", "lon", "color", "tags"]
+
+    def __init__(self, lat: float, lon: float, name: str, color: str, tags: List[str] = None):
         Coords.__init__(self, lat, lon)
         self.name = name 
         self.color = color
+        self.tags = tags
+    
+    def to_row(self):
+        return [self.name, self.lat, self.lon, self.color, self.tags]
     
     def __str__(self):
         return self.name
+    
+def parse_zone_file(filepath: str) -> List[Zone]:
+    zones = []
+    with open(filepath, 'r') as zone_file:
+        reader = csv.reader(zone_file)
+        for index, row in enumerate(reader):
+            if index == 0:
+                assert row == Zone.attributes
+            else:
+                new_zone = Zone(lat=row[1], lon=row[2], name=row[0], color=row[3], tags=row[4])
+                zones.append(new_zone)
+    return zones
 
 class TransitPath:
     def __init__(self, first_zone: Zone, second_zone: Zone, weight: float):
@@ -28,24 +47,10 @@ class TransitPath:
     def as_tuple(self) -> Tuple[Zone, Zone, float]:
         return (self.first_zone, self.second_zone, self.weight)
 
-Z1 = Zone(params.Z1_LAT, params.Z1_LON, params.Z1_NAME, params.Z1_COLOR)
-Z2 = Zone(params.Z2_LAT, params.Z2_LON, params.Z2_NAME, params.Z2_COLOR)
-Z3 = Zone(params.Z3_LAT, params.Z3_LON, params.Z3_NAME, params.Z3_COLOR)
-Z4 = Zone(params.Z4_LAT, params.Z4_LON, params.Z4_NAME, params.Z4_COLOR)
-Z5 = Zone(params.Z5_LAT, params.Z5_LON, params.Z5_NAME, params.Z5_COLOR)
-Z6 = Zone(params.Z6_LAT, params.Z6_LON, params.Z6_NAME, params.Z6_COLOR)
-Z7 = Zone(params.Z7_LAT, params.Z7_LON, params.Z7_NAME, params.Z7_COLOR)
-Z8 = Zone(params.Z8_LAT, params.Z8_LON, params.Z8_NAME, params.Z8_COLOR)
-Z9 = Zone(params.Z9_LAT, params.Z9_LON, params.Z9_NAME, params.Z9_COLOR)
-Z10 = Zone(params.Z10_LAT, params.Z10_LON, params.Z10_NAME, params.Z10_COLOR)
-Z11 = Zone(params.Z11_LAT, params.Z11_LON, params.Z11_NAME, params.Z11_COLOR)
-Z12 = Zone(params.Z12_LAT, params.Z12_LON, params.Z12_NAME, params.Z12_COLOR)
-all_zones = [Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12]
-
 def create_paths_to_downtown(DowntownZone: Zone, all_zones: List[Zone], weight: float) -> List[TransitPath]:
     return [TransitPath(DowntownZone, z, weight) for z in all_zones]
 
-def full_connect_zones(zone_group: List[Zone], weight: float) -> List[TransitPath]:
+def fully_connect_zones(zone_group: List[Zone], weight: float) -> List[TransitPath]:
     paths = []
     for index1, z1 in enumerate(zone_group):
         for z2 in zone_group[index1:]:
@@ -54,28 +59,29 @@ def full_connect_zones(zone_group: List[Zone], weight: float) -> List[TransitPat
 
     return paths
 
-class ZoneEvaluator:
-    
-    zones = all_zones
-    zone_paths = [p for p in create_paths_to_downtown(Z2, all_zones, 1.0)] + \
-        [p for p in full_connect_zones([z for z in all_zones if z != Z2], 0.5)]
+def find_zones_with_tag(zone_group: List[Zone], tag: str, max_matches: int = 1) -> List[Zone]: 
+    matches = [z for z in zone_group if 'downtown' in z.tags]
+    if len(matches) == 0:
+        RootLogger.log_error(f'Failed to zone with tag {tag} in {zone_group}')
+        raise ValueError
+    if len(matches) > max_matches:
+        RootLogger.log_warning(f'Found more than maximal matching zones {matches} with tag {tag}')
+    else:
+        return matches
 
-    # zone_paths = [(Z1, Z2, 1.0), 
-    #               (Z3, Z2, 1.0), 
-    #               (Z4, Z2, 1.0),
-    #               (Z5, Z2, 1.0), 
-    #               (Z6, Z2, 1.0), 
-    #               (Z7, Z2, 1.0), 
-    #               (Z8, Z2, 1.0),
-    #               (Z9, Z2, 1.0), 
-    #               (Z1, Z3, 0.5),
-    #               ()]
+ZONES = parse_zone_file(params.ZONE_FILE)
+DOWNTOWN_ZONE = find_zones_with_tag(ZONES, 'downtown')[0]
+SUBURB_ZONES = [z for z in ZONES if z != DOWNTOWN_ZONE]
+
+class ZoneEvaluator:
+
+    zone_paths = [p for p in create_paths_to_downtown(DOWNTOWN_ZONE, ZONES, 1.0)] + [p for p in fully_connect_zones(SUBURB_ZONES, 0.5)]
 
     def __init__(self, initial_network: TransitNetwork):
         self.initial_network = initial_network
         self.pool_of_stops = initial_network.stops 
-        self.zone_keys = dict([(z, i) for i, z in enumerate(self.zones)])
-        self.stops_in_zone = [self.determine_stops_in_range(z) for z in self.zones]
+        self.zone_keys = dict([(z, i) for i, z in enumerate(ZONES)])
+        self.stops_in_zone = [self.determine_stops_in_range(z) for z in ZONES]
         self.current_stop_choices = {}
         self.initial_zone_score = 0
 
@@ -83,9 +89,8 @@ class ZoneEvaluator:
         self.log_choices()
         
     def log_choices(self) -> None:
-
         result_str = '*\n'
-        for zone in self.zones:
+        for zone in ZONES:
             result_str += str(zone)
             for stop_choice in self.current_stop_choices[self.get_zone_key(zone)]:
                 result_str += '\t'
@@ -116,7 +121,7 @@ class ZoneEvaluator:
         return stop_choice
     
     def sample_stops(self):
-        for z in self.zones:
+        for z in ZONES:
             z_key = self.get_zone_key(z) 
             self.current_stop_choices[z_key] = [self.sample_stop_for_zone(z) for i in range(params.ZONE_SAMPLE_NUM)]
         # Update initial_zone_score with new sample
@@ -193,8 +198,8 @@ class ZoneEvaluator:
                 routes_dist.append(route_dist)
 
         if routes_dist == [] or min(routes_dist) == float('inf'):
-            RootLogger.log_warning(f'Unable to find route from {source_zone} to {target_zone}, giving distance of {params.DEFAULT_ZONE_DISTANCE}')
-            RootLogger.log_warning(f'None of {all_route_options} reach {target_zone}!')
+            RootLogger.log_debug(f'Unable to find route from {source_zone} to {target_zone}, giving distance of {params.DEFAULT_ZONE_DISTANCE}')
+            RootLogger.log_debug(f'None of {all_route_options} reach {target_zone}!')
             return params.DEFAULT_ZONE_DISTANCE
 
         return min(routes_dist)
@@ -203,7 +208,7 @@ class ZoneEvaluator:
         total_zone_distance = 0.0
 
         for path in self.zone_paths:
-            source_zone, target_zone, weight = path.to_tuple()
+            source_zone, target_zone, weight = path.as_tuple()
 
             dist_1 = self.evaluate_zone_distance(target_network, source_zone, target_zone)
             dist_2 = self.evaluate_zone_distance(target_network, target_zone, source_zone)

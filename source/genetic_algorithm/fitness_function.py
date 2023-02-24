@@ -5,7 +5,12 @@ from genetic_algorithm.zone_evaluator import ZoneEvaluator
 
 class Fitness:
 
-    def __init__(self, zone_val: float, ridership_val: float, routes_val: float, coverage_val: float, ridership_density_val: float, fitness: float):
+    def __init__(self, zone_val: float, 
+                       ridership_val: float, 
+                       routes_val: float, 
+                       coverage_val: float, 
+                       ridership_density_val: float, 
+                       fitness: float):
         self.ridership_val = ridership_val / (params.sum_of_fitness_coefficients())
         self.routes_val = routes_val / (params.sum_of_fitness_coefficients())
         self.coverage_val = coverage_val / (params.sum_of_fitness_coefficients())
@@ -19,7 +24,7 @@ class Fitness:
             'routes_val': self.routes_val, 
             'coverage_val': self.coverage_val, 
             'ridership_density_val': self.ridership_density_val, 
-            'zone': self.zone_val,
+            'zone_val': self.zone_val,
             'fitness': self.fitness
         }
     
@@ -44,10 +49,10 @@ def evaluate_network_new(net: TransitNetwork, initial_metrics: NetworkMetrics, Z
     fitness = (ridership_val + routes_val + coverage_val + ridership_density_val + zone_score)/(params.sum_of_fitness_coefficients())
 
     FitnessObj = Fitness(zone_val=zone_score, 
-                         ridership_val=0, 
-                         routes_val=0, 
-                         coverage_val=0, 
-                         ridership_density_val=0,
+                         ridership_val=ridership_val, 
+                         routes_val=routes_val, 
+                         coverage_val=coverage_val, 
+                         ridership_density_val=ridership_density_val,
                          fitness=fitness)
     
     return FitnessObj

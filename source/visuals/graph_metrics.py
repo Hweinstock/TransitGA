@@ -14,6 +14,7 @@ RIDERSHIP_HEADER = 'ridership_val'
 NUM_ROUTES_HEADER = 'routes_val'
 COVERAGE_HEADER = 'coverage_val'
 RIDERSHIP_DENSITY_HEADER = 'ridership_density_val'
+ZONE_HEADER = 'zone_val'
 
 ALPHA_VALUE = 0.5
 DOT_SIZE = 1
@@ -58,6 +59,7 @@ def plot_all_fitness_metrics(filename, output_file='fitness_plot.png'):
     ridership = df[get_header(RIDERSHIP_HEADER, 'avg')]
     num_routes = df[get_header(NUM_ROUTES_HEADER, 'avg')].apply(lambda x: abs(x))
     coverage = df[get_header(COVERAGE_HEADER, 'avg')]
+    zone_vals = df[get_header(ZONE_HEADER, 'avg')]
     ridership_density = df[get_header(RIDERSHIP_DENSITY_HEADER, 'avg')]
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
@@ -65,7 +67,8 @@ def plot_all_fitness_metrics(filename, output_file='fitness_plot.png'):
     ax1.scatter(x, ridership, c='blue', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='ridership')
     ax1.scatter(x, num_routes, c='green', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='num_routes(-1)')
     ax1.scatter(x, coverage, c='red', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='coverage')
-    ax1.scatter(x, ridership_density, c='orange', s=DOT_SIZE, alpha=ALPHA_VALUE, marker="o", label='ridership_density')
+    ax1.scatter(x, zone_vals, c='pink', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='zone_val')
+    ax1.scatter(x, ridership_density, c='purple', s=DOT_SIZE, alpha=ALPHA_VALUE, marker="o", label='ridership_density')
 
     plt.legend(loc='upper left')
     plt.xlabel("Iteration #")

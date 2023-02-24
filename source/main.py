@@ -2,10 +2,8 @@ from utility import read_object_from_file
 from genetic_algorithm.initial_population_generator import initiate_population_from_network 
 from visuals.graph_metrics import graph_all_metrics
 from visuals.graph_gtfs import generate_diagram
-from visuals.plot_zones import plot_zones
 from root_logger import RootLogger
-from simplify_gtfs import create_simplified_gtfs_SFMTA
-from genetic_algorithm.zone_evaluator import all_zones
+from visuals.plot_zones import plot_zones
 
 import os
 import pandas as pd
@@ -49,10 +47,10 @@ def examine_best_performer(output_dir: str):
 
 
 if __name__ == '__main__':
-    plot_zones(all_zones)
-    # num_generations = 750
-    # population_size = 100
-    # initial_network_path_input = './data/new_initial_net.pkl'
-    # run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)
-    #examine_best_performer('output/1000i500p')
+    # plot_zones()
+    num_generations = 50
+    population_size = 100
+    initial_network_path_input = './data/new_initial_net.pkl'
+    run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)
+    examine_best_performer('output/50i100p')
     #create_simplified_gtfs_SFMTA('data/new_initial_net')
