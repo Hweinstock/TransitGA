@@ -49,6 +49,7 @@ def new_determine_transfers(routes: List[GTFSRoute]):
     RootLogger.log_info(f'Looking for duplicate stops across routes, starting with {len(all_stops)}')
     unique_stops_map = {}
     for stop in all_stops:
+        # TODO: check if transfer??
         if stop.id not in unique_stops_map:
             unique_stops_map[stop.id] = stop
         else:

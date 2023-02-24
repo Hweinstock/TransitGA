@@ -2,7 +2,7 @@ from typing import List, Dict
 
 from root_logger import RootLogger
 from utility import sphere_distance
-from transit_network.shapes import ShapePoint
+from transit_network.shapes import Coords
 
 def stop_from_stop_row_data(row, route_id):
     id = row['stop_id']
@@ -29,8 +29,24 @@ class Stop:
         self.ridership = 0
         self.location = location
     
+    def copy(self):
+        new_stop = Stop(id = self.id, 
+                        name=self.name, 
+                        location=self.location, 
+                        parent_id=self.parent_id, 
+                        routes=self.routes)
+        new_stop.trip_sequences = self.trip_sequences
+        new_stop.ridership = self.ridership
+        return new_stop 
+        
     def add_transfer_routes(self, new_routes: List[str]):
-        self.routes += new_routes
+        self.routes += [r for r in new_routes if r not in self.routes]
+    
+    def remove_route(self, target_route: str) -> None:
+        self.remove_routes([target_route])
+    
+    def remove_routes(self, target_routes: List[str]) -> None:
+        self.routes = [r for r in self.routes if r not in target_routes]
 
     @property
     def location_lat(self):
@@ -49,7 +65,7 @@ class Stop:
 
         return sphere_distance([x_1, y_1], [x_2, y_2])
         
-    def distance_to_point(self, point: ShapePoint) -> float:
+    def distance_to_point(self, point: Coords) -> float:
         x_1 = self.location_lat
         x_2 = point.lat
 
@@ -78,19 +94,19 @@ class Stop:
                      {self.parent_id} and {second_stop.parent_id}.')
             new_parent = self.parent_id if second_stop.parent_id is None else second_stop.parent_id
         
-        new_routes = self.routes + second_stop.routes 
         new_lat = (self.location_lat + second_stop.location_lat) / 2.0
         new_lon = (self.location_lon + second_stop.location_lon) / 2.0
 
-        return Stop(id= new_id, name=new_name, location=(new_lat, new_lon), parent_id=new_parent, routes=new_routes)
+        # Add routes one at time to avoid duplicates. 
+        NewStop = Stop(id= new_id, name=new_name, location=(new_lat, new_lon), parent_id=new_parent, routes=[])
+        NewStop.add_transfer_routes(self.routes)
+        NewStop.add_transfer_routes(second_stop.routes)
+        return NewStop
 
     def is_transfer(self):
         if len(self.routes) == 0:
-            RootLogger.log_warning(f'Stop {self.id} with parent {self.parent_id} has no routes!')
-        try:
-            num_unique_routes = len(set(self.routes))
-        except TypeError:
-            print(self.routes)
+            RootLogger.log_error(f'Stop {self.id} with parent {self.parent_id} has no routes!')
+        num_unique_routes = len(set(self.routes))
         return num_unique_routes > 1
     
     def get_id(self):

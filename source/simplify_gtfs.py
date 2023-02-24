@@ -22,7 +22,7 @@ def create_simplified_gtfs_SFMTA(export_file='initial_network') -> str:
     """Full end-to-end generation of the network from ridership and GTFS data. 
 
     Args:
-        export_name (str, optional):  Defaults to 'initial_network'.
+        export_file (str, optional):  Defaults to 'initial_network'.
 
     Returns:
         str: compression metrics report

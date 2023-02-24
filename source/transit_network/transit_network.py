@@ -1,4 +1,4 @@
-from typing import List 
+from typing import List, Tuple
 import pandas as pd 
 import os
 import shutil
@@ -7,7 +7,8 @@ from copy import deepcopy
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
 from transit_network.trips import GTFSTrip, simplify_trip, SimpleTrip
-from transit_network.shapes import ShapePoint, get_shapes_from_df
+from transit_network.shapes import get_shapes_from_df
+from genetic_algorithm.family import Family
 from preprocessing.determine_transfers import new_determine_transfers
 import preprocessing.gtfs_data as GTFS
 
@@ -29,6 +30,7 @@ class TransitNetwork:
         self.ridership = self.get_ridership()
         self.coverage = self.get_coverage()
         self.ridership_density_score = self.get_ridership_density_score()
+        # self.set_transfer_points()
 
     def get_copy(self):
         # Make this a deepcopy. 
@@ -66,7 +68,6 @@ class TransitNetwork:
         return len(self.stops)
 
     def get_ridership_density_score(self) -> float:
-
         score = 0
         for trip in self.trips:
             intersections = trip.count_intersections()
@@ -74,6 +75,49 @@ class TransitNetwork:
 
             score += intersections * ridership
         return score 
+
+    def search_for_stop(self, stop_id: str) -> Tuple[SimpleRoute, SimpleTrip]:
+        for cur_route in self.routes:
+            for cur_trip in cur_route.trips:
+                if stop_id in cur_trip.unique_stop_ids:
+                    return (cur_route.id, cur_trip.id)
+        
+        return None, None
+    
+    def get_stop_transfers(self, target_stop_id: str) -> List[str]:
+        stop_matches = [s for s in self.stops if s.id == target_stop_id]
+        num_matches = len(stop_matches)
+        if num_matches == 0:
+            RootLogger.log_error(f'Failed to find stop of id {target_stop_id} in network {self.id}!')
+            raise KeyError
+        
+        if num_matches > 1:
+            RootLogger.log_warning(f'Found multiple stops of same id {target_stop_id} in network {self.id}, returning first one.')
+
+        return stop_matches[0].routes
+
+    def has_stop(self, stop_id: str) -> bool:
+        all_stops_id = [s.id for s in self.get_stops()]
+        return stop_id in all_stops_id
+
+    def set_transfer_points(self) -> None:
+        # Reset all transfer routes. 
+        for stop in self.stops:
+            stop.routes = [] 
+
+        for cur_trip in self.trips:
+            for stop in cur_trip.stops:
+                stop.add_transfer_routes([cur_trip.route_id])
+
+    def lookup_route_by_id(self, id: str) -> SimpleRoute or None:
+        matches = [r for r in self.routes if r.id == id]
+        if len(matches) == 0:
+            RootLogger.log_error(f'Unable to find route with id {id} in network {self.id}.')
+            return None
+        if len(matches) > 1:
+            RootLogger.log_warning(f'Found duplicate routes with id {id} in network {self.id}. Returning first one. ')
+            
+        return matches[0]
 
     def __str__(self):
         num_routes = len(self.routes)
@@ -129,14 +173,13 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
         RootLogger.log_info(f'Simplifying trips for route {route.id}')
         new_trips = []
         for trip in route.trips:
-
-
             new_stops = [] 
 
             for stop in trip.stops:
                 stop_id = stop[0].get_id()
                 cur_stop = id_to_obj_map[stop_id]
                 if cur_stop.is_transfer(): 
+                    RootLogger.log_debug(f'Identified transfer stop {cur_stop.id} with {len(cur_stop.routes)} transfers.')
                     new_stops.append(cur_stop)
             
             # We want to add endpoint to the trips
@@ -177,16 +220,26 @@ def create_network_from_GTFSRoutes(routes: List[GTFSRoute], shapes_df: pd.DataFr
 
 def create_network_from_trips(trips: List[SimpleTrip], id: str):
     routes_dict = {} # maps route-ids to the trips referencing them
+
     for trip in trips:
         route_id = trip.route_id
         if route_id in routes_dict:
             routes_dict[route_id].append(trip)
         else:
             routes_dict[route_id] = [trip]
+        
+        for stop in trip.stops:
+            stop.routes = [] # Reset transfer points to none
     
     new_routes = []
     for route_id in routes_dict:
         new_route = SimpleRoute(route_id, None)
+        route_trips = routes_dict[route_id]
+
+        # Set transfer points
+        for trip in route_trips:
+            trip.set_stop_transfer_points()
+
         new_route.add_trips(routes_dict[route_id])
         new_routes.append(new_route)
         

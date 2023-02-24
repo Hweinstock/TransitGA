@@ -5,11 +5,29 @@
 # from genetic_algorithm.breeder import breed_networks
 # import os
 from simplify_gtfs import create_simplified_gtfs_SFMTA
+from utility import read_object_from_file
+from genetic_algorithm.zone_evaluator import ZoneEvaluator
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
+# import csv 
 
-create_simplified_gtfs_SFMTA('output/new_initial_net')
+# headers = temp_all_zones[0].attributes
+# rows = [z.to_row() for z in temp_all_zones]
+# with open('zone_file.csv', 'w') as output:
+#     csv_writer = csv.writer(output)
+#     csv_writer.writerow(headers)
+#     csv_writer.writerows(rows)
+
+# Network = read_object_from_file('data/new_initial_net/new_initial_net.pkl')
+# ZE = ZoneEvaluator(Network)
+# ZE.sample_stops()
+# score = ZE.evaluate_network(Network)
+# print(score)
+
+
+
+# create_simplified_gtfs_SFMTA('output/new_initial_net')
 #generate_diagram('new_initial_net.zip', 'test_diagrams/new_net')
 # print(Network)
 #Network2 = read_object_from_file('new_initial_net.pkl')

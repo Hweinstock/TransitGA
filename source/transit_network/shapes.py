@@ -1,12 +1,20 @@
 import pandas as pd 
 from typing import List
 
-class ShapePoint:
+class Coords:
 
-    def __init__(self, shape_id, lat, lon, sequence_num):
-        self.shape_id = shape_id
+    def __init__(self, lat: float, lon: float):
         self.lat = lat 
-        self.lon = lon 
+        self.lon = lon
+    
+    def get_coords(self) -> List[float]:
+        return [self.lat, self.lon]
+
+class ShapePoint(Coords):
+
+    def __init__(self, shape_id, lat: float, lon: float, sequence_num: int):
+        Coords.__init__(self, lat, lon)
+        self.shape_id = shape_id
         self.sequence_num = sequence_num 
     
     def to_gtfs_row(self, new_shape_id: str):

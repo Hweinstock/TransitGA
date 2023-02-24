@@ -13,8 +13,12 @@ class BaseRoute:
         self.name = name
         self.trips = []
     
-    def add_trips(self, trips: BaseTrip):
+    def add_trips(self, trips: List[BaseTrip]):
         self.trips += trips
+
+        for trip in trips:
+            for stop in trip.stops:
+                stop.add_transfer_routes([self.id])
     
     def display_trips(self):
         return ''.join([f'{t}\n' for t in self.trips])

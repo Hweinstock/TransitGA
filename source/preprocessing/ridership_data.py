@@ -58,7 +58,7 @@ class RidershipData(DataBase):
             route_id = row['route_id']
             result = gtfs_routes_df.loc[(gtfs_routes_df['route_id'] == route_id)]
             if result.empty:
-                RootLogger.log_warning(f'Failed to match route with id {route_id}, dropping it.')
+                RootLogger.log_info(f'Failed to match route with id {route_id}, dropping it.')
             else:
                 if len(result.index) > 1:
                     RootLogger.log_warning(f'Matched multiple routes with {route_id}, taking first found.')

@@ -32,8 +32,8 @@ class BaseTrip:
         for index, cur_stop in enumerate(self.stops):
             if cur_stop.id == target_id: 
                 return index 
-
-        RootLogger.log_error(f'Unable to locate shared stop {target_id} in trip {self.id}')
+        
+        RootLogger.log_warning(f'Unable to locate shared stop {target_id} in trip {self.id}')
         return None 
     
     def __eq__(self, other_obj: object) -> bool:
@@ -50,6 +50,7 @@ class SimpleTrip(BaseTrip):
         self.shape_points = shape_points
         self.dead = False
         self.set_sequence_values_for_stops()
+        self.set_stop_transfer_points()
         
     @property
     def flattened_shape_points(self):
@@ -58,6 +59,19 @@ class SimpleTrip(BaseTrip):
     @property
     def unique_stop_ids(self):
         return [stop.id for stop in self.stops]
+    
+    def copy(self):
+        new_trip = SimpleTrip(trip_id=self.id, 
+                              route_id=self.route_id, 
+                              message=self.message, 
+                              direction=self.direction, 
+                              shape_points=self.shape_points, 
+                              stops=[stop.copy() for stop in self.stops])
+
+        return new_trip 
+
+    def does_stop_at(self, stop: str) -> bool:
+        return stop in self.unique_stop_ids
 
     def count_intersections(self):
         unique_trips = {} 
@@ -95,6 +109,10 @@ class SimpleTrip(BaseTrip):
             rows.append(new_row)
     
         return rows
+
+    def set_stop_transfer_points(self):
+        for s in self.stops:
+            s.add_transfer_routes([self.route_id])
         
     @property
     def custom_shape_id(self):
