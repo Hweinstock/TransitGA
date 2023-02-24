@@ -25,6 +25,7 @@ class Population:
                        fitness_function, 
                        breeding_function, 
                        elitist_cutoff):
+        
         self.population = networks
         self.population_size = len(networks)
         self.fitness_function = fitness_function
@@ -38,6 +39,8 @@ class Population:
         self.ZoneEvaluator = ZoneEvaluator
         self.done_running = False
         self.running_time = 0.0
+
+        self.max_iteration = None
     
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
@@ -117,11 +120,13 @@ class Population:
 
         # Select best performing networks
         RootLogger.log_debug(f'Performing Elitist Selection on population.')
-        percent_cutoff = self.elitist_cutoff(self.iteration_number)
+        percent_cutoff = self.elitist_cutoff(self.iteration_number, self.max_iteration)
         elitist_num = int(percent_cutoff*self.population_size)
         sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id].fitness, reverse=True)
+
         top_performers = sorted_by_performance[:elitist_num]
         bot_performers = sorted_by_performance[elitist_num:]
+
         self.dispose_of_dead_chromosomes(bot_performers)
 
         new_population += top_performers
@@ -164,7 +169,7 @@ class Population:
 
     def run(self, max_iteration: int):
         RootLogger.log_info(f'Running population for {max_iteration} iterations.')
-
+        self.max_iteration = max_iteration
         while self.iteration_number <= max_iteration:
             start_time = time.time()
             RootLogger.log_info(f'On iteration {self.iteration_number} of {max_iteration}.')

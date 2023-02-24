@@ -80,8 +80,10 @@ Z12_LON = -122.436089
 Z12_NAME = "Marina District"
 Z12_COLOR = "olive"
 
-def cutoff_by_round(iteration: int) -> float:
-    return 0.1
+def cutoff_by_round(iteration: int, max_iteration: int) -> float:
+    # From [1, max_iteration] -> 0.1 to 0.9
+    val =  0.1 + ((0.8)/(max_iteration- 1))*(iteration - 0.1)
+    return val
 
 def sum_of_fitness_coefficients():
     return RIDERSHIP_LAMBDA + NUM_ROUTES_LAMBDA + COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA

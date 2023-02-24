@@ -51,5 +51,5 @@ if __name__ == '__main__':
     args = cmdline_args()
     run_from_network(args.num_generations, args.population_size, initial_network_path=args.initial_network)
     if args.best_performer:
-        examine_best_performer('output/50i100p')
+        examine_best_performer(f'output/{args.num_generations}i{args.population_size}p')
     # create_simplified_gtfs_SFMTA('data/new_initial_net')

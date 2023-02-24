@@ -10,8 +10,9 @@ def cmdline_args():
     p.add_argument("-g", "--num_generations", type=int,
                    help="number of generations.", required=True)
     
-    p.add_argument("-bp", "-best_performer",
-                   action="store_true",
+    p.add_argument("-bp", "--best_performer",
+                   type=bool,
+                   default=False,
                    help="include to enable graphing the best performer after finishing.")
     
     p.add_argument("-in", "--initial_network", 
