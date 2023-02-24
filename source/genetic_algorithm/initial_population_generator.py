@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import List, Dict
 import random
 from statistics import mean, median, stdev
 import pprint
@@ -12,6 +12,7 @@ from genetic_algorithm.fitness_function import evaluate_network, evaluate_networ
 from genetic_algorithm.breeder import breed_networks
 from genetic_algorithm.network_metrics import NetworkMetrics
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
+from genetic_algorithm.params import cutoff_by_round
     
 def generate_population(initial_network: TransitNetwork, population_size: int, do_print_metrics: bool = True) -> List[TransitNetwork]:
     RootLogger.log_debug(f'Generating initial population of size {population_size} from {initial_network.id}')
@@ -97,4 +98,9 @@ def initiate_population_from_network(network: TransitNetwork, size: int) -> Popu
     init_network_metrics = NetworkMetrics(network)
     initial_population = [Chromosome(net) for net in initial_networks]
     ZoneEV = ZoneEvaluator(network)
-    return Population(initial_population, init_network_metrics, ZoneEV, evaluate_network_new, breed_networks)
+    return Population(networks= initial_population, 
+                      initial_metrics= init_network_metrics, 
+                      ZoneEvaluator= ZoneEV, 
+                      fitness_function= evaluate_network_new, 
+                      breeding_function= breed_networks, 
+                      elitist_cutoff= cutoff_by_round)

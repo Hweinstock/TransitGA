@@ -75,7 +75,7 @@ SUBURB_ZONES = [z for z in ZONES if z != DOWNTOWN_ZONE]
 
 class ZoneEvaluator:
 
-    zone_paths = [p for p in create_paths_to_downtown(DOWNTOWN_ZONE, ZONES, 1.0)] + [p for p in fully_connect_zones(SUBURB_ZONES, 0.5)]
+    zone_paths = [p for p in create_paths_to_downtown(DOWNTOWN_ZONE, SUBURB_ZONES, 1.0)] #+ [p for p in fully_connect_zones(SUBURB_ZONES, 0.5)]
 
     def __init__(self, initial_network: TransitNetwork):
         self.initial_network = initial_network

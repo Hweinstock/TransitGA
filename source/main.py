@@ -19,7 +19,7 @@ def run_from_network(num_generations: int, population_size: int, initial_network
     RootLogger.log_info(f'Running network {initial_network_path} for {num_generations} with size {population_size}. Sending results to {output_dir}.')
 
     Network = read_object_from_file(initial_network_path)
-    Pop = initiate_population_from_network(Network, 10)
+    Pop = initiate_population_from_network(Network, population_size)
     res = Pop.run(num_generations)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -48,7 +48,7 @@ def examine_best_performer(output_dir: str):
 
 if __name__ == '__main__':
     # plot_zones()
-    num_generations = 50
+    num_generations = 100
     population_size = 100
     initial_network_path_input = './data/new_initial_net.pkl'
     run_from_network(num_generations, population_size, initial_network_path=initial_network_path_input)

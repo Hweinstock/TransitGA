@@ -136,3 +136,4 @@ dmypy.json
 *.csv
 *.html
 *.pkl
+.vscode

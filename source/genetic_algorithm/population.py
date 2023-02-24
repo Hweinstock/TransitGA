@@ -18,13 +18,18 @@ def scale_to_prob_dist(weights: List[float]) -> List[float]:
 class Population:
 
     mutation_rate = 0.1
-    elitist_cutoff = 0.25
 
-    def __init__(self, networks: List[Chromosome], initial_metrics: NetworkMetrics, ZoneEvaluator: ZoneEvaluator, fitness_function, breeding_function):
+    def __init__(self, networks: List[Chromosome], 
+                       initial_metrics: NetworkMetrics, 
+                       ZoneEvaluator: ZoneEvaluator, 
+                       fitness_function, 
+                       breeding_function, 
+                       elitist_cutoff):
         self.population = networks
         self.population_size = len(networks)
         self.fitness_function = fitness_function
         self.breeding_function = breeding_function
+        self.elitist_cutoff = elitist_cutoff
         self.iteration_number = 1
         self.performance_dict = {}
         self.per_round_metrics = []
@@ -60,10 +65,15 @@ class Population:
     
     def select_parents(self, pool: List[Chromosome]) -> Tuple[Chromosome, Chromosome]:
         weights = scale_to_prob_dist([self.performance_dict[m.unique_id].fitness for m in pool])
-
-        [parent_1, parent_2] = np.random.choice(pool, 
-                                                     size=2, replace=False, 
-                                                     p=weights)
+        
+        if len(pool) == 0:
+            RootLogger.log_error(f'Attempt to sample parent network from empty pool!')
+            raise ValueError
+        if len(pool) < 2:
+            [parent_1, parent_2] = [pool[0], pool[0]]
+        else:
+            [parent_1, parent_2] = np.random.choice(pool, size=2, replace=False, p=weights)
+            
         return parent_1, parent_2
     
     def breed_children(self, pool_of_parents: List[Chromosome], child_num: int) -> Chromosome:
@@ -107,7 +117,8 @@ class Population:
 
         # Select best performing networks
         RootLogger.log_debug(f'Performing Elitist Selection on population.')
-        elitist_num = int(self.elitist_cutoff*self.population_size)
+        percent_cutoff = self.elitist_cutoff(self.iteration_number)
+        elitist_num = int(percent_cutoff*self.population_size)
         sorted_by_performance = sorted(self.population, key=lambda mem: self.performance_dict[mem.unique_id].fitness, reverse=True)
         top_performers = sorted_by_performance[:elitist_num]
         bot_performers = sorted_by_performance[elitist_num:]
