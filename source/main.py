@@ -9,6 +9,7 @@ from visuals.plot_zones import plot_zones
 
 import os
 import pandas as pd
+import logging
 
 
 def run_from_network(num_generations: int, population_size: int, initial_network_path: str or None = None, output_dir: str or None = None, do_output: bool=True) -> Population:
@@ -63,6 +64,13 @@ def examine_best_performer(output_dir: str):
 if __name__ == '__main__':
     # plot_zones()
     args = model_run_args()
+    verbosity_to_level = {
+        0: logging.ERROR,
+        1: logging.WARNING, 
+        2: logging.INFO, 
+        3: logging.DEBUG,
+    }
+    RootLogger.outputHandler.setLevel(verbosity_to_level[args.verbosity])
     if args.time_estimate != 0:
         from statistics import mean 
 

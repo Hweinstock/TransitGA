@@ -2,24 +2,21 @@ import logging
 from colorama import Fore, Back, Style
 import sys
 
-CONSOLE_LEVEL = logging.INFO
-FILE_LEVEL = logging.DEBUG
-
-logging_format = logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s')
-fileHandler = logging.FileHandler("log.txt", mode="w")
-fileHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
-fileHandler.setLevel(level=FILE_LEVEL)
-
-outputHandler = logging.StreamHandler(stream=sys.stdout)
-outputHandler.setFormatter(logging_format)
-outputHandler.setLevel(level=CONSOLE_LEVEL)
-logging.basicConfig(handlers = [fileHandler, outputHandler],
-                    format='%(asctime)s, %(name)s %(levelname)s %(message)s', 
-                    level=logging.NOTSET)
-
 class RootLogger:
     console_level = logging.INFO
     file_level = logging.DEBUG
+
+    logging_format = logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s')
+    fileHandler = logging.FileHandler("log.txt", mode="w")
+    fileHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
+    fileHandler.setLevel(level=file_level)
+
+    outputHandler = logging.StreamHandler(stream=sys.stdout)
+    outputHandler.setFormatter(logging_format)
+    outputHandler.setLevel(level=console_level)
+    logging.basicConfig(handlers = [fileHandler, outputHandler],
+                    format='%(asctime)s, %(name)s %(levelname)s %(message)s', 
+                    level=logging.NOTSET)
 
     def log_info(msg):
         logging.info(f'{Fore.BLUE}{msg}{Style.RESET_ALL}')

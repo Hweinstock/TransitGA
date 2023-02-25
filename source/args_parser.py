@@ -25,8 +25,7 @@ def model_run_args() -> Namespace:
                    default=0, 
                    help='get an estimate of running with these parameters. Integer passed in serves as number of test runs to estimate. ')
     
-    # Not implemented 
-    p.add_argument("-v", "--verbosity", type=int, choices=[0,1,2], default=0,
+    p.add_argument("-v", "--verbosity", type=int, choices=[0,1,2,3], default=0,
                    help="increase output verbosity (default: %(default)s)")
     
 
