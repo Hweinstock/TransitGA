@@ -131,11 +131,15 @@ dmypy.json
 # Data types
 *.zip
 *.txt
-!requirements.txt
 .DS_Store
 *.xlsx
 *.csv
+
 *.html
 *.pkl
 .vscode
 misc/*
+
+!data/*.csv 
+!data/*.pkl 
+!data/*.zip

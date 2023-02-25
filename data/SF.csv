@@ -1,0 +1,91 @@
+,route_id,route_name,total_ridership
+0,90,San Bruno Owl,70545
+1,56,Rutland,40526
+2,8,Bayshore,5324625
+3,714,BART Early Bird,310
+4,12,Folsom/Pacific,972302
+5,28,19th Avenue,2126510
+6,6,Haight/Parnassus,1092118
+7,1BX,California B Express,102790
+8,21,Hayes,760964
+9,33,Ashbury/18th,934540
+10,48,Quintara/24th Street,1007264
+11,T,Third Shuttle,119031
+12,25,Treasure Island,415241
+13,27,Bryant,888051
+14,2,Clement,570378
+15,55,16th Street,277948
+16,44,O'Shaughnessy,2388728
+17,30X,Marina Express,137990
+18,57,Parkmerced,361399
+19,38R,Geary Rapid,3979732
+20,49,Van Ness/Mission,4377266
+21,1,California,3452705
+22,60,Powell/Hyde Cable Car,1153230
+23,JBUS,J Church Bus,2997
+24,5,Fulton,2253827
+25,T,Third,45437
+26,35,Eureka,112729
+27,38BX,Geary B Express,61360
+28,9,San Bruno,2374924
+29,J,Church,2024555
+30,8BX,Bayshore B Express,374752
+31,31,Balboa,1203008
+32,82X,Levi Plaza Express,27110
+33,15,Bayview Hunters Point Express,92697
+34,14,Mission,5457031
+35,59,Powell/Mason Cable Car,954050
+36,61,California Cable Car,670740
+37,KLM,N Owl,98324
+38,KTBUS,KT Ingleside/Third Bus,1997
+39,23,Monterey,450319
+40,5R,Fulton Rapid,784654
+41,10,Townsend,731457
+42,58,Lake Merced,24888
+43,29,Sunset,2656818
+44,28R,19th Avenue Rapid,258120
+45,19,Polk,1120227
+46,41,Union,192950
+47,38AX,Geary A Express,52160
+48,3,Jackson,339460
+49,88,BART Shuttle,21930
+50,F,Market & Wharves,3038298
+51,52,Excelsior,248441
+52,7,Haight/Noriega,2090111
+53,31AX,Balboa A Express,65290
+54,8AX,Bayshore A Express,383447
+55,14X,Mission Express,223020
+56,30,Stockton,3826118
+57,1AX,California A Express,75840
+58,22,Fillmore,3057362
+59,39,Coit,75201
+60,45,Union/Stockton,1919000
+61,MBUS,M Ocean View Bus,30415
+62,E,Embarcadero,251180
+63,67,Bernal Heights,196253
+64,M,Ocean View,3797934
+65,66,Quintara/24th Street,99150
+66,L,Taraval,3636760
+67,54,Felton,1060132
+68,14R,Mission Rapid,3328388
+69,37,Corbett,236602
+70,83X,Mid/Market Express,14830
+71,9R,San Bruno Rapid,817632
+72,76X,Marin Headlands Express,38360
+73,36,Teresita,153599
+74,43,Masonic,1707498
+75,N,Judah,5656586
+76,24,Divisadero,1868827
+77,91,Owl,154617
+78,7X,Noriega Express,87700
+79,KT,Ingleside/Third,5003606
+80,FBUS,F Wharves Bus,65
+81,18,46th Avenue,512018
+82,31BX,Balboa B Express,54730
+83,LBUS,L Taraval Bus,1306
+84,81X,Caltrain Express,7160
+85,47,Van Ness,1495592
+86,NBUS,N Judah Bus,221303
+87,KBUS,K Ingleside Bus,61118
+88,NX,N Express,71370
+89,38,Geary,4323238
