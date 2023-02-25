@@ -120,7 +120,7 @@ class SimpleTrip(BaseTrip):
 
 class GTFSTrip(BaseTrip):
 
-    def __init__(self, trip_id, route_id, message, shape_id, direction):
+    def __init__(self, trip_id: str, route_id: str, message: str, shape_id: str, direction: int):
         BaseTrip.__init__(self, trip_id, route_id, message, direction)
         self.shape_id = shape_id 
         self.stops = [] # In Tuple format: (Stop, seq in trip)

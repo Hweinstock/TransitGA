@@ -181,8 +181,8 @@ class Population:
 
             RootLogger.log_info(f'Iteration complete, took {end_time - start_time}s')
             time_est = (self.running_time / self.iteration_number) * (max_iteration - self.iteration_number)
-            print(f'Estimated {time_est}s remaining for {(max_iteration - self.iteration_number)} rounds.', end="\r", flush=True)
-
+            RootLogger.log_info(f'Estimated {time_est}s remaining for {(max_iteration - self.iteration_number)} rounds.')
+        
         RootLogger.log_info(f'Done running population for {max_iteration} iterations. Returning Metrics.')
         self.done_running = True
         return self.per_round_metrics

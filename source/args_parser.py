@@ -1,6 +1,7 @@
 import argparse
+from argparse import Namespace
 
-def cmdline_args():
+def model_run_args() -> Namespace:
     p = argparse.ArgumentParser(description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     
@@ -11,8 +12,7 @@ def cmdline_args():
                    help="number of generations.", required=True)
     
     p.add_argument("-bp", "--best_performer",
-                   type=bool,
-                   default=False,
+                   action='store_true',
                    help="include to enable graphing the best performer after finishing.")
     
     p.add_argument("-in", "--initial_network", 
@@ -20,16 +20,24 @@ def cmdline_args():
                    type=str,
                    help="initial network to use to generate population.")
     
+    p.add_argument("-te",  "--time_estimate", 
+                   type=int,
+                   default=0, 
+                   help='get an estimate of running with these parameters. Integer passed in serves as number of test runs to estimate. ')
+    
+    # Not implemented 
     p.add_argument("-v", "--verbosity", type=int, choices=[0,1,2], default=0,
                    help="increase output verbosity (default: %(default)s)")
+    
 
     return(p.parse_args())
 
-
-# Try running with these args
-#
-# "Hello" 123 --enable
-if __name__ == '__main__':
+def simplify_network_args() -> Namespace:
+    p = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    args = cmdline_args()
-    print(args)
+    p.add_argument("-n", "--name", type=str, 
+                   help="name of network", 
+                   default="initial_network")
+    
+    return (p.parse_args())

@@ -1,6 +1,7 @@
 from utility import read_object_from_file
-from args_parser import cmdline_args
+from args_parser import model_run_args
 from genetic_algorithm.initial_population_generator import initiate_population_from_network 
+from genetic_algorithm.population import Population
 from visuals.graph_metrics import graph_all_metrics
 from visuals.graph_gtfs import generate_diagram
 from root_logger import RootLogger
@@ -10,7 +11,18 @@ import os
 import pandas as pd
 
 
-def run_from_network(num_generations: int, population_size: int, initial_network_path: str or None = None, output_dir: str or None = None):
+def run_from_network(num_generations: int, population_size: int, initial_network_path: str or None = None, output_dir: str or None = None, do_output: bool=True) -> Population:
+    """Generate network and run for specified number of iterations
+
+    Args:
+        num_generations (int): num generations to run model
+        population_size (int): how many networks to generate
+        initial_network_path (strorNone, optional): path to initial network pickle file. Defaults to 'data/new_initial_net/new_initial_net.pkl'.
+        output_dir (strorNone, optional): where to dump metrics. Defaults to './output/{num_generations}i{population_size}p'.
+
+    Returns:
+        Population: Final population of the run. 
+    """
     if output_dir is None:
         output_dir = f'./output/{num_generations}i{population_size}p'
 
@@ -22,10 +34,12 @@ def run_from_network(num_generations: int, population_size: int, initial_network
     Network = read_object_from_file(initial_network_path)
     Pop = initiate_population_from_network(Network, population_size)
     res = Pop.run(num_generations)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    results_filename = Pop.export_metrics(output_directory=output_dir)
-    graph_all_metrics(Population=Pop, results_csv=results_filename, output_folder=output_dir)
+    if do_output:
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        results_filename = Pop.export_metrics(output_directory=output_dir)
+        graph_all_metrics(Population=Pop, results_csv=results_filename, output_folder=output_dir)
+    return Pop
 
 def examine_best_performer(output_dir: str):
     RootLogger.log_info(f'Examining best performer...')
@@ -48,8 +62,20 @@ def examine_best_performer(output_dir: str):
 
 if __name__ == '__main__':
     # plot_zones()
-    args = cmdline_args()
-    run_from_network(args.num_generations, args.population_size, initial_network_path=args.initial_network)
+    args = model_run_args()
+    if args.time_estimate != 0:
+        from statistics import mean 
+
+        RootLogger.log_info(f'Producing time estimate of running {args.num_generations} of {args.population_size} networks based on {args.time_estimate} runs.')
+        FinalPop = run_from_network(args.time_estimate+1, args.population_size, initial_network_path=args.initial_network, do_output=False)
+       
+        avg_time = mean([x['time'] for x in FinalPop.per_round_metrics[1:]])
+        estimate = avg_time * args.num_generations
+        RootLogger.log_info(f'Time estimate complete with time of {estimate}.')
+    else:
+        FinalPop = run_from_network(args.num_generations, args.population_size, initial_network_path=args.initial_network)
+        RootLogger.log_info(f'Run Complete with time of {FinalPop.running_time}.')
     if args.best_performer:
         examine_best_performer(f'output/{args.num_generations}i{args.population_size}p')
+
     # create_simplified_gtfs_SFMTA('data/new_initial_net')

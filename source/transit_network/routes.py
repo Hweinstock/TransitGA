@@ -13,7 +13,7 @@ class BaseRoute:
         self.name = name
         self.trips = []
     
-    def add_trips(self, trips: List[BaseTrip]):
+    def add_trips(self, trips: List[SimpleTrip]):
         self.trips += trips
 
         for trip in trips:
@@ -40,7 +40,14 @@ class GTFSRoute(BaseRoute):
         self.ridership = ridership
         self.shapes_covered = {}
 
-    def get_trips_for_route(self, trips_df: pd.DataFrame, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame):
+    def get_trips_for_route(self, trips_df: pd.DataFrame, stop_times_df: pd.DataFrame, stops_df: pd.DataFrame) -> None:
+        """Parse trips df and match them to route objects
+
+        Args:
+            trips_df (pd.DataFrame): source df for trips. (GTFS format)
+            stop_times_df (pd.DataFrame): source stop_times df. (GTFS format)
+            stops_df (pd.DataFrame): source stop df, (GTFS format)
+        """
 
         RootLogger.log_debug(f'Getting trips for route {self.id}...')
         trip_id_for_route= trips_df.loc[(trips_df['route_id'] == self.id)]
@@ -68,7 +75,8 @@ class GTFSRoute(BaseRoute):
 
         # Currently use heuristic to just take longest trips in each direction and assign them to route. 
         longest_trips = self.get_longest_trips(trip_objects, stop_times_df, stops_df)
-        self.add_trips(longest_trips)
+
+        self.trips += longest_trips
     
     def get_all_stops(self) -> List[Stop]:
         all_stops = []
@@ -78,7 +86,7 @@ class GTFSRoute(BaseRoute):
         return all_stops
 
 
-    def get_longest_trips(self, trip_objects: List[GTFSTrip], stop_times_df: pd.DataFrame, stops_df:pd.DataFrame):
+    def get_longest_trips(self, trip_objects: List[GTFSTrip], stop_times_df: pd.DataFrame, stops_df:pd.DataFrame) -> List[GTFSTrip]:
         """
         Take the longest trips in each direction and assign them to the route. 
         This ensures we have a 2-1 mapping of trips to routes. 
