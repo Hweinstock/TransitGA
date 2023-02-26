@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import shutil
 from copy import deepcopy
+from statistics import mean
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
@@ -65,7 +66,8 @@ class TransitNetwork:
         return sum([s.ridership for s in self.stops])
     
     def get_coverage(self) -> int:
-        return len(self.stops)
+        avg_transfers_per_stop = mean([len(s.routes) for s in self.stops])
+        return len(self.stops) * avg_transfers_per_stop
 
     def get_ridership_density_score(self) -> float:
         score = 0

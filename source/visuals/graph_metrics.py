@@ -10,7 +10,6 @@ INTERATION_HEADER = 'iteration'
 FITNESS_HEADER = 'fitness'
 TIME_HEADER = 'time'
 
-RIDERSHIP_HEADER = 'ridership_val'
 NUM_ROUTES_HEADER = 'routes_val'
 COVERAGE_HEADER = 'coverage_val'
 RIDERSHIP_DENSITY_HEADER = 'ridership_density_val'
@@ -36,7 +35,6 @@ def graph_all_metrics(Population: Population, results_csv: str, output_folder: s
 
     pickle_object(Population, os.path.join(output_folder, 'population.pkl'))
 
-
 def get_header(base: str, add_on: str):
     return add_on + '_' + base
 
@@ -56,19 +54,16 @@ def plot_all_fitness_metrics(filename, output_file='fitness_plot.png'):
     df = pd.read_csv(filename)
     x = df[INTERATION_HEADER]
     avg_overall = df[get_header(FITNESS_HEADER, 'avg')]
-    ridership = df[get_header(RIDERSHIP_HEADER, 'avg')]
-    num_routes = df[get_header(NUM_ROUTES_HEADER, 'avg')].apply(lambda x: abs(x))
     coverage = df[get_header(COVERAGE_HEADER, 'avg')]
     zone_vals = df[get_header(ZONE_HEADER, 'avg')]
     ridership_density = df[get_header(RIDERSHIP_DENSITY_HEADER, 'avg')]
     fig = plt.figure()
     ax1 = fig.add_subplot(111)
+
     ax1.scatter(x, avg_overall, c='black', marker="o", s= DOT_SIZE, alpha=ALPHA_VALUE, label='overall')
-    ax1.scatter(x, ridership, c='blue', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='ridership')
-    ax1.scatter(x, num_routes, c='green', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='num_routes(-1)')
     ax1.scatter(x, coverage, c='red', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='coverage')
-    ax1.scatter(x, zone_vals, c='pink', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='zone_val')
-    ax1.scatter(x, ridership_density, c='purple', s=DOT_SIZE, alpha=ALPHA_VALUE, marker="o", label='ridership_density')
+    ax1.scatter(x, zone_vals, c='green', marker="o", s=DOT_SIZE, alpha=ALPHA_VALUE, label='zone_val')
+    ax1.scatter(x, ridership_density, c='blue', s=DOT_SIZE, alpha=ALPHA_VALUE, marker="o", label='ridership_density')
 
     plt.legend(loc='upper left')
     plt.xlabel("Iteration #")

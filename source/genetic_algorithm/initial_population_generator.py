@@ -8,7 +8,7 @@ from transit_network.transit_network import TransitNetwork
 from root_logger import RootLogger
 from genetic_algorithm.population import Population
 from genetic_algorithm.chromosome import Chromosome
-from genetic_algorithm.fitness_function import evaluate_network, evaluate_network_new
+from genetic_algorithm.fitness_function import evaluate_network_new
 from genetic_algorithm.breeder import breed_networks
 from genetic_algorithm.network_metrics import NetworkMetrics
 from genetic_algorithm.zone_evaluator import ZoneEvaluator

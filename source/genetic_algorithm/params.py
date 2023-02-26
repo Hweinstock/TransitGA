@@ -4,8 +4,6 @@ PROB_MUTATION = 0.01
 DELTA_MUTATION = 2
 
 ##  Fitness Function
-RIDERSHIP_LAMBDA = 0.25
-NUM_ROUTES_LAMBDA = 0.25
 COVERAGE_LAMBDA = 0.25
 RIDERSHIP_DENSITY_LAMBDA = 0.25
 ZONE_LAMBDA = 0.5
@@ -89,4 +87,4 @@ def cutoff_by_round(iteration: int, max_iteration: int) -> float:
     return val
 
 def sum_of_fitness_coefficients():
-    return RIDERSHIP_LAMBDA + NUM_ROUTES_LAMBDA + COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA
+    return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA
