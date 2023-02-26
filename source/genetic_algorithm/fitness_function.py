@@ -32,7 +32,7 @@ def evaluate_network_new(net: TransitNetwork, initial_metrics: NetworkMetrics, Z
     coverage_val = (net.coverage / initial_metrics.coverage) * params.COVERAGE_LAMBDA
     ridership_density_val = (net.ridership_density_score / initial_metrics.ridership_density_score) * params.RIDERSHIP_DENSITY_LAMBDA
     zone_score = ZoneEvaluator.evaluate_network(net) * params.ZONE_LAMBDA
-    extreme_trips = (-1)*(net.count_extreme_routes(params.MIN_NUM_STOPS, params.MAX_NUM_STOPS) / initial_metrics.extreme_routes) * params.EXTREME_TRIP_LAMBDA
+    extreme_trips = (net.count_extreme_routes(params.MIN_NUM_STOPS, params.MAX_NUM_STOPS) / initial_metrics.extreme_routes) * params.EXTREME_TRIP_LAMBDA
     fitness = (coverage_val + ridership_density_val + zone_score + extreme_trips)/(params.sum_of_fitness_coefficients())
 
     FitnessObj = Fitness(zone_val=zone_score, 

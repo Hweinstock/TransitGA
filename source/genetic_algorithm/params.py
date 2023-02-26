@@ -103,7 +103,8 @@ def overwrite_lambdas(args: argparse.Namespace):
     RootLogger.log_info(f'Running model with ZONE_LAMBDA: {args.zone_lambda}')
     RootLogger.log_info(f'Running model with EXTREME_TRIP_LAMBDA: {args.extreme_trip_lambda}')
     
-    COVERAGE_LAMBDA = args.coverage_lambda
-    RIDERSHIP_DENSITY_LAMBDA = args.ridership_density_lambda
-    ZONE_LAMBDA = args.zone_lambda
-    EXTREME_TRIP_LAMBDA = args.extreme_trip_lambda
+    total = args.coverage_lambda + args.ridership_density_lambda + args.zone_lambda + args.extreme_trip_lambda
+    COVERAGE_LAMBDA = args.coverage_lambda / total 
+    RIDERSHIP_DENSITY_LAMBDA = args.ridership_density_lambda / total
+    ZONE_LAMBDA = args.zone_lambda / total
+    EXTREME_TRIP_LAMBDA = args.extreme_trip_lambda / total

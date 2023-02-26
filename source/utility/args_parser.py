@@ -42,13 +42,13 @@ def model_run_args() -> Namespace:
     
     lambda_parameters = parser.add_argument_group('lambda parameters')
 
-    lambda_parameters.add_argument('--coverage_lambda', type=float, default=1, 
+    lambda_parameters.add_argument('--coverage_lambda', type=float, default=0, 
                                    help="weight associated with coverage score (default: %(default)s)")
     lambda_parameters.add_argument('--ridership_density_lambda', type=float, default=1, 
                                    help="weight associated with ridership density score (default: %(default)s)")
     lambda_parameters.add_argument('--zone_lambda', type=float, default=1, 
                                    help="weight associated zone lambda score (default: %(default)s)")
-    lambda_parameters.add_argument('--extreme_trip_lambda', type=float, default=1, 
+    lambda_parameters.add_argument('--extreme_trip_lambda', type=float, default=-1, 
                                    help="weight associated extreme trip lambda score (default: %(default)s)")
 
 
