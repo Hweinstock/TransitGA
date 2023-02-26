@@ -33,6 +33,9 @@ def model_run_args() -> Namespace:
     p.add_argument("-v", "--verbosity", type=int, choices=[0,1,2,3], default=0,
                    help="increase output verbosity (default: %(default)s)")
     
+    p.add_argument("-fv", "--file_verbosity", type=int, choices=[0, 1, 2, 3], default=3,
+                   help="decrease output log file verbosity (default: %(default)s")
+    
 
     return(p.parse_args())
 

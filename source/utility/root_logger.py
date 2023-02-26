@@ -6,9 +6,6 @@ from argparse import Namespace
 
 class RootLogger:
 
-    console_level = logging.INFO
-    file_level = logging.DEBUG
-
     verbosity_to_level = {
         0: logging.ERROR,
         1: logging.WARNING, 
@@ -16,10 +13,10 @@ class RootLogger:
         3: logging.DEBUG,
     }
     
-    def initialize(path: str, verbosity: int):
+    def initialize(path: str, verbosity: int, file_verbosity: int):
         fileHandler = logging.FileHandler(os.path.join(path, 'log.txt'), mode="w")
         fileHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
-        fileHandler.setLevel(level=RootLogger.file_level)
+        fileHandler.setLevel(level=RootLogger.verbosity_to_level[file_verbosity])
 
         outputHandler = logging.StreamHandler(stream=sys.stdout)
         outputHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
