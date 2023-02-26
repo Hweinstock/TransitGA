@@ -5,11 +5,18 @@
 # from genetic_algorithm.breeder import breed_networks
 # import os
 from simplify_gtfs import create_simplified_gtfs_SFMTA
-from utility import read_object_from_file
+from utility.pickle import read_object_from_file
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
+
+Net = read_object_from_file('../data/new_initial_net.pkl')
+lengths = [len(t.stops) for t in Net.trips if t.route_id != '25']
+max_l = max(lengths) 
+min_l = min(lengths)
+print(str([t for t in Net.trips if len(t.stops) == 93][0]))
+print(f'max length: {max_l}, min length: {min_l}')
 # import csv 
 
 # headers = temp_all_zones[0].attributes

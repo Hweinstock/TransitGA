@@ -4,14 +4,18 @@ PROB_MUTATION = 0.01
 DELTA_MUTATION = 2
 
 ##  Fitness Function
-COVERAGE_LAMBDA = 0.25
-RIDERSHIP_DENSITY_LAMBDA = 0.25
-ZONE_LAMBDA = 0.5
+COVERAGE_LAMBDA = 0
+RIDERSHIP_DENSITY_LAMBDA = 1
+ZONE_LAMBDA = 3
+EXTREME_TRIP_LAMBDA = 2
 
 ZONE_RADIUS = 900
 ZONE_EPSILON = 0.5
 DEFAULT_ZONE_DISTANCE = 40
 ZONE_SAMPLE_NUM = 3
+
+MIN_NUM_STOPS = 5 
+MAX_NUM_STOPS = 90
 
 ZONE_FILE = '../data/zone_file.csv'
 # Can use to draw: https://www.calcmaps.com/map-radius/
@@ -87,4 +91,4 @@ def cutoff_by_round(iteration: int, max_iteration: int) -> float:
     return val
 
 def sum_of_fitness_coefficients():
-    return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA
+    return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA + EXTREME_TRIP_LAMBDA

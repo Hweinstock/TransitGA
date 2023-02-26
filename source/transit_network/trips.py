@@ -39,6 +39,13 @@ class BaseTrip:
     def __eq__(self, other_obj: object) -> bool:
         return other_obj.id == self.id
 
+    def __str__(self):
+        return f'(trip_id: {self.id}, \
+        route_id: {self.route_id}, \
+        message: {self.message}, \
+        direction: {self.direction}, \
+        ridership: {self.ridership}'
+
 
 class SimpleTrip(BaseTrip):
 

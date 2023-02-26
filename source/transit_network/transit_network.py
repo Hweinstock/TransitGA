@@ -30,7 +30,6 @@ class TransitNetwork:
         self.ridership = self.get_ridership()
         self.coverage = self.get_coverage()
         self.ridership_density_score = self.get_ridership_density_score()
-        # self.set_transfer_points()
 
     def get_copy(self):
         # Make this a deepcopy. 
@@ -67,6 +66,14 @@ class TransitNetwork:
     def get_coverage(self) -> int:
         avg_transfers_per_stop = mean([len(s.routes) for s in self.stops])
         return len(self.stops) * avg_transfers_per_stop
+
+    def count_extreme_routes(self, lower_bound: int, upper_bound: int) -> int:
+        count = 0
+        for t in self.trips:
+            n_stops = len(t.stops)
+            if n_stops > upper_bound or n_stops < lower_bound:
+                count += 1
+        return count
 
     def get_ridership_density_score(self) -> float:
         score = 0
