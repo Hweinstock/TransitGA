@@ -45,7 +45,7 @@ class Population:
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
         self.performance_dict = {}
-        #self.ZoneEvaluator.sample_stops()
+        self.ZoneEvaluator.sample_stops()
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index
