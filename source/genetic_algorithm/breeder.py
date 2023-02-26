@@ -1,13 +1,13 @@
-from transit_network.transit_network import TransitNetwork, create_network_from_trips
-from transit_network.trips import common_transfer_point, SimpleTrip
-from root_logger import RootLogger
-import genetic_algorithm.params as params
-from genetic_algorithm.family import Family
-
 from typing import List, Tuple
 import uuid
 import random 
 from copy import deepcopy
+
+from transit_network.transit_network import TransitNetwork, create_network_from_trips
+from transit_network.trips import common_transfer_point, SimpleTrip
+from utility.root_logger import RootLogger
+import genetic_algorithm.params as params
+from genetic_algorithm.family import Family
 
 def kill_random_trips(trips: List[SimpleTrip]):
     r_val = random.uniform(0, 1)

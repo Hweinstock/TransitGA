@@ -5,7 +5,7 @@ import pandas as pd
 
 from transit_network.stops import Stop, stop_from_stop_row_data
 from transit_network.shapes import ShapePoint
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from preprocessing.partition_shape_points import partition_shape_points
 
 class BaseTrip:

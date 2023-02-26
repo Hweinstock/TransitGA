@@ -1,8 +1,8 @@
 from preprocessing.ridership_data import RidershipData, RawRidershipData
 from preprocessing.gtfs_data import GTFSData
 from transit_network.transit_network import create_network_from_GTFSRoutes, TransitNetwork
-from args_parser import simplify_network_args
-from utility import pickle_object
+from utility.args_parser import simplify_network_args
+from utility.pickle import pickle_object
 
 
 def generate_compression_metrics(Gtfs: GTFSData, SimplifiedNetwork: TransitNetwork) -> str:

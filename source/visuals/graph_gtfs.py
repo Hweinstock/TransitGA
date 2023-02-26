@@ -5,7 +5,7 @@ import warnings
 import pandas as pd
 from typing import List
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 
 
 def generate_diagram(zip_path: str, output_filename: str, route_ids: List[int] = None, include_stops=True):

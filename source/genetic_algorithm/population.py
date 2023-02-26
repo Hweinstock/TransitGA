@@ -8,8 +8,7 @@ import os
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.network_metrics import NetworkMetrics
-from root_logger import RootLogger
-from utility import pickle_object
+from utility.root_logger import RootLogger
 
 def scale_to_prob_dist(weights: List[float]) -> List[float]:
     s = sum(weights)
@@ -34,7 +33,6 @@ class Population:
         self.iteration_number = 1
         self.performance_dict = {}
         self.per_round_metrics = []
-        self.write_to_pickle = pickle_object
         self.initial_metrics = initial_metrics
         self.ZoneEvaluator = ZoneEvaluator
         self.done_running = False

@@ -1,5 +1,5 @@
 import logging
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 import sys
 
 class RootLogger:

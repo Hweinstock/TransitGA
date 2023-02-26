@@ -3,7 +3,7 @@ from typing import List
 from transit_network.shapes import ShapePoint
 from transit_network.stops import Stop 
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 
 def closest_shape_point_index(cur_stop: Stop, shape_points: List[ShapePoint]) -> int: 
 

@@ -1,10 +1,10 @@
 from typing import List
 import pandas as pd 
 
-from transit_network.trips import GTFSTrip, SimpleTrip, BaseTrip
+from transit_network.trips import GTFSTrip, SimpleTrip
 from transit_network.stops import Stop 
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 
 class BaseRoute:
 

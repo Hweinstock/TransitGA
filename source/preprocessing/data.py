@@ -1,5 +1,4 @@
 from pathlib import Path
-from os import path
 
 class DataBase:
     """

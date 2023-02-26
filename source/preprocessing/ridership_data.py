@@ -1,7 +1,7 @@
 import pandas as pd  
 from typing import List
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from preprocessing.data import DataBase
 from preprocessing.gtfs_data import GTFSData
 from transit_network.routes import GTFSRoute

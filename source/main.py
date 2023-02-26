@@ -1,11 +1,10 @@
-from utility import read_object_from_file
-from args_parser import model_run_args
+from utility.pickle import read_object_from_file
+from utility.args_parser import model_run_args
 from genetic_algorithm.initial_population_generator import initiate_population_from_network 
 from genetic_algorithm.population import Population
 from visuals.graph_metrics import graph_all_metrics
 from visuals.graph_gtfs import generate_diagram
-from root_logger import RootLogger
-from visuals.plot_zones import plot_zones
+from utility.root_logger import RootLogger
 
 import os
 import pandas as pd

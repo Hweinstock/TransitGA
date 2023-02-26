@@ -5,7 +5,7 @@ import pprint
 from math import ceil
 
 from transit_network.transit_network import TransitNetwork
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from genetic_algorithm.population import Population
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.fitness_function import evaluate_network_new

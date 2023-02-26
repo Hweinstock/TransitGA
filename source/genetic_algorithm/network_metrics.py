@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from transit_network.transit_network import TransitNetwork 
 
 class NetworkMetrics:

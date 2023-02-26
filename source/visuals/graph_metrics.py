@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 import pandas as pd 
 import os 
 
-from utility import pickle_object
+from utility.pickle import pickle_object
 from genetic_algorithm.population import Population
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 
 INTERATION_HEADER = 'iteration'
 FITNESS_HEADER = 'fitness'
@@ -22,7 +22,7 @@ SINGLE_DOT_SIZE = 5
 def graph_all_metrics(Population: Population, results_csv: str, output_folder: str= None):
     RootLogger.log_debug(f'Graphing all metrics for results file {results_csv} and exporting to {output_folder}...')
     if output_folder is None:
-        output_folder = f'{Population.iteration_number-1}i{Population.population_size}p/'
+        output_folder = f'{Population.iteration_number-1}i{Population.population_size}p'
         
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)

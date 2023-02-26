@@ -12,8 +12,7 @@ from transit_network.shapes import get_shapes_from_df
 from genetic_algorithm.family import Family
 from preprocessing.determine_transfers import new_determine_transfers
 import preprocessing.gtfs_data as GTFS
-
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 
 class TransitNetwork:
 
