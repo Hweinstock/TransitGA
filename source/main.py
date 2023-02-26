@@ -12,7 +12,11 @@ import pandas as pd
 import logging
 
 
-def run_from_network(num_generations: int, population_size: int, initial_network_path: str or None = None, output_dir: str or None = None, do_output: bool=True) -> Population:
+def run_from_network(num_generations: int, 
+                     population_size: int, 
+                     initial_network_path: str or None = None, 
+                     output_dir: str or None = None, 
+                     do_output: bool=True) -> Population:
     """Generate network and run for specified number of iterations
 
     Args:
@@ -26,6 +30,8 @@ def run_from_network(num_generations: int, population_size: int, initial_network
     """
     if output_dir is None:
         output_dir = f'./output/{num_generations}i{population_size}p'
+    else:
+        output_dir = f'{output_dir}/{num_generations}i{population_size}p'
 
     if initial_network_path is None:
         initial_network_path = 'data/new_initial_net/new_initial_net.pkl'
@@ -81,9 +87,11 @@ if __name__ == '__main__':
         estimate = avg_time * args.num_generations
         RootLogger.log_info(f'Time estimate complete with time of {estimate}.')
     else:
-        FinalPop = run_from_network(args.num_generations, args.population_size, initial_network_path=args.initial_network)
+        FinalPop = run_from_network(args.num_generations, args.population_size, 
+                                    initial_network_path=args.initial_network, 
+                                    output_dir=args.output)
         RootLogger.log_info(f'Run Complete with time of {FinalPop.running_time}.')
     if args.best_performer:
-        examine_best_performer(f'output/{args.num_generations}i{args.population_size}p')
+        examine_best_performer(f'{args.output}{args.num_generations}i{args.population_size}p')
 
     # create_simplified_gtfs_SFMTA('data/new_initial_net')

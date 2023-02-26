@@ -140,6 +140,6 @@ dmypy.json
 .vscode
 misc/*
 
+!output/*/*.html
 !data/*.csv 
-!data/*.pkl 
 !data/*.zip

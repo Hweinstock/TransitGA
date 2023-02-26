@@ -19,6 +19,11 @@ def model_run_args() -> Namespace:
                    default='../data/new_initial_net.pkl', 
                    type=str,
                    help="initial network to use to generate population.")
+
+    p.add_argument("-o", "--output", 
+                   default="../output/", 
+                   type=str,
+                   help='path to output directory, defaults to ../output/')
     
     p.add_argument("-te",  "--time_estimate", 
                    type=int,
