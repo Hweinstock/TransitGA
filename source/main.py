@@ -5,6 +5,7 @@ from genetic_algorithm.population import Population
 from visuals.graph_metrics import graph_all_metrics
 from visuals.graph_gtfs import generate_diagram
 from utility.root_logger import RootLogger
+from genetic_algorithm.params import overwrite_lambdas
 
 import os
 import pandas as pd
@@ -70,6 +71,7 @@ if __name__ == '__main__':
     # plot_zones()
     args = model_run_args()
     RootLogger.initialize(args.output, args.verbosity, args.file_verbosity)
+    overwrite_lambdas(args)
     
     if args.time_estimate != 0:
         from statistics import mean 

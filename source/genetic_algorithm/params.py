@@ -1,3 +1,6 @@
+import argparse
+from utility.root_logger import RootLogger
+
 ##  Breeder
 MAX_RETRY_COUNT = 100
 PROB_MUTATION = 0.01
@@ -11,14 +14,13 @@ EXTREME_TRIP_LAMBDA = 2
 
 ZONE_RADIUS = 900
 ZONE_EPSILON = 0.5
-DEFAULT_ZONE_DISTANCE = 40
+DEFAULT_ZONE_DISTANCE = 90
 ZONE_SAMPLE_NUM = 3
 
 MIN_NUM_STOPS = 5 
 MAX_NUM_STOPS = 90
 
 ZONE_FILE = '../data/zone_file.csv'
-# Can use to draw: https://www.calcmaps.com/map-radius/
 Z1_LAT = 37.780554
 Z1_LON = -122.472288
 Z1_NAME = "Inner Richmond"
@@ -91,4 +93,17 @@ def cutoff_by_round(iteration: int, max_iteration: int) -> float:
     return val
 
 def sum_of_fitness_coefficients():
-    return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA + EXTREME_TRIP_LAMBDA
+    return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA + EXTREME_TRIP_LAMBDA 
+
+def overwrite_lambdas(args: argparse.Namespace):
+
+    global COVERAGE_LAMBDA, RIDERSHIP_DENSITY_LAMBDA, ZONE_LAMBDA, EXTREME_TRIP_LAMBDA
+    RootLogger.log_info(f'Running model with COVERAGE_LAMBDA: {args.coverage_lambda}')
+    RootLogger.log_info(f'Running model with RIDERSHIP_DENSITY_LAMBDA: {args.ridership_density_lambda}')
+    RootLogger.log_info(f'Running model with ZONE_LAMBDA: {args.zone_lambda}')
+    RootLogger.log_info(f'Running model with EXTREME_TRIP_LAMBDA: {args.extreme_trip_lambda}')
+    
+    COVERAGE_LAMBDA = args.coverage_lambda
+    RIDERSHIP_DENSITY_LAMBDA = args.ridership_density_lambda
+    ZONE_LAMBDA = args.zone_lambda
+    EXTREME_TRIP_LAMBDA = args.extreme_trip_lambda
