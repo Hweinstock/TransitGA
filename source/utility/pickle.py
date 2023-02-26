@@ -8,7 +8,7 @@ def pickle_object(object: object, filename: str) -> None:
         filename += '.pkl'
     with open(filename, 'wb') as output:
         pickle.dump(object, output)
-    RootLogger.log_info(f'Succesffuly wrote object to {filename}.')
+    RootLogger.log_info(f'Successfully wrote object to {filename}.')
 
 def read_object_from_file(filename: str) -> object:
     if Path(filename).suffix != '.pkl':

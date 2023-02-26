@@ -69,13 +69,8 @@ def examine_best_performer(output_dir: str):
 if __name__ == '__main__':
     # plot_zones()
     args = model_run_args()
-    verbosity_to_level = {
-        0: logging.ERROR,
-        1: logging.WARNING, 
-        2: logging.INFO, 
-        3: logging.DEBUG,
-    }
-    RootLogger.outputHandler.setLevel(verbosity_to_level[args.verbosity])
+    RootLogger.initialize(args.output, args.verbosity)
+    
     if args.time_estimate != 0:
         from statistics import mean 
 

@@ -1,23 +1,34 @@
 import logging
 from colorama import Fore, Style
 import sys
+import os
+from argparse import Namespace
 
 class RootLogger:
+
     console_level = logging.INFO
     file_level = logging.DEBUG
 
-    logging_format = logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s')
-    fileHandler = logging.FileHandler("log.txt", mode="w")
-    fileHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
-    fileHandler.setLevel(level=file_level)
+    verbosity_to_level = {
+        0: logging.ERROR,
+        1: logging.WARNING, 
+        2: logging.INFO, 
+        3: logging.DEBUG,
+    }
+    
+    def initialize(path: str, verbosity: int):
+        fileHandler = logging.FileHandler(os.path.join(path, 'log.txt'), mode="w")
+        fileHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
+        fileHandler.setLevel(level=RootLogger.file_level)
 
-    outputHandler = logging.StreamHandler(stream=sys.stdout)
-    outputHandler.setFormatter(logging_format)
-    outputHandler.setLevel(level=console_level)
-    logging.basicConfig(handlers = [fileHandler, outputHandler],
+        outputHandler = logging.StreamHandler(stream=sys.stdout)
+        outputHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
+        outputHandler.setLevel(level=RootLogger.verbosity_to_level[verbosity])
+
+        logging.basicConfig(handlers = [fileHandler, outputHandler],
                     format='%(asctime)s, %(name)s %(levelname)s %(message)s', 
                     level=logging.NOTSET)
-
+    
     def log_info(msg):
         logging.info(f'{Fore.BLUE}{msg}{Style.RESET_ALL}')
     
