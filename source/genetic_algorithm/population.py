@@ -4,6 +4,7 @@ import pandas as pd
 from statistics import mean, median, stdev
 import time
 import os
+from copy import deepcopy
 
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
 from genetic_algorithm.chromosome import Chromosome
@@ -39,6 +40,9 @@ class Population:
         self.running_time = 0.0
 
         self.max_iteration = None
+    
+    def copy(self) -> object:
+        return deepcopy(self)
     
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
