@@ -27,7 +27,7 @@ def try_different_lambdas(args):
         InitialPopulation = initiate_population_from_network(Network, args.population_size)
         res = InitialPopulation.run(args.num_generations)
         overwrite_lambdas(coverage_lambda=0, ridership_density_lambda=ridership_density_lambda, 
-                        zone_lambda=zone_lambda, extreme_trip_lambda=extreme_trip_lambda)
+                        zone_lambda=zone_lambda, extreme_trip_lambda=-1*extreme_trip_lambda)
         
         cur_output = os.path.join(args.output, f'rd{ridership_density_lambda}z{zone_lambda}et{extreme_trip_lambda}-{args.num_generations}i{args.population_size}p')
 
