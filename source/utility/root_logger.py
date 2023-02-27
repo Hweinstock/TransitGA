@@ -14,10 +14,17 @@ class RootLogger:
     }
     
     def initialize(path: str, verbosity: int, file_verbosity: int):
+
+        # Create output folder if it doesn't exist
+        if not os.path.exists(path):
+            os.makedirs(path)
+        
+        # Setup up output logging file. 
         fileHandler = logging.FileHandler(os.path.join(path, 'log.txt'), mode="w")
         fileHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
         fileHandler.setLevel(level=RootLogger.verbosity_to_level[file_verbosity])
 
+        # Setup console logging
         outputHandler = logging.StreamHandler(stream=sys.stdout)
         outputHandler.setFormatter(logging.Formatter('%(asctime)s, %(name)s %(levelname)s %(message)s'))
         outputHandler.setLevel(level=RootLogger.verbosity_to_level[verbosity])

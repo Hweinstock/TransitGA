@@ -46,6 +46,7 @@ def try_different_lambdas(args):
 
 if __name__ == '__main__':
     args = batch_run_args()
+    
     RootLogger.initialize(args.output, args.verbosity, args.file_verbosity)
     try_different_lambdas(args)
         
