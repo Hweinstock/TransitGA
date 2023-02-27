@@ -1,7 +1,12 @@
 import argparse
 from argparse import Namespace
+import os
 
-def add_model_arguments(parser: argparse.ArgumentParser) -> None:
+def add_model_arguments(parser: argparse.ArgumentParser, batch: bool =False) -> None:
+    if batch: 
+        default_dir = os.path.join("../output/", "batch/")
+    else:
+        default_dir = "../output/"
     model_parameters = parser.add_argument_group('model parameters')
     
     model_parameters.add_argument("-p", "--population_size", type=int,
@@ -15,9 +20,9 @@ def add_model_arguments(parser: argparse.ArgumentParser) -> None:
                    type=str,
                    help="initial network to use to generate population. \n defaults to %(default)s")
     model_parameters.add_argument("-o", "--output", 
-                   default="../output/", 
+                   default=default_dir, 
                    type=str,
-                   help='path to output directory, defaults to ../output/')
+                   help=f'path to output directory, defaults to {default_dir}')
 
     model_parameters.add_argument("-bp", "--best_performer",
                 action='store_true',
@@ -35,7 +40,7 @@ def batch_run_args() -> Namespace:
     parser = argparse.ArgumentParser(description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     
-    add_model_arguments(parser)
+    add_model_arguments(parser, batch=True)
     add_logging_arguments(parser)
 
     return parser.parse_args()

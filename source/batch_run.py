@@ -34,10 +34,12 @@ def try_different_lambdas(args):
         if not os.path.exists(cur_output):
             os.makedirs(cur_output)
         results_filename = InitialPopulation.export_metrics(output_directory=cur_output)
+        RootLogger.log_info(f'Graphing all metrics for batch {index + 1}')
         graph_all_metrics(Population=InitialPopulation, results_csv=results_filename, output_folder=cur_output)
 
         if args.best_performer:
             try:
+                RootLogger.log_info(f'Graphing best performer for batch {index + 1}')
                 examine_best_performer(cur_output)
             except ValueError:
                 RootLogger.log_error(f'Failed to generate diagram for batch run to {cur_output}')
