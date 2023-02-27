@@ -19,6 +19,10 @@ def add_model_arguments(parser: argparse.ArgumentParser) -> None:
                    type=str,
                    help='path to output directory, defaults to ../output/')
 
+    model_parameters.add_argument("-bp", "--best_performer",
+                action='store_true',
+                help="include to enable graphing the best performer after finishing.")
+
 def add_logging_arguments(parser: argparse.ArgumentParser) -> None:
     logging_options = parser.add_argument_group('logging options')
     logging_options.add_argument("-v", "--verbosity", type=int, choices=[0,1,2,3], default=0,
@@ -44,9 +48,6 @@ def model_run_args() -> Namespace:
     add_model_arguments(parser)
     
     options = parser.add_argument_group('additional options')
-    options.add_argument("-bp", "--best_performer",
-                   action='store_true',
-                   help="include to enable graphing the best performer after finishing.")
     
     options.add_argument("-te",  "--time_estimate", 
                    type=int,

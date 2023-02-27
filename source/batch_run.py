@@ -7,6 +7,7 @@ from genetic_algorithm.initial_population_generator import initiate_population_f
 from genetic_algorithm.params import overwrite_lambdas
 from utility.root_logger import RootLogger
 from utility.args_parser import batch_run_args
+from main import examine_best_performer
 
 def try_different_lambdas(args):
     RootLogger.log_info(f'Running batch with different lambda with {args.population_size} size and {args.num_generations} generations.')
@@ -34,6 +35,12 @@ def try_different_lambdas(args):
             os.makedirs(cur_output)
         results_filename = InitialPopulation.export_metrics(output_directory=cur_output)
         graph_all_metrics(Population=InitialPopulation, results_csv=results_filename, output_folder=cur_output)
+
+        if args.best_performer:
+            try:
+                examine_best_performer(cur_output)
+            except ValueError:
+                RootLogger.log_error(f'Failed to generate diagram for batch run to {cur_output}')
 
 if __name__ == '__main__':
     args = batch_run_args()
