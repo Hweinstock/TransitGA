@@ -67,11 +67,10 @@ def examine_best_performer(output_dir: str):
     generate_diagram(zip_path, os.path.join(output_dir, "best performer"), include_stops=False)
     RootLogger.log_info(f'Done!')
 
-if __name__ == '__main__':
-    # plot_zones()
-    args = model_run_args()
+def main(args) -> None:
     RootLogger.initialize(args.output, args.verbosity, args.file_verbosity)
-    overwrite_lambdas(args)
+    overwrite_lambdas(coverage_lambda=args.coverage_lambda, ridership_density_lambda=args.ridership_density_lambda, 
+                      zone_lambda=args.zone_lambda, extreme_trip_lambda=args.extreme_trip_lambda)
     
     if args.time_estimate != 0:
         from statistics import mean 
@@ -90,4 +89,6 @@ if __name__ == '__main__':
     if args.best_performer:
         examine_best_performer(f'{args.output}{args.num_generations}i{args.population_size}p')
 
-    # create_simplified_gtfs_SFMTA('data/new_initial_net')
+if __name__ == '__main__':
+   args = model_run_args()
+   main(args)

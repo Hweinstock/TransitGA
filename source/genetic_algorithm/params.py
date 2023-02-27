@@ -95,16 +95,16 @@ def cutoff_by_round(iteration: int, max_iteration: int) -> float:
 def sum_of_fitness_coefficients():
     return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA + EXTREME_TRIP_LAMBDA 
 
-def overwrite_lambdas(args: argparse.Namespace):
+def overwrite_lambdas(coverage_lambda: float, ridership_density_lambda: float, zone_lambda: float, extreme_trip_lambda: float):
 
     global COVERAGE_LAMBDA, RIDERSHIP_DENSITY_LAMBDA, ZONE_LAMBDA, EXTREME_TRIP_LAMBDA
-    RootLogger.log_info(f'Running model with COVERAGE_LAMBDA: {args.coverage_lambda}')
-    RootLogger.log_info(f'Running model with RIDERSHIP_DENSITY_LAMBDA: {args.ridership_density_lambda}')
-    RootLogger.log_info(f'Running model with ZONE_LAMBDA: {args.zone_lambda}')
-    RootLogger.log_info(f'Running model with EXTREME_TRIP_LAMBDA: {args.extreme_trip_lambda}')
+    RootLogger.log_info(f'Running model with COVERAGE_LAMBDA: {coverage_lambda}')
+    RootLogger.log_info(f'Running model with RIDERSHIP_DENSITY_LAMBDA: {ridership_density_lambda}')
+    RootLogger.log_info(f'Running model with ZONE_LAMBDA: {zone_lambda}')
+    RootLogger.log_info(f'Running model with EXTREME_TRIP_LAMBDA: {extreme_trip_lambda}')
     
-    total = args.coverage_lambda + args.ridership_density_lambda + args.zone_lambda + args.extreme_trip_lambda
-    COVERAGE_LAMBDA = args.coverage_lambda / total 
-    RIDERSHIP_DENSITY_LAMBDA = args.ridership_density_lambda / total
-    ZONE_LAMBDA = args.zone_lambda / total
-    EXTREME_TRIP_LAMBDA = args.extreme_trip_lambda / total
+    total = coverage_lambda + ridership_density_lambda + zone_lambda + extreme_trip_lambda
+    COVERAGE_LAMBDA = coverage_lambda / total 
+    RIDERSHIP_DENSITY_LAMBDA = ridership_density_lambda / total
+    ZONE_LAMBDA = zone_lambda / total
+    EXTREME_TRIP_LAMBDA = extreme_trip_lambda / total

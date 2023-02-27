@@ -1,10 +1,7 @@
 import argparse
 from argparse import Namespace
 
-def model_run_args() -> Namespace:
-    parser = argparse.ArgumentParser(description=__doc__,
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    
+def add_model_arguments(parser: argparse.ArgumentParser) -> None:
     model_parameters = parser.add_argument_group('model parameters')
     
     model_parameters.add_argument("-p", "--population_size", type=int,
@@ -17,29 +14,47 @@ def model_run_args() -> Namespace:
                    default='../data/new_initial_net.pkl', 
                    type=str,
                    help="initial network to use to generate population. \n defaults to %(default)s")
-    
-    options = parser.add_argument_group('additional options')
-    options.add_argument("-bp", "--best_performer",
-                   action='store_true',
-                   help="include to enable graphing the best performer after finishing.")
-
-    options.add_argument("-o", "--output", 
+    model_parameters.add_argument("-o", "--output", 
                    default="../output/", 
                    type=str,
                    help='path to output directory, defaults to ../output/')
-    
-    options.add_argument("-te",  "--time_estimate", 
-                   type=int,
-                   default=0, 
-                   help='get an estimate of running with these parameters. Integer passed in serves as number of test runs to estimate. ')
-    
+
+def add_logging_arguments(parser: argparse.ArgumentParser) -> None:
     logging_options = parser.add_argument_group('logging options')
     logging_options.add_argument("-v", "--verbosity", type=int, choices=[0,1,2,3], default=0,
                    help="increase output verbosity (default: %(default)s)")
     
     logging_options.add_argument("-fv", "--file_verbosity", type=int, choices=[0, 1, 2, 3], default=3,
                    help="decrease output log file verbosity (default: %(default)s)")
+
+def batch_run_args() -> Namespace:
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     
+    add_model_arguments(parser)
+    add_logging_arguments(parser)
+
+    return parser.parse_args()
+
+
+def model_run_args() -> Namespace:
+    parser = argparse.ArgumentParser(description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    
+    add_model_arguments(parser)
+    
+    options = parser.add_argument_group('additional options')
+    options.add_argument("-bp", "--best_performer",
+                   action='store_true',
+                   help="include to enable graphing the best performer after finishing.")
+    
+    options.add_argument("-te",  "--time_estimate", 
+                   type=int,
+                   default=0, 
+                   help='get an estimate of running with these parameters. Integer passed in serves as number of test runs to estimate. ')
+    
+    add_logging_arguments(parser)
+
     lambda_parameters = parser.add_argument_group('lambda parameters')
 
     lambda_parameters.add_argument('--coverage_lambda', type=float, default=0, 
