@@ -71,8 +71,12 @@ class TransitNetwork:
         count = 0
         for t in self.trips:
             n_stops = len(t.stops)
-            if n_stops > upper_bound or n_stops < lower_bound:
-                count += 1
+            if n_stops > upper_bound:
+                count += n_stops - upper_bound
+            
+            if n_stops < lower_bound:
+                count += lower_bound - n_stops
+                
         return count
 
     def get_ridership_density_score(self) -> float:
