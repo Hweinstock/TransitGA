@@ -14,9 +14,9 @@ def try_different_lambdas(args):
 
     Network = read_object_from_file(args.initial_network)
 
-    batches = [(0, 0, 1), (0, 1, 0), (1, 0, 0), 
-               (1, 1, 0), (1, 0, 1), (0, 1, 1),
-               (2, 1, 1), (1, 2, 1), (1, 1, 2)]
+    batches = [(2, 2, 1), (2, 4, 1), (4, 2, 1), 
+               (3, 3, 1), (6, 3, 1), (3, 6, 1),
+               (1, 1, 1), (1, 10, 1), (10, 1, 1)]
     
     if not os.path.exists(args.output):
         os.makedirs(args.output)
@@ -26,9 +26,13 @@ def try_different_lambdas(args):
         ridership_density_lambda, zone_lambda, extreme_trip_lambda = batch 
         InitialPopulation = initiate_population_from_network(Network, args.population_size)
         res = InitialPopulation.run(args.num_generations)
-        overwrite_lambdas(coverage_lambda=0, ridership_density_lambda=ridership_density_lambda, 
+        valid_params = overwrite_lambdas(coverage_lambda=0, ridership_density_lambda=ridership_density_lambda, 
                         zone_lambda=zone_lambda, extreme_trip_lambda=-1*extreme_trip_lambda)
         
+        if not valid_params:
+            RootLogger.log_warning(f'Skipping batch {index +1} due to invalid parameters.')
+            continue
+
         cur_output = os.path.join(args.output, f'rd{ridership_density_lambda}z{zone_lambda}et{extreme_trip_lambda}-{args.num_generations}i{args.population_size}p')
 
         if not os.path.exists(cur_output):

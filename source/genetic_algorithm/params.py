@@ -95,7 +95,10 @@ def cutoff_by_round(iteration: int, max_iteration: int) -> float:
 def sum_of_fitness_coefficients():
     return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA + EXTREME_TRIP_LAMBDA 
 
-def overwrite_lambdas(coverage_lambda: float, ridership_density_lambda: float, zone_lambda: float, extreme_trip_lambda: float):
+def overwrite_lambdas(coverage_lambda: float, 
+                      ridership_density_lambda: float, 
+                      zone_lambda: float, 
+                      extreme_trip_lambda: float) -> bool:
 
     global COVERAGE_LAMBDA, RIDERSHIP_DENSITY_LAMBDA, ZONE_LAMBDA, EXTREME_TRIP_LAMBDA
     RootLogger.log_info(f'Running model with COVERAGE_LAMBDA: {coverage_lambda}')
@@ -104,7 +107,12 @@ def overwrite_lambdas(coverage_lambda: float, ridership_density_lambda: float, z
     RootLogger.log_info(f'Running model with EXTREME_TRIP_LAMBDA: {extreme_trip_lambda}')
     
     total = coverage_lambda + ridership_density_lambda + zone_lambda + extreme_trip_lambda
+    if total == 0:
+        RootLogger.log_error('Set of parameters sum to 0!')
+        return False 
     COVERAGE_LAMBDA = coverage_lambda / total 
     RIDERSHIP_DENSITY_LAMBDA = ridership_density_lambda / total
     ZONE_LAMBDA = zone_lambda / total
     EXTREME_TRIP_LAMBDA = extreme_trip_lambda / total
+
+    return True 
