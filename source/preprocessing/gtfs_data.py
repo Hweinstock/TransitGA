@@ -2,7 +2,7 @@ from typing import List
 import gtfs_kit as gk
 from pathlib import Path
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from preprocessing.data import DataBase
 from transit_network.routes import GTFSRoute
 

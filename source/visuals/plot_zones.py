@@ -5,7 +5,6 @@ from math import cos, sin, pi
 
 from typing import List, Tuple
 
-from genetic_algorithm.zone_evaluator import Zone, parse_zone_file
 from genetic_algorithm.params import ZONE_RADIUS, ZONE_FILE
 
 def get_circle_radius(lat: float, lon: float) -> Tuple[List[Tuple[float, float]]]:

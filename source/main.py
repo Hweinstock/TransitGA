@@ -1,17 +1,22 @@
-from utility import read_object_from_file
-from args_parser import model_run_args
+from utility.pickle import read_object_from_file
+from utility.args_parser import model_run_args
 from genetic_algorithm.initial_population_generator import initiate_population_from_network 
 from genetic_algorithm.population import Population
 from visuals.graph_metrics import graph_all_metrics
 from visuals.graph_gtfs import generate_diagram
-from root_logger import RootLogger
-from visuals.plot_zones import plot_zones
+from utility.root_logger import RootLogger
+from genetic_algorithm.params import overwrite_lambdas
 
 import os
 import pandas as pd
+import logging
 
 
-def run_from_network(num_generations: int, population_size: int, initial_network_path: str or None = None, output_dir: str or None = None, do_output: bool=True) -> Population:
+def run_from_network(num_generations: int, 
+                     population_size: int, 
+                     initial_network_path: str or None = None, 
+                     output_dir: str or None = None, 
+                     do_output: bool=True) -> Population:
     """Generate network and run for specified number of iterations
 
     Args:
@@ -25,6 +30,8 @@ def run_from_network(num_generations: int, population_size: int, initial_network
     """
     if output_dir is None:
         output_dir = f'./output/{num_generations}i{population_size}p'
+    else:
+        output_dir = f'{output_dir}/{num_generations}i{population_size}p'
 
     if initial_network_path is None:
         initial_network_path = 'data/new_initial_net/new_initial_net.pkl'
@@ -60,9 +67,11 @@ def examine_best_performer(output_dir: str):
     generate_diagram(zip_path, os.path.join(output_dir, "best performer"), include_stops=False)
     RootLogger.log_info(f'Done!')
 
-if __name__ == '__main__':
-    # plot_zones()
-    args = model_run_args()
+def main(args) -> None:
+    RootLogger.initialize(args.output, args.verbosity, args.file_verbosity)
+    overwrite_lambdas(coverage_lambda=args.coverage_lambda, ridership_density_lambda=args.ridership_density_lambda, 
+                      zone_lambda=args.zone_lambda, extreme_trip_lambda=args.extreme_trip_lambda)
+    
     if args.time_estimate != 0:
         from statistics import mean 
 
@@ -73,9 +82,13 @@ if __name__ == '__main__':
         estimate = avg_time * args.num_generations
         RootLogger.log_info(f'Time estimate complete with time of {estimate}.')
     else:
-        FinalPop = run_from_network(args.num_generations, args.population_size, initial_network_path=args.initial_network)
+        FinalPop = run_from_network(args.num_generations, args.population_size, 
+                                    initial_network_path=args.initial_network, 
+                                    output_dir=args.output)
         RootLogger.log_info(f'Run Complete with time of {FinalPop.running_time}.')
     if args.best_performer:
-        examine_best_performer(f'output/{args.num_generations}i{args.population_size}p')
+        examine_best_performer(f'{args.output}{args.num_generations}i{args.population_size}p')
 
-    # create_simplified_gtfs_SFMTA('data/new_initial_net')
+if __name__ == '__main__':
+   args = model_run_args()
+   main(args)

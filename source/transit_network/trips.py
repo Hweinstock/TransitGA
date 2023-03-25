@@ -5,7 +5,7 @@ import pandas as pd
 
 from transit_network.stops import Stop, stop_from_stop_row_data
 from transit_network.shapes import ShapePoint
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from preprocessing.partition_shape_points import partition_shape_points
 
 class BaseTrip:
@@ -38,6 +38,13 @@ class BaseTrip:
     
     def __eq__(self, other_obj: object) -> bool:
         return other_obj.id == self.id
+
+    def __str__(self):
+        return f'(trip_id: {self.id}, \
+        route_id: {self.route_id}, \
+        message: {self.message}, \
+        direction: {self.direction}, \
+        ridership: {self.ridership}'
 
 
 class SimpleTrip(BaseTrip):

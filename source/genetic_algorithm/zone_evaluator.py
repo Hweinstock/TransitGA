@@ -4,7 +4,7 @@ from transit_network.routes import SimpleRoute
 from transit_network.trips import SimpleTrip
 from transit_network.shapes import Coords
 import genetic_algorithm.params as params
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from genetic_algorithm.caching import RouteDistanceToZoneKey, AllRouteDistancesToZoneKey
 
 import csv

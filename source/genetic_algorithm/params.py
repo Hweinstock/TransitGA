@@ -1,22 +1,26 @@
+import argparse
+from utility.root_logger import RootLogger
+
 ##  Breeder
 MAX_RETRY_COUNT = 100
 PROB_MUTATION = 0.01
 DELTA_MUTATION = 2
 
 ##  Fitness Function
-RIDERSHIP_LAMBDA = 0.25
-NUM_ROUTES_LAMBDA = 0.25
-COVERAGE_LAMBDA = 0.25
-RIDERSHIP_DENSITY_LAMBDA = 0.25
-ZONE_LAMBDA = 0.5
+COVERAGE_LAMBDA = 0
+RIDERSHIP_DENSITY_LAMBDA = 1
+ZONE_LAMBDA = 3
+EXTREME_TRIP_LAMBDA = 2
 
 ZONE_RADIUS = 900
 ZONE_EPSILON = 0.5
-DEFAULT_ZONE_DISTANCE = 40
+DEFAULT_ZONE_DISTANCE = 90
 ZONE_SAMPLE_NUM = 3
 
+MIN_NUM_STOPS = 10
+MAX_NUM_STOPS = 80
+
 ZONE_FILE = '../data/zone_file.csv'
-# Can use to draw: https://www.calcmaps.com/map-radius/
 Z1_LAT = 37.780554
 Z1_LON = -122.472288
 Z1_NAME = "Inner Richmond"
@@ -86,9 +90,29 @@ def cutoff_by_round(iteration: int, max_iteration: int) -> float:
     min_cutoff = 0.1
 
     val = (iteration-1)/(max_iteration-1) * (max_cutoff-min_cutoff) + min_cutoff
-    # val =  0.1 + ((0.8)/(max_iteration- 1))*(iteration - 0.1)
-    print(iteration, val)
     return val
 
 def sum_of_fitness_coefficients():
-    return RIDERSHIP_LAMBDA + NUM_ROUTES_LAMBDA + COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA
+    return COVERAGE_LAMBDA + RIDERSHIP_DENSITY_LAMBDA + ZONE_LAMBDA + EXTREME_TRIP_LAMBDA 
+
+def overwrite_lambdas(coverage_lambda: float, 
+                      ridership_density_lambda: float, 
+                      zone_lambda: float, 
+                      extreme_trip_lambda: float) -> bool:
+
+    global COVERAGE_LAMBDA, RIDERSHIP_DENSITY_LAMBDA, ZONE_LAMBDA, EXTREME_TRIP_LAMBDA
+    RootLogger.log_info(f'Running model with COVERAGE_LAMBDA: {coverage_lambda}')
+    RootLogger.log_info(f'Running model with RIDERSHIP_DENSITY_LAMBDA: {ridership_density_lambda}')
+    RootLogger.log_info(f'Running model with ZONE_LAMBDA: {zone_lambda}')
+    RootLogger.log_info(f'Running model with EXTREME_TRIP_LAMBDA: {extreme_trip_lambda}')
+    
+    total = coverage_lambda + ridership_density_lambda + zone_lambda + extreme_trip_lambda
+    if total == 0:
+        RootLogger.log_error('Set of parameters sum to 0!')
+        return False 
+    COVERAGE_LAMBDA = coverage_lambda / total 
+    RIDERSHIP_DENSITY_LAMBDA = ridership_density_lambda / total
+    ZONE_LAMBDA = zone_lambda / total
+    EXTREME_TRIP_LAMBDA = extreme_trip_lambda / total
+
+    return True 

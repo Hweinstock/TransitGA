@@ -1,8 +1,8 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
-from root_logger import RootLogger
-from utility import sphere_distance
+from utility.root_logger import RootLogger
 from transit_network.shapes import Coords
+import geopy.distance
 
 def stop_from_stop_row_data(row, route_id):
     id = row['stop_id']
@@ -16,6 +16,11 @@ def stop_from_stop_row_data(row, route_id):
     
     return Stop(id= id, name=stop_name, location=(stop_lat, stop_lon), parent_id=parent_station, routes=[route_id])
 
+def sphere_distance(coords_1: Tuple[float, float], coords_2: Tuple[float, float]) -> float:
+    # returns distance in meters. 
+    # https://stackoverflow.com/questions/19412462/getting-distance-between-two-points-based-on-latitude-longitude/43211266#43211266
+    km_dist = geopy.distance.geodesic(coords_1, coords_2).km 
+    return km_dist * 1000
 
 class Stop:
 

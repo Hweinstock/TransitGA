@@ -4,12 +4,12 @@ import pandas as pd
 from statistics import mean, median, stdev
 import time
 import os
+from copy import deepcopy
 
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
 from genetic_algorithm.chromosome import Chromosome
 from genetic_algorithm.network_metrics import NetworkMetrics
-from root_logger import RootLogger
-from utility import pickle_object
+from utility.root_logger import RootLogger
 
 def scale_to_prob_dist(weights: List[float]) -> List[float]:
     s = sum(weights)
@@ -34,7 +34,6 @@ class Population:
         self.iteration_number = 1
         self.performance_dict = {}
         self.per_round_metrics = []
-        self.write_to_pickle = pickle_object
         self.initial_metrics = initial_metrics
         self.ZoneEvaluator = ZoneEvaluator
         self.done_running = False
@@ -42,10 +41,13 @@ class Population:
 
         self.max_iteration = None
     
+    def copy(self) -> object:
+        return deepcopy(self)
+    
     def evaluate_population(self):
         RootLogger.log_debug('Evaluating population...')
         self.performance_dict = {}
-        #self.ZoneEvaluator.sample_stops()
+        self.ZoneEvaluator.sample_stops()
         for index, member in enumerate(self.population):
             # Assign the member a unique_id equal to index. 
             member.unique_id = index

@@ -1,7 +1,8 @@
 from typing import Tuple
 
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from transit_network.transit_network import TransitNetwork 
+from genetic_algorithm.params import MAX_NUM_STOPS, MIN_NUM_STOPS
 
 class NetworkMetrics:
     def __init__(self, network: TransitNetwork):
@@ -15,6 +16,7 @@ class NetworkMetrics:
         self.num_routes = len(self.route_ids)
         self.coverage = network.coverage
         self.ridership_density_score = network.ridership_density_score
+        self.extreme_routes = network.count_extreme_routes(MIN_NUM_STOPS, MAX_NUM_STOPS)
     
     def similarity(self, other) -> Tuple[float, float, float]:
         if self.network_id == other.network_id:

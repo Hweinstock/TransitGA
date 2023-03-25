@@ -1,0 +1,13 @@
+name,lat,lon,color,tags
+Inner Richmond,37.780554,-122.472288,blue,
+Downtown,37.779743,-122.413583,red,['downtown']
+Mission,37.752252,-122.418125,green,
+West Portal,37.73803,-122.469079,purple,
+Embarcadero,37.792728,-122.397015,pink,
+Chinatown,37.794521,-122.404864,orange,
+Pacific Heights/Japantown,37.784542,-122.431252,cyan,
+Dogpatch,37.757698,-122.392687,lime,
+Haight and Ashbury,37.770224,-122.445421,grey,
+Outer Richmond,37.775891,-122.496533,teal,
+Irving/Judah-Sunset,37.761713,-122.47704,tomato,
+Marina District,37.799901,-122.436089,olive,

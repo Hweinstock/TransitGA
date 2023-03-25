@@ -2,7 +2,7 @@ from typing import List
 
 from transit_network.routes import GTFSRoute
 from transit_network.stops import Stop
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 from preprocessing.params import STOP_TRANSFER_THRESHOLD
 
 def flatten(lst: List[List[any]]) -> List[any]:

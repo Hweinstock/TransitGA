@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import shutil
 from copy import deepcopy
+from statistics import mean
 
 from transit_network.routes import SimpleRoute, GTFSRoute, simplify_route
 from transit_network.stops import Stop, map_ids_to_obj
@@ -11,8 +12,7 @@ from transit_network.shapes import get_shapes_from_df
 from genetic_algorithm.family import Family
 from preprocessing.determine_transfers import new_determine_transfers
 import preprocessing.gtfs_data as GTFS
-
-from root_logger import RootLogger
+from utility.root_logger import RootLogger
 
 class TransitNetwork:
 
@@ -30,7 +30,6 @@ class TransitNetwork:
         self.ridership = self.get_ridership()
         self.coverage = self.get_coverage()
         self.ridership_density_score = self.get_ridership_density_score()
-        # self.set_transfer_points()
 
     def get_copy(self):
         # Make this a deepcopy. 
@@ -65,7 +64,20 @@ class TransitNetwork:
         return sum([s.ridership for s in self.stops])
     
     def get_coverage(self) -> int:
-        return len(self.stops)
+        avg_transfers_per_stop = mean([len(s.routes) for s in self.stops])
+        return len(self.stops) * avg_transfers_per_stop
+
+    def count_extreme_routes(self, lower_bound: int, upper_bound: int) -> int:
+        count = 0
+        for t in self.trips:
+            n_stops = len(t.stops)
+            if n_stops > upper_bound:
+                count += n_stops - upper_bound
+            
+            if n_stops < lower_bound:
+                count += lower_bound - n_stops
+                
+        return count
 
     def get_ridership_density_score(self) -> float:
         score = 0
