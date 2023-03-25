@@ -71,3 +71,5 @@ lambda parameters:
 Example run:  
 `python3 main.py -p 10 -g 10 -v 2`  
 This command would run the model with a population size of 10 for 10 generations, with a console logging level of 2. 
+
+Next: run preprocessing. and outline data requirements. 
