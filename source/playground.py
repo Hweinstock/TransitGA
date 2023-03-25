@@ -7,16 +7,22 @@
 from simplify_gtfs import create_simplified_gtfs_SFMTA
 from utility.pickle import read_object_from_file
 from genetic_algorithm.zone_evaluator import ZoneEvaluator
+from visuals.plot_zones import plot_zones
+from visuals.graph_gtfs import generate_diagram
 """
 This script is purely for informal testing and 'playing' with new code. 
 """
 
-Net = read_object_from_file('../data/new_initial_net.pkl')
-lengths = [len(t.stops) for t in Net.trips if t.route_id != '25']
-max_l = max(lengths) 
-min_l = min(lengths)
-print(str([t for t in Net.trips if len(t.stops) == 93][0]))
-print(f'max length: {max_l}, min length: {min_l}')
+generate_diagram('../data/new_initial_net.zip', 'simplified_network.html')
+
+# plot_zones()
+
+# Net = read_object_from_file('../data/new_initial_net.pkl')
+# lengths = [len(t.stops) for t in Net.trips if t.route_id != '25']
+# max_l = max(lengths) 
+# min_l = min(lengths)
+# print(str([t for t in Net.trips if len(t.stops) == 93][0]))
+# print(f'max length: {max_l}, min length: {min_l}')
 # import csv 
 
 # headers = temp_all_zones[0].attributes
