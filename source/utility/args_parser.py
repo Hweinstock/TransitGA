@@ -83,4 +83,14 @@ def simplify_network_args() -> Namespace:
                    help="name of network", 
                    default="initial_network")
     
+    p.add_argument("-r", "--ridership_source", type=str, 
+                   help="path to ridership data (.csv) [route_id,route_name,total_ridership]", 
+                   default="../data/SF.csv")
+    
+    p.add_argument("-g", "--gtfs_source", type=str, 
+                   help="path to gtfs source data (.zip)", 
+                   default="../data/gtfs_data/SFMTA.zip")
+    
+    add_logging_arguments(p)
+    
     return (p.parse_args())

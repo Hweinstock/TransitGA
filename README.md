@@ -73,3 +73,25 @@ Example run:
 This command would run the model with a population size of 10 for 10 generations, with a console logging level of 2. 
 
 Next: run preprocessing. and outline data requirements. 
+### Network Simplification
+```
+usage: simplify_gtfs.py [-h] [-n NAME] [-r RIDERSHIP_SOURCE] [-g GTFS_SOURCE] [-v {0,1,2,3}] [-fv {0,1,2,3}]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -n NAME, --name NAME  name of network
+  -r RIDERSHIP_SOURCE, --ridership_source RIDERSHIP_SOURCE
+                        path to ridership data (.csv) [route_id,route_name,total_ridership]
+  -g GTFS_SOURCE, --gtfs_source GTFS_SOURCE
+                        path to gtfs source data (.zip)
+
+logging options:
+  -v {0,1,2,3}, --verbosity {0,1,2,3}
+                        increase output verbosity (default: 0)
+  -fv {0,1,2,3}, --file_verbosity {0,1,2,3}
+                        decrease output log file verbosity (default: 3)
+```
+The name parameter is what the final network should be called on export. 
+This run also assumes some data has been put in place:
+- `../data/ridership_data/SFMTA.xlsx`: should contain the SFMTA ridership data. 
+- `../data/gtfs_data/SFMTA.zip`: should contain the SFMTA gtfs network. 

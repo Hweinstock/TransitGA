@@ -9,7 +9,10 @@ from transit_network.routes import GTFSRoute
 class RawRidershipData(DataBase):
 
     def read_data(self) -> pd.DataFrame:
-        df = pd.read_excel(self.filepath)
+        if self.filetype == '.csv':
+            df = pd.read_csv(self.filepath, index_col=[0])
+        elif self.filetype == 'xlsx':
+            df = pd.read_excel(self.filepath)
         return df 
 
 class RidershipData(DataBase):
@@ -19,6 +22,9 @@ class RidershipData(DataBase):
         DataBase.__init__(self, raw_data.filepath, raw_data.city_name)
 
     def read_data(self) -> pd.DataFrame:
+        if self.filetype == '.csv':
+            return self.raw_data.read_data()
+        
         raw_df = self.raw_data.read_data()
         routes = raw_df['Route']
         total_ridership_data = []
@@ -37,7 +43,7 @@ class RidershipData(DataBase):
             total_ridership_data.append((route_id, route_name, total_ridership))
         new_data = pd.DataFrame(total_ridership_data, 
                     columns=['route_id', 'route_name', 'total_ridership'])
-
+        print(new_data.head(10))
         return new_data
     
     def get_matched_ids_from_gtfs(self, gtfs: GTFSData) -> List[GTFSRoute]:
