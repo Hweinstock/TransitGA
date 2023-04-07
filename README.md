@@ -2,7 +2,7 @@
 Application of evolutionary computing techniques to explore algorithmic optimization of transit networks. 
 
 ## Abstract 
-This project leverages artificial intelligence techniques from the field of evolutionary computing to investigate the task of optimizing the geometry of urban transit systems. Working with the San Francisco Municipal Transpiration Agency (SFMTA) bus network, we attempt to optimize the shape and organization of the routes using a custom genetic algorithm (GA). Due to the complexity of the problem, multiple iterations of the model are proposed to incorporate new ideas, and address shortcomings in previous versions. The results exemplify both the GAs ability to consistently find unexpected ways to maximize its objective function and the nuanced complexities in the problem of transit optimization. 
+This project leverages artificial intelligence techniques from the field of evolutionary computing to investigate the task of optimizing the geometry of urban transit systems. Working with the San Francisco Municipal Transporation Agency (SFMTA) bus network, we attempt to optimize the shape and organization of the routes using a custom genetic algorithm (GA). Due to the complexity of the problem, multiple iterations of the model are proposed to incorporate new ideas, and address shortcomings in previous versions. The results exemplify both the GAs ability to consistently find unexpected ways to maximize its objective function and the nuanced complexities in the problem of transit optimization. 
 <br>
 
 ## Basic Setup
