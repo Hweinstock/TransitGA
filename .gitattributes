@@ -1,2 +1,4 @@
 *.html linguist-detectable=false
 *.tex linguist-detectable=false
+*.bib linguist-detectable=false
+*.pdf linguist-detectable=false
