@@ -2,3 +2,5 @@
 *.tex linguist-detectable=false
 *.bib linguist-detectable=false
 *.pdf linguist-detectable=false
+./paper_source/* linguist_detectable=false
+./presentation_source/* linguist_detectable=false
